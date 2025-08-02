@@ -286,11 +286,23 @@
                         <a href="#tournaments" class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Turnuvalar</a>
                     </div>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <button id="loginBtn" class="text-gray-300 hover:text-white transition-colors font-medium">Giriş Yap</button>
-                    <button id="registerBtn" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
-                        Üye Ol
-                    </button>
+                <div class="flex items-center space-x-4" id="authButtons">
+                    <!-- Giriş yapmamış kullanıcılar için -->
+                    <div id="guestButtons">
+                        <button id="loginBtn" class="text-gray-300 hover:text-white transition-colors font-medium">Giriş Yap</button>
+                        <button id="registerBtn" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
+                            Üye Ol
+                        </button>
+                    </div>
+                    <!-- Giriş yapmış kullanıcılar için -->
+                    <div id="userButtons" class="hidden">
+                        <button id="profileBtn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
+                            <span id="userName">Profil</span>
+                        </button>
+                        <button id="logoutBtn" class="text-gray-300 hover:text-red-400 transition-colors font-medium ml-4">
+                            Çıkış Yap
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -720,14 +732,55 @@
             });
         });
 
+        // Kullanıcı durumunu kontrol et
+        function checkUserStatus() {
+            const token = localStorage.getItem('authToken');
+            const userData = localStorage.getItem('userData');
+            
+            const guestButtons = document.getElementById('guestButtons');
+            const userButtons = document.getElementById('userButtons');
+            const userName = document.getElementById('userName');
+            
+            if (token && userData) {
+                // Kullanıcı giriş yapmış
+                const user = JSON.parse(userData);
+                guestButtons.classList.add('hidden');
+                userButtons.classList.remove('hidden');
+                userName.textContent = user.first_name || 'Profil';
+            } else {
+                // Kullanıcı giriş yapmamış
+                guestButtons.classList.remove('hidden');
+                userButtons.classList.add('hidden');
+            }
+        }
+
+        // Buton event listener'ları
         const loginBtn = document.getElementById('loginBtn');
         const registerBtn = document.getElementById('registerBtn');
+        const profileBtn = document.getElementById('profileBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
 
         loginBtn.addEventListener('click', function(e) {
             window.location.href = "/login";
         });
+        
         registerBtn.addEventListener('click', function(e) {
             window.location.href = "/login";
+        });
+        
+        profileBtn.addEventListener('click', function(e) {
+            window.location.href = "/profile";
+        });
+        
+        logoutBtn.addEventListener('click', function(e) {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            window.location.reload();
+        });
+
+        // Sayfa yüklendiğinde kullanıcı durumunu kontrol et
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUserStatus();
         });
     </script>
 </body>

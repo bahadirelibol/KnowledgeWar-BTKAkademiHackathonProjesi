@@ -173,9 +173,9 @@ loginFormElement.addEventListener('submit', async function (e) {
         
         showNotification('Giriş başarılı!', 'success');
         
-        // Redirect to dashboard or main page
+        // Redirect to main page
         setTimeout(() => {
-            window.location.href = '/profile'; // You can change this to your desired page
+            window.location.href = '/';
         }, 1500);
         
     } catch (error) {
@@ -256,8 +256,8 @@ function checkAuthStatus() {
     const userData = localStorage.getItem('userData');
     
     if (token && userData) {
-        // User is logged in, redirect to dashboard
-        window.location.href = '/dashboard';
+        // User is logged in, redirect to main page
+        window.location.href = '/';
     }
 }
 
@@ -265,7 +265,7 @@ function checkAuthStatus() {
 function logout() {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
-    window.location.href = '/';
+    window.location.reload();
 }
 
 // Check auth status on page load
