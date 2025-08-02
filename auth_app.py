@@ -98,6 +98,10 @@ init_db()
 
 @app.route('/')
 def index():
+    return render_template('index.html')
+
+@app.route('/login')
+def loginIndex():
     return render_template('login-register.html')
 
 @app.route('/dashboard')

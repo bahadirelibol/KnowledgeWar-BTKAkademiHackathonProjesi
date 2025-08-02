@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS - AI Destekli Öğrenme Platformu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background: radial-gradient(ellipse at top, #1e1b4b 0%, #0f0f23 50%, #000000 100%);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .floating-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(1px);
+            animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .orb-1 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            top: 20%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            top: 60%;
+            right: -5%;
+            animation-delay: -2s;
+        }
+
+        .orb-3 {
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.1) 0%, transparent 70%);
+            bottom: 20%;
+            left: 70%;
+            animation-delay: -4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(15px) rotate(240deg); }
+        }
+
+        /* Glass Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Neon Effects */
+        .neon-text {
+            color: #00f5ff;
+            text-shadow: 0 0 5px #00f5ff, 0 0 10px #00f5ff, 0 0 15px #00f5ff;
+        }
+
+        .neon-glow {
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Hover Effects */
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 245, 255, 0.2);
+        }
+
+        /* Animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide-in-up {
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        .slide-in-left {
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.8s ease-out;
+        }
+
+        /* Button Pulse Effect */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+            }
+        }
+
+        .pulse-btn {
+            animation: pulse 2s infinite;
+        }
+
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+        }
+
+        /* Feature cards gradient borders */
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 24px;
+            padding: 2px;
+        }
+
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 24px;
+            padding: 2px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            -webkit-mask-composite: xor;
+        }
+
+        .gradient-border-inner {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 22px;
+            height: 100%;
+        }
+
+        /* Process Steps Animation */
+        @keyframes stepGlow {
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+            }
+            50% { 
+                box-shadow: 0 0 30px rgba(0, 245, 255, 0.6);
+            }
+        }
+
+        .step-glow {
+            animation: stepGlow 2s ease-in-out infinite;
+        }
+
+        /* Tournament Trophy Animation */
+        @keyframes trophyFloat {
+            0%, 100% { transform: translateY(0px) rotate(-5deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .trophy-float {
+            animation: trophyFloat 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-white">
+    <!-- Animated Background -->
+    <div class="stars" id="stars"></div>
+    <div class="floating-orb orb-1"></div>
+    <div class="floating-orb orb-2"></div>
+    <div class="floating-orb orb-3"></div>
+
+    <!-- Navigation -->
+    <nav class="relative z-20 glass-card border-b border-white/10 fixed w-full top-0">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="text-3xl font-black neon-text">NEXUS</div>
+                    <div class="hidden md:flex items-center space-x-8 ml-12">
+                        <a href="#home" class="text-white hover:text-cyan-400 transition-colors font-medium">Anasayfa</a>
+                        <a href="#how-it-works" class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Nasıl Çalışır</a>
+                        <a href="#features" class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Özellikler</a>
+                        <a href="#tournaments" class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Turnuvalar</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="loginBtn" class="text-gray-300 hover:text-white transition-colors font-medium">Giriş Yap</button>
+                    <button class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
+                        Üye Ol
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative z-10 min-h-screen flex items-center justify-center pt-20">
+        <div class="container mx-auto px-6 text-center">
+            <div class="slide-in-up">
+                <h1 class="text-5xl md:text-7xl font-black mb-8">
+                    <span class="neon-text">AI DESTEKLİ</span><br>
+                    <span class="gradient-text">ÖĞRENME PLATFORMU</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
+                    Öğrenmek istediğin konuyu söyle, yapay zeka BTK Akademi'den en uygun kursları bulup 
+                    <span class="neon-text">kişiselleştirilmiş yol haritası</span> oluştursun. 
+                    Sorularla pekiştir, turnuvalarda yarış!
+                </p>
+                <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                    <button class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-4 px-12 rounded-2xl neon-glow hover:scale-110 transition-all duration-300 pulse-btn text-lg">
+                        Öğrenmeye Başla
+                    </button>
+                    <button class="glass-card border border-white/20 text-white font-bold py-4 px-12 rounded-2xl hover:bg-white/10 transition-all duration-300 text-lg">
+                        Demo İzle
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="relative z-10 py-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-20 fade-in">
+                <h2 class="text-5xl md:text-6xl font-black neon-text mb-6">NASIL ÇALIŞIR?</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    4 basit adımda kişiselleştirilmiş öğrenme deneyimini başlat
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="gradient-border hover-lift fade-in step-glow">
+                    <div class="gradient-border-inner p-8 text-center">
+                        <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 neon-glow">
+                            <span class="text-2xl font-black">1</span>
+                        </div>
+                        <div class="text-4xl mb-4">🎯</div>
+                        <h3 class="text-xl font-bold neon-text mb-4">Hedefini Belirle</h3>
+                        <p class="text-gray-300 text-sm">
+                            "Python ileri seviye öğrenmek istiyorum" gibi hedefini sisteme gir
+                        </p>
+                    </div>
+                </div>
+
+                <div class="gradient-border hover-lift fade-in step-glow" style="animation-delay: 0.2s;">
+                    <div class="gradient-border-inner p-8 text-center">
+                        <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 neon-glow">
+                            <span class="text-2xl font-black">2</span>
+                        </div>
+                        <div class="text-4xl mb-4">🤖</div>
+                        <h3 class="text-xl font-bold neon-text mb-4">AI Kurs Önerir</h3>
+                        <p class="text-gray-300 text-sm">
+                            Gemini AI, BTK Akademi'den en uygun kursları bulup sana önerir
+                        </p>
+                    </div>
+                </div>
+
+                <div class="gradient-border hover-lift fade-in step-glow" style="animation-delay: 0.4s;">
+                    <div class="gradient-border-inner p-8 text-center">
+                        <div class="w-16 h-16 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 neon-glow">
+                            <span class="text-2xl font-black">3</span>
+                        </div>
+                        <div class="text-4xl mb-4">🗺️</div>
+                        <h3 class="text-xl font-bold neon-text mb-4">Yol Haritası</h3>
+                        <p class="text-gray-300 text-sm">
+                            Kişiselleştirilmiş öğrenme yol haritası ve adım adım rehber
+                        </p>
+                    </div>
+                </div>
+
+                <div class="gradient-border hover-lift fade-in step-glow" style="animation-delay: 0.6s;">
+                    <div class="gradient-border-inner p-8 text-center">
+                        <div class="w-16 h-16 bg-gradient-to-r from-pink-500 to-rose-600 rounded-full flex items-center justify-center mx-auto mb-6 neon-glow">
+                            <span class="text-2xl font-black">4</span>
+                        </div>
+                        <div class="text-4xl mb-4">⚔️</div>
+                        <h3 class="text-xl font-bold neon-text mb-4">Yarış ve Kazan</h3>
+                        <p class="text-gray-300 text-sm">
+                            Sorularla pekiştir, günlük turnuvalarda diğer öğrencilerle yarış
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Learning Process Details -->
+    <section class="relative z-10 py-20">
+        <div class="container mx-auto px-6">
+            <div class="glass-card rounded-3xl p-12 neon-glow">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div class="slide-in-left">
+                        <h2 class="text-4xl font-black neon-text mb-8">ÖĞRENME SÜRECİ</h2>
+                        <div class="space-y-8">
+                            <div class="flex items-start space-x-6">
+                                <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center neon-glow flex-shrink-0">
+                                    <span class="text-lg">📚</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold text-white mb-2">1. Ders İzle</h4>
+                                    <p class="text-gray-300">BTK Akademi'den seçilen kaliteli videolarla adım adım öğren</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-6">
+                                <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center neon-glow flex-shrink-0">
+                                    <span class="text-lg">❓</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold text-white mb-2">2. Soru Çöz</h4>
+                                    <p class="text-gray-300">Her dersten sonra konuyu pekiştirmek için özel sorular çöz</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-6">
+                                <div class="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-full flex items-center justify-center neon-glow flex-shrink-0">
+                                    <span class="text-lg">📊</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold text-white mb-2">3. İlerlemeni Takip Et</h4>
+                                    <p class="text-gray-300">Detaylı analitiklerle hangi konularda güçlü olduğunu gör</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-6">
+                                <div class="w-12 h-12 bg-gradient-to-r from-pink-500 to-rose-600 rounded-full flex items-center justify-center neon-glow flex-shrink-0">
+                                    <span class="text-lg">🎯</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold text-white mb-2">4. Sıradaki Ders</h4>
+                                    <p class="text-gray-300">Yol haritandaki bir sonraki derse geç ve öğrenmeye devam et</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-in-right">
+                        <div class="relative">
+                            <div class="w-full h-96 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl border border-blue-500/30 flex items-center justify-center">
+                                <div class="text-center">
+                                    <div class="text-8xl mb-4">🧠</div>
+                                    <h3 class="text-2xl font-bold neon-text">Akıllı Öğrenme</h3>
+                                    <p class="text-gray-300 mt-4">AI destekli kişiselleştirilmiş deneyim</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tournaments Section -->
+    <section id="tournaments" class="relative z-10 py-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-20 fade-in">
+                <h2 class="text-5xl md:text-6xl font-black neon-text mb-6">
+                    <span class="trophy-float inline-block">🏆</span> TURNUVALAR
+                </h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Her gün düzenlenen turnuvalarda diğer öğrencilerle yarış, sıralamalarda yüksel!
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="gradient-border hover-lift fade-in">
+                    <div class="gradient-border-inner p-8 text-center">
+                        <div class="text-6xl mb-6">⚡</div>
+                        <h3 class="text-2xl font-bold neon-text mb-4">Hızlı Cevap</h3>
+                        <p class="text-gray-300 mb-6">
+                            Soruları en hızlı ve doğru şekilde cevaplayarak puan kazan
+                        </p>
+                        <div class="bg-yellow-500/20 rounded-lg p-4 border border-yellow-500/30">
+                            <div class="text-sm text-yellow-300">Günlük Ödül</div>
+                            <div class="text-2xl font-bold text-yellow-400">100 XP</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gradient-border hover-lift fade-in">
+                    <div class="gradient-border-inner p-8 text-center">
+                        <div class="text-6xl mb-6">🧠</div>
+                        <h3 class="text-2xl font-bold neon-text mb-4">Bilgi Yarışması</h3>
+                        <p class="text-gray-300 mb-6">
+                            Öğrendiğin konularda derinlemesine sorularla test ol
+                        </p>
+                        <div class="bg-blue-500/20 rounded-lg p-4 border border-blue-500/30">
+                            <div class="text-sm text-blue-300">Haftalık Ödül</div>
+                            <div class="text-2xl font-bold text-blue-400">500 XP</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gradient-border hover-lift fade-in">
+                    <div class="gradient-border-inner p-8 text-center">
+                        <div class="text-6xl mb-6">👥</div>
+                        <h3 class="text-2xl font-bold neon-text mb-4">Takım Savaşı</h3>
+                        <p class="text-gray-300 mb-6">
+                            Takım halinde diğer gruplarla rekabet et ve birlikte kazan
+                        </p>
+                        <div class="bg-purple-500/20 rounded-lg p-4 border border-purple-500/30">
+                            <div class="text-sm text-purple-300">Özel Ödül</div>
+                            <div class="text-2xl font-bold text-purple-400">1000 XP</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="relative z-10 py-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-20 fade-in">
+                <h2 class="text-5xl md:text-6xl font-black neon-text mb-6">ÖZELLİKLER</h2>
+                <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+                    NEXUS'u diğer platformlardan ayıran özel özellikler
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="gradient-border hover-lift fade-in">
+                    <div class="gradient-border-inner p-8">
+                        <div class="text-6xl mb-6">🤖</div>
+                        <h3 class="text-2xl font-bold neon-text mb-4">Gemini AI Entegrasyonu</h3>
+                        <p class="text-gray-300 leading-relaxed">
+                            Google'ın Gemini AI'sı ile BTK Akademi kurslarından en uygun içerikleri bulur ve önerir.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="gradient-border hover-lift fade-in">
+                    <div class="gradient-border-inner p-8">
+                        <div class="text-6xl mb-6">🗺️</div>
+                        <h3 class="text-2xl font-bold neon-text mb-4">Kişisel Yol Haritası</h3>
+                        <p class="text-gray-300 leading-relaxed">
+                            Seviyene ve hedeflerine göre özel olarak tasarlanmış adım adım öğrenme planı.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="gradient-border hover-lift fade-in">
+                    <div class="gradient-border-inner p-8">
+                        <div class="text-6xl mb-6">❓</div>
+                        <h3 class="text-2xl font-bold neon-text mb-4">Akıllı Soru Sistemi</h3>
+                        <p class="text-gray-300 leading-relaxed">
+                            Her dersten sonra konuyu pekiştiren, seviyene uygun otomatik soru üretimi.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="gradient-border hover-lift fade-in">
+                    <div class="gradient-border-inner p-8">
+                        <div class="text-6xl mb-6">⚔️</div>
+                        <h3 class="text-2xl font-bold neon-text mb-4">Günlük Turnuvalar</h3>
+                        <p class="text-gray-300 leading-relaxed">
+                            Her gün farklı konularda düzenlenen turnuvalarla eğlenceli rekabet ortamı.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="gradient-border hover-lift fade-in">
+                    <div class="gradient-border-inner p-8">
+                        <div class="text-6xl mb-6">📊</div>
+                        <h3 class="text-2xl font-bold neon-text mb-4">Detaylı Analitik</h3>
+                        <p class="text-gray-300 leading-relaxed">
+                            İlerleme takibi, güçlü/zayıf yönlerin analizi ve kişiselleştirilmiş öneriler.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="gradient-border hover-lift fade-in">
+                    <div class="gradient-border-inner p-8">
+                        <div class="text-6xl mb-6">🏆</div>
+                        <h3 class="text-2xl font-bold neon-text mb-4">Başarı Sistemi</h3>
+                        <p class="text-gray-300 leading-relaxed">
+                            Rozetler, seviyeler ve liderlik tabloları ile motive edici ödül sistemi.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="relative z-10 py-20">
+        <div class="container mx-auto px-6">
+            <div class="glass-card rounded-3xl p-12 neon-glow fade-in">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                    <div>
+                        <div class="text-4xl md:text-6xl font-black neon-text mb-2">10K+</div>
+                        <div class="text-gray-400 text-lg">Aktif Öğrenci</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl md:text-6xl font-black neon-text mb-2">500+</div>
+                        <div class="text-gray-400 text-lg">BTK Kursu</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl md:text-6xl font-black neon-text mb-2">95%</div>
+                        <div class="text-gray-400 text-lg">Başarı Oranı</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl md:text-6xl font-black neon-text mb-2">24/7</div>
+                        <div class="text-gray-400 text-lg">AI Destek</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="relative z-10 py-20">
+        <div class="container mx-auto px-6 text-center">
+            <div class="glass-card rounded-3xl p-16 neon-glow fade-in">
+                <h2 class="text-5xl md:text-6xl font-black neon-text mb-8">HEMEN BAŞLA!</h2>
+                <p class="text-2xl text-gray-300 mb-12 max-w-3xl mx-auto">
+                    Öğrenmek istediğin konuyu söyle, yapay zeka sana özel yol haritası çizsin. 
+                    Günlük turnuvalarda yarış ve zirvede yer al!
+                </p>
+                <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                    <button class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-6 px-16 rounded-2xl neon-glow hover:scale-110 transition-all duration-300 pulse-btn text-xl">
+                        Ücretsiz Başla
+                    </button>
+                    <button class="glass-card border border-white/20 text-white font-bold py-6 px-16 rounded-2xl hover:bg-white/10 transition-all duration-300 text-xl">
+                        Demo İzle
+                    </button>
+                </div>
+                <div class="mt-8 text-gray-400 text-sm">
+                    ✨ Ücretsiz hesap oluştur • 🚀 Hemen öğrenmeye başla • 🏆 Turnuvalara katıl
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative z-10 py-12 border-t border-white/10">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-3xl font-black neon-text mb-4 md:mb-0">NEXUS</div>
+                <div class="flex space-x-8">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Gizlilik</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Kullanım Şartları</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Destek</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">İletişim</a>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-white/10 text-center text-gray-400">
+                <p>&copy; 2025 NEXUS. AI Destekli Öğrenme Platformu. Tüm hakları saklıdır.</p>
+                <p class="mt-2 text-sm">BTK Akademi entegrasyonu ile güçlendirilmiştir.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Create animated stars
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const numberOfStars = 100;
+
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Intersection Observer for fade-in animations
+        function initScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            initScrollAnimations();
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add some interactive effects
+        document.addEventListener('mousemove', (e) => {
+            const orbs = document.querySelectorAll('.floating-orb');
+            orbs.forEach((orb, index) => {
+                const speed = (index + 1) * 0.0001;
+                const x = e.clientX * speed;
+                const y = e.clientY * speed;
+                orb.style.transform += ` translate(${x}px, ${y}px)`;
+            });
+        });
+
+        const loginBtn = document.getElementById('loginBtn');
+        loginBtn.addEventListener('click', function(e) {
+            window.location.href = "/login";
+        });
+    </script>
+</body>
+
+</html>
