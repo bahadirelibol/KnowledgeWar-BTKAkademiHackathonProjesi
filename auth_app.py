@@ -16,6 +16,7 @@ def init_db():
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     
+    # Users tablosu
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,6 +26,67 @@ def init_db():
             password_hash TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             last_login TIMESTAMP
+        )
+    ''')
+    
+    # Turnuvalar tablosu
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS tournaments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            content TEXT,
+            start_time DATETIME NOT NULL,
+            end_time DATETIME NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            status TEXT DEFAULT 'active'
+        )
+    ''')
+    
+    # Sorular tablosu
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS questions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tournament_id INTEGER NOT NULL,
+            question TEXT NOT NULL,
+            option_a TEXT NOT NULL,
+            option_b TEXT NOT NULL,
+            option_c TEXT NOT NULL,
+            option_d TEXT NOT NULL,
+            correct_option TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (tournament_id) REFERENCES tournaments(id)
+        )
+    ''')
+    
+    # Turnuva katılımcıları tablosu
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS tournament_participants (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            tournament_id INTEGER NOT NULL,
+            joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            completed_at TIMESTAMP NULL,
+            total_score INTEGER DEFAULT 0,
+            total_questions INTEGER DEFAULT 0,
+            correct_answers INTEGER DEFAULT 0,
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            FOREIGN KEY (tournament_id) REFERENCES tournaments(id)
+        )
+    ''')
+    
+    # Kullanıcı cevapları tablosu
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_answers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            tournament_id INTEGER NOT NULL,
+            question_id INTEGER NOT NULL,
+            selected_option TEXT NOT NULL,
+            is_correct BOOLEAN NOT NULL,
+            answer_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            FOREIGN KEY (tournament_id) REFERENCES tournaments(id),
+            FOREIGN KEY (question_id) REFERENCES questions(id)
         )
     ''')
     
