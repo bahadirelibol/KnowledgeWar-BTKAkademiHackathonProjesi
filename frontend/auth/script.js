@@ -89,6 +89,7 @@ forms.forEach(form => {
                     Processing...
                 `;
         submitBtn.disabled = true;
+        window.location.href = "../profile/index.html";
 
         // Simulate API call
         setTimeout(() => {
