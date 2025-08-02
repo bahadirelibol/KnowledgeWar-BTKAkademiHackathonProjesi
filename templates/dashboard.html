@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - BTK Auth</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="min-h-screen text-white bg-gray-900">
+    <!-- Animated Background -->
+    <div class="stars" id="stars"></div>
+    <div class="floating-orb orb-1"></div>
+    <div class="floating-orb orb-2"></div>
+    <div class="floating-orb orb-3"></div>
+    
+    <!-- Navigation -->
+    <nav class="relative z-10 bg-black/20 backdrop-blur-lg border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold neon-text">BTK Auth</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="userName" class="text-gray-300"></span>
+                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-colors">
+                        Çıkış Yap
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- User Profile Card -->
+            <div class="lg:col-span-1">
+                <div class="glass-card rounded-2xl p-6 neon-glow">
+                    <div class="text-center mb-6">
+                        <div class="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span id="userInitials" class="text-2xl font-bold text-white"></span>
+                        </div>
+                        <h2 id="userFullName" class="text-xl font-bold neon-text"></h2>
+                        <p id="userEmail" class="text-gray-400"></p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Üye Olma Tarihi:</span>
+                            <span id="userCreatedAt" class="text-white"></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-400">Son Giriş:</span>
+                            <span id="userLastLogin" class="text-white"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Dashboard -->
+            <div class="lg:col-span-2">
+                <div class="glass-card rounded-2xl p-6 neon-glow">
+                    <h2 class="text-2xl font-bold neon-text mb-6">Hoş Geldiniz! 🎉</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl p-6 border border-blue-500/30">
+                            <h3 class="text-lg font-semibold mb-2">Profil Bilgileri</h3>
+                            <p class="text-gray-400 text-sm">Kişisel bilgilerinizi görüntüleyin ve güncelleyin</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-green-600/20 to-blue-600/20 rounded-xl p-6 border border-green-500/30">
+                            <h3 class="text-lg font-semibold mb-2">Güvenlik</h3>
+                            <p class="text-gray-400 text-sm">Şifrenizi değiştirin ve güvenlik ayarlarınızı yönetin</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-xl p-6 border border-purple-500/30">
+                            <h3 class="text-lg font-semibold mb-2">Aktivite</h3>
+                            <p class="text-gray-400 text-sm">Hesap aktivitelerinizi ve giriş geçmişinizi görüntüleyin</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-orange-600/20 to-red-600/20 rounded-xl p-6 border border-orange-500/30">
+                            <h3 class="text-lg font-semibold mb-2">Ayarlar</h3>
+                            <p class="text-gray-400 text-sm">Hesap ayarlarınızı ve tercihlerinizi yönetin</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <p class="text-gray-400 mb-4">Bu dashboard henüz geliştirme aşamasındadır.</p>
+                        <button onclick="logout()" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg transition-colors">
+                            Çıkış Yap
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const userData = localStorage.getItem('userData');
+            
+            if (!token || !userData) {
+                window.location.href = '/';
+                return;
+            }
+            
+            // Load user data
+            const user = JSON.parse(userData);
+            
+            // Update UI
+            document.getElementById('userName').textContent = `${user.first_name} ${user.last_name}`;
+            document.getElementById('userFullName').textContent = `${user.first_name} ${user.last_name}`;
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userInitials').textContent = `${user.first_name[0]}${user.last_name[0]}`;
+            
+            // Load additional user data from API
+            loadUserProfile();
+        }
+        
+        async function loadUserProfile() {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const user = data.user;
+                    
+                    // Format dates
+                    const createdDate = new Date(user.created_at).toLocaleDateString('tr-TR');
+                    const lastLoginDate = user.last_login ? new Date(user.last_login).toLocaleDateString('tr-TR') : 'İlk giriş';
+                    
+                    document.getElementById('userCreatedAt').textContent = createdDate;
+                    document.getElementById('userLastLogin').textContent = lastLoginDate;
+                }
+            } catch (error) {
+                console.error('Profil yüklenirken hata:', error);
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            window.location.href = '/';
+        }
+        
+        // Check auth on page load
+        document.addEventListener('DOMContentLoaded', checkAuth);
+    </script>
+</body>
+</html> 
