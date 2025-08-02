@@ -175,7 +175,7 @@ loginFormElement.addEventListener('submit', async function (e) {
         
         // Redirect to dashboard or main page
         setTimeout(() => {
-            window.location.href = '/dashboard'; // You can change this to your desired page
+            window.location.href = '/profile'; // You can change this to your desired page
         }, 1500);
         
     } catch (error) {

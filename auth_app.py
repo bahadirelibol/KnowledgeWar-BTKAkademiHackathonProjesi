@@ -104,9 +104,9 @@ def index():
 def loginIndex():
     return render_template('login-register.html')
 
-@app.route('/dashboard')
-def dashboard():
-    return render_template('dashboard.html')
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
 
 @app.route('/api/register', methods=['POST'])
 def register():

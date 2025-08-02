@@ -288,7 +288,7 @@
                 </div>
                 <div class="flex items-center space-x-4">
                     <button id="loginBtn" class="text-gray-300 hover:text-white transition-colors font-medium">Giriş Yap</button>
-                    <button class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
+                    <button id="registerBtn" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
                         Üye Ol
                     </button>
                 </div>
@@ -721,7 +721,12 @@
         });
 
         const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+
         loginBtn.addEventListener('click', function(e) {
+            window.location.href = "/login";
+        });
+        registerBtn.addEventListener('click', function(e) {
             window.location.href = "/login";
         });
     </script>
