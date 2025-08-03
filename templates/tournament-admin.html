@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turnuva Admin Paneli - BTK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #00f5ff, #ff00f5);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #00ccff, #ff00cc);
+        }
+        
+        /* Ensure body can scroll */
+        html, body {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        /* Cosmic button styles */
+        .cosmic-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white !important;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .cosmic-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+            color: white !important;
+        }
+
+        .cosmic-btn:active {
+            transform: translateY(0);
+        }
+
+        .cosmic-btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .cosmic-btn-danger:hover {
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+        }
+
+        .cosmic-btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .cosmic-btn-success:hover {
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6);
+        }
+
+        /* Pulse button animation */
+        .pulse-btn {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            }
+            50% {
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.8), 0 0 0 10px rgba(102, 126, 234, 0.1);
+            }
+            100% {
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            }
+        }
+
+        /* Cosmic background */
+        .cosmic-bg {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+        }
+
+        /* Glass card styles */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Cosmic header */
+        .cosmic-header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Input glow effect */
+        .input-glow:focus {
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Cosmic colors */
+        .text-cosmic-blue {
+            color: #667eea;
+        }
+
+        .text-cosmic-green {
+            color: #10b981;
+        }
+
+        .text-cosmic-red {
+            color: #ef4444;
+        }
+
+        .text-cosmic-yellow {
+            color: #f59e0b;
+        }
+
+        .bg-cosmic-blue {
+            background-color: #667eea;
+        }
+
+        /* Progress bar */
+        .cosmic-progress-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        /* Question card */
+        .question-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        /* Option styles */
+        .option-correct {
+            border-color: #10b981 !important;
+            background: rgba(16, 185, 129, 0.1) !important;
+        }
+
+        .option-wrong {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.1) !important;
+        }
+    </style>
+</head>
+<body class="cosmic-bg min-h-screen overflow-y-auto">
+    <!-- Header -->
+    <header class="cosmic-header">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">
+                        🚀 BTK Akademi
+                    </a>
+                    <span class="text-gray-400">|</span>
+                    <span class="text-xl font-semibold text-cosmic-blue">🏆 Turnuva Admin Paneli</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/tournament" class="text-gray-300 hover:text-white transition-colors">
+                        ← Turnuva Sayfasına Dön
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12 min-h-screen">
+        <div class="max-w-6xl mx-auto pb-12">
+            <!-- Page Title -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent mb-4">
+                    🎯 Turnuva Yönetim Paneli
+                </h1>
+                <p class="text-gray-400 text-lg">Gemini AI ile otomatik soru üretimi ve turnuva yönetimi arayüzü yapıyorum</p>
+            </div>
+
+            <!-- Form Container -->
+            <div id="formContainer" class="glass-card p-8 rounded-3xl mb-8">
+                <form id="tournamentForm" class="space-y-8">
+                    <!-- Tournament Title -->
+                    <div class="space-y-4">
+                        <label class="block text-xl font-semibold text-white">
+                            🏆 Turnuva Başlığı
+                        </label>
+                        <input type="text" name="title" required 
+                               class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400"
+                               placeholder="Örnek: Python Data Structures Mastery Challenge">
+                    </div>
+
+                    <!-- Tournament Content -->
+                    <div class="space-y-4">
+                        <label class="block text-xl font-semibold text-white">
+                            📝 Turnuva İçeriği (Soru Üretimi İçin)
+                        </label>
+                        <textarea name="content" required rows="4"
+                                  class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400"
+                                  placeholder="Örnek: Python programlama dili, değişkenler, döngüler, fonksiyonlar, listeler, sözlükler, dosya işlemleri, hata yönetimi, nesne yönelimli programlama, modüller ve paketler hakkında sorular hazırla"></textarea>
+                        <p class="text-sm text-gray-400">Bu alana yazdığınız konulara göre AI sorular üretecektir.</p>
+                    </div>
+
+                    <!-- Date and Time Selection -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <label class="block text-xl font-semibold text-white">
+                                🕐 Başlangıç Zamanı
+                            </label>
+                            <input type="datetime-local" name="start_time" required 
+                                   class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400">
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <label class="block text-xl font-semibold text-white">
+                                🕐 Bitiş Zamanı
+                            </label>
+                            <input type="datetime-local" name="end_time" required 
+                                   class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400">
+                        </div>
+                    </div>
+
+                    <!-- Generate Questions Button -->
+                    <div class="text-center pt-6">
+                        <button type="submit" 
+                                class="cosmic-btn text-xl px-12 py-4 pulse-btn">
+                            🤖 AI ile Soru Üret
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Loading Container -->
+            <div id="loadingContainer" class="glass-card p-8 rounded-3xl hidden">
+                <div class="text-center space-y-6">
+                    <div class="text-3xl">🚀</div>
+                    <h3 class="text-2xl font-bold text-white">Sorular Üretiliyor...</h3>
+                    <p class="text-gray-400">Gemini AI en uygun soruları hazırlıyor</p>
+                    
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-gray-700 rounded-full h-3">
+                        <div class="cosmic-progress-fill h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    
+                    <p class="text-sm text-gray-500">Bu işlem birkaç saniye sürebilir</p>
+                </div>
+            </div>
+
+            <!-- Questions Container -->
+            <div id="questionsContainer" class="glass-card p-8 rounded-3xl hidden">
+                <div class="space-y-8">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-2xl font-bold text-white">📝 Üretilen Sorular</h3>
+                        <div class="text-sm text-gray-400">
+                            <span id="questionCount">0</span> soru üretildi
+                        </div>
+                    </div>
+
+                    <div id="questionsList" class="space-y-6">
+                        <!-- Questions will be inserted here -->
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                        <button id="saveTournamentBtn" 
+                                class="cosmic-btn cosmic-btn-success text-lg px-8 py-3 flex-1">
+                            💾 Turnuvayı Kaydet
+                        </button>
+                        <button onclick="resetForm()" 
+                                class="cosmic-btn cosmic-btn-danger text-lg px-8 py-3 flex-1">
+                            🔄 Yeni Turnuva
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Existing Tournaments -->
+            <div class="glass-card p-8 rounded-3xl mt-8">
+                <h3 class="text-2xl font-bold text-white mb-6">📋 Mevcut Turnuvalar</h3>
+                <div id="existingTournaments" class="space-y-4">
+                    <!-- Existing tournaments will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Form submission
+        document.getElementById('tournamentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await generateQuestions();
+        });
+
+        // Save tournament button
+        document.getElementById('saveTournamentBtn').addEventListener('click', async () => {
+            await saveTournament();
+        });
+
+        async function generateQuestions() {
+            const form = document.getElementById('tournamentForm');
+            const formData = new FormData(form);
+            
+            const data = {
+                title: formData.get('title'),
+                content: formData.get('content'),
+                start_time: formData.get('start_time'),
+                end_time: formData.get('end_time')
+            };
+            
+            console.log('Sending data:', data);
+            
+            // Show loading
+            document.getElementById('formContainer').classList.add('hidden');
+            document.getElementById('loadingContainer').classList.remove('hidden');
+            
+            // Simulate loading animation
+            const progressBar = document.querySelector('#loadingContainer .cosmic-progress-fill');
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = progress + '%';
+                if (progress >= 90) {
+                    clearInterval(interval);
+                }
+            }, 100);
+            
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    throw new Error('Giriş yapmanız gerekiyor');
+                }
+                
+                console.log('Making API request...');
+                const response = await fetch('/api/generate-questions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                console.log('Response status:', response.status);
+                const result = await response.json();
+                console.log('Response data:', result);
+                
+                if (result.success) {
+                    showQuestions(result.questions, data);
+                } else {
+                    throw new Error(result.error || 'Bir hata oluştu');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Hide loading and show form again
+                document.getElementById('loadingContainer').classList.add('hidden');
+                document.getElementById('formContainer').classList.remove('hidden');
+                
+                // Show error message
+                const errorMessage = error.message || 'Bilinmeyen bir hata oluştu';
+                alert('Hata: ' + errorMessage);
+            }
+        }
+
+        function showQuestions(questions, tournamentData) {
+            console.log('Showing questions:', questions);
+            
+            // Complete the progress bar
+            const progressBar = document.querySelector('#loadingContainer .cosmic-progress-fill');
+            progressBar.style.width = '100%';
+            
+            // Hide loading and show questions
+            setTimeout(() => {
+                document.getElementById('loadingContainer').classList.add('hidden');
+                document.getElementById('questionsContainer').classList.remove('hidden');
+                
+                // Update question count
+                document.getElementById('questionCount').textContent = questions.length;
+                
+                // Show questions
+                const questionsList = document.getElementById('questionsList');
+                questionsList.innerHTML = '';
+                
+                questions.forEach((question, index) => {
+                    const questionCard = document.createElement('div');
+                    questionCard.className = 'question-card rounded-xl p-6';
+                    questionCard.innerHTML = `
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-lg font-bold text-white">Soru ${index + 1}</h4>
+                            <button onclick="editQuestion(${index})" class="text-cosmic-blue hover:text-white transition-colors">
+                                ✏️ Düzenle
+                            </button>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-300 mb-2">Soru Metni:</label>
+                                <textarea class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
+                                          rows="3" data-question="${index}">${question.question}</textarea>
+                            </div>
+                            
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-300 mb-2">A Şıkkı:</label>
+                                    <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
+                                           value="${question.options[0]}" data-option="${index}-0">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-300 mb-2">B Şıkkı:</label>
+                                    <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
+                                           value="${question.options[1]}" data-option="${index}-1">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-300 mb-2">C Şıkkı:</label>
+                                    <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
+                                           value="${question.options[2]}" data-option="${index}-2">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-300 mb-2">D Şıkkı:</label>
+                                    <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
+                                           value="${question.options[3]}" data-option="${index}-3">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-300 mb-2">Doğru Şık:</label>
+                                <select class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
+                                        data-correct="${index}">
+                                    <option value="A" ${question.correct_option === 'A' ? 'selected' : ''}>A</option>
+                                    <option value="B" ${question.correct_option === 'B' ? 'selected' : ''}>B</option>
+                                    <option value="C" ${question.correct_option === 'C' ? 'selected' : ''}>C</option>
+                                    <option value="D" ${question.correct_option === 'D' ? 'selected' : ''}>D</option>
+                                </select>
+                            </div>
+                        </div>
+                    `;
+                    questionsList.appendChild(questionCard);
+                });
+                
+                // Store tournament data for later use
+                window.currentTournament = {
+                    ...tournamentData,
+                    questions: questions
+                };
+                
+            }, 500);
+        }
+
+        async function saveTournament() {
+            if (!window.currentTournament) {
+                alert('Önce sorular üretin');
+                return;
+            }
+
+            // Collect updated questions
+            const updatedQuestions = [];
+            const questionCount = window.currentTournament.questions.length;
+            
+            for (let i = 0; i < questionCount; i++) {
+                const questionText = document.querySelector(`[data-question="${i}"]`).value;
+                const options = [
+                    document.querySelector(`[data-option="${i}-0"]`).value,
+                    document.querySelector(`[data-option="${i}-1"]`).value,
+                    document.querySelector(`[data-option="${i}-2"]`).value,
+                    document.querySelector(`[data-option="${i}-3"]`).value
+                ];
+                const correctOption = document.querySelector(`[data-correct="${i}"]`).value;
+                
+                updatedQuestions.push({
+                    question: questionText,
+                    options: options,
+                    correct_option: correctOption
+                });
+            }
+
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    throw new Error('Giriş yapmanız gerekiyor');
+                }
+
+                const response = await fetch('/api/save-tournament', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        title: window.currentTournament.title,
+                        content: window.currentTournament.content,
+                        start_time: window.currentTournament.start_time,
+                        end_time: window.currentTournament.end_time,
+                        questions: updatedQuestions
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Turnuva başarıyla kaydedildi!');
+                    loadExistingTournaments();
+                    resetForm();
+                } else {
+                    throw new Error(result.error || 'Turnuva kaydedilirken hata oluştu');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Hata: ' + error.message);
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('questionsContainer').classList.add('hidden');
+            document.getElementById('formContainer').classList.remove('hidden');
+            document.getElementById('tournamentForm').reset();
+            document.getElementById('saveTournamentBtn').textContent = '💾 Turnuvayı Kaydet';
+            window.currentTournament = null;
+        }
+
+        function displayQuestions(questions) {
+            // Update question count
+            document.getElementById('questionCount').textContent = questions.length;
+            
+            // Show questions
+            const questionsList = document.getElementById('questionsList');
+            questionsList.innerHTML = '';
+            
+            questions.forEach((question, index) => {
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card rounded-xl p-6';
+                questionCard.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-bold text-white">Soru ${index + 1}</h4>
+                        <button onclick="editQuestion(${index})" class="text-cosmic-blue hover:text-white transition-colors">
+                            ✏️ Düzenle
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">Soru Metni:</label>
+                            <textarea class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
+                                      rows="3" data-question="${index}">${question.question}</textarea>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-300 mb-2">A Şıkkı:</label>
+                                <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
+                                       value="${question.options[0]}" data-option="${index}-0">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-300 mb-2">B Şıkkı:</label>
+                                <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
+                                       value="${question.options[1]}" data-option="${index}-1">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-300 mb-2">C Şıkkı:</label>
+                                <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
+                                       value="${question.options[2]}" data-option="${index}-2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-300 mb-2">D Şıkkı:</label>
+                                <input type="text" class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
+                                       value="${question.options[3]}" data-option="${index}-3">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">Doğru Şık:</label>
+                            <select class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white input-glow focus:outline-none focus:border-cyan-400" 
+                                    data-correct="${index}">
+                                <option value="A" ${question.correct_option === 'A' ? 'selected' : ''}>A</option>
+                                <option value="B" ${question.correct_option === 'B' ? 'selected' : ''}>B</option>
+                                <option value="C" ${question.correct_option === 'C' ? 'selected' : ''}>C</option>
+                                <option value="D" ${question.correct_option === 'D' ? 'selected' : ''}>D</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+                questionsList.appendChild(questionCard);
+            });
+            
+            // Store tournament data for later use
+            window.currentTournament = {
+                ...window.currentTournament,
+                questions: questions
+            };
+        }
+
+        async function loadExistingTournaments() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) return;
+
+                const response = await fetch('/api/tournaments', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const container = document.getElementById('existingTournaments');
+                    container.innerHTML = '';
+                    
+                    result.tournaments.forEach(tournament => {
+                        const tournamentCard = document.createElement('div');
+                        tournamentCard.className = 'question-card rounded-xl p-6';
+                        tournamentCard.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-lg font-bold text-white">${tournament.title}</h4>
+                                    <p class="text-gray-400 text-sm">${tournament.content}</p>
+                                    <p class="text-gray-500 text-xs">Başlangıç: ${new Date(tournament.start_time).toLocaleString()}</p>
+                                    <p class="text-gray-500 text-xs">Bitiş: ${new Date(tournament.end_time).toLocaleString()}</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-cosmic-green font-bold">${tournament.status}</div>
+                                    <div class="flex gap-2 mt-2">
+                                        <button onclick="editTournament(${tournament.id})" class="text-cosmic-blue hover:text-white transition-colors text-sm">
+                                            ✏️ Düzenle
+                                        </button>
+                                        <button onclick="deleteTournament(${tournament.id})" class="text-cosmic-red hover:text-white transition-colors text-sm">
+                                            🗑️ Sil
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(tournamentCard);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading tournaments:', error);
+            }
+        }
+
+        async function editTournament(tournamentId) {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    throw new Error('Giriş yapmanız gerekiyor');
+                }
+
+                const response = await fetch(`/api/tournaments/${tournamentId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const tournament = result.tournament;
+                    
+                    // Form alanlarını doldur
+                    document.querySelector('input[name="title"]').value = tournament.title;
+                    document.querySelector('textarea[name="content"]').value = tournament.content;
+                    document.querySelector('input[name="start_time"]').value = tournament.start_time.replace('Z', '');
+                    document.querySelector('input[name="end_time"]').value = tournament.end_time.replace('Z', '');
+                    
+                    // Soruları yükle
+                    window.currentTournament = {
+                        id: tournament.id,
+                        title: tournament.title,
+                        content: tournament.content,
+                        start_time: tournament.start_time,
+                        end_time: tournament.end_time,
+                        questions: tournament.questions || []
+                    };
+                    
+                    displayQuestions(tournament.questions);
+                    
+                    // Buton metnini güncelle
+                    document.getElementById('saveTournamentBtn').textContent = '💾 Turnuvayı Güncelle';
+                    
+                    // Formu gizle, soruları göster
+                    document.getElementById('formContainer').classList.add('hidden');
+                    document.getElementById('questionsContainer').classList.remove('hidden');
+                    
+                } else {
+                    throw new Error(result.error || 'Turnuva bilgileri alınırken hata oluştu');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Hata: ' + error.message);
+            }
+        }
+
+        async function deleteTournament(tournamentId) {
+            if (!confirm('Bu turnuvayı silmek istediğinizden emin misiniz?')) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    throw new Error('Giriş yapmanız gerekiyor');
+                }
+
+                const response = await fetch(`/api/tournaments/${tournamentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Turnuva silindi!');
+                    loadExistingTournaments();
+                } else {
+                    throw new Error(result.error || 'Turnuva silinirken hata oluştu');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Hata: ' + error.message);
+            }
+        }
+
+        // Check authentication and load existing tournaments on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                alert('Bu sayfayı kullanmak için giriş yapmanız gerekiyor');
+                window.location.href = '/login';
+            } else {
+                loadExistingTournaments();
+            }
+        });
+    </script>
+</body>
+</html> 

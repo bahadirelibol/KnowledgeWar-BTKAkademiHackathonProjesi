@@ -286,22 +286,34 @@
                         <a href="#tournaments" class="text-gray-300 hover:text-cyan-400 transition-colors font-medium">Turnuvalar</a>
                     </div>
                 </div>
-                <div class="flex items-center space-x-4" id="authButtons">
-                    <!-- Giriş yapmamış kullanıcılar için -->
-                    <div id="guestButtons">
-                        <button id="loginBtn" class="text-gray-300 hover:text-white transition-colors font-medium">Giriş Yap</button>
-                        <button id="registerBtn" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
-                            Üye Ol
+                <div class="flex items-center space-x-4">
+                    <!-- Navigation Buttons -->
+                    <div class="flex items-center space-x-4 mr-6">
+                        <button id="roadmapBtn" class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
+                            🗺️ Yol Haritası
+                        </button>
+                        <button id="tournamentBtn" class="bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
+                            ⚔️ Turnuvalar
                         </button>
                     </div>
-                    <!-- Giriş yapmış kullanıcılar için -->
-                    <div id="userButtons" class="hidden">
-                        <button id="profileBtn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
-                            <span id="userName">Profil</span>
-                        </button>
-                        <button id="logoutBtn" class="text-gray-300 hover:text-red-400 transition-colors font-medium ml-4">
-                            Çıkış Yap
-                        </button>
+                    
+                    <div id="authButtons">
+                        <!-- Giriş yapmamış kullanıcılar için -->
+                        <div id="guestButtons">
+                            <button id="loginBtn" class="text-gray-300 hover:text-white transition-colors font-medium">Giriş Yap</button>
+                            <button id="registerBtn" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
+                                Üye Ol
+                            </button>
+                        </div>
+                        <!-- Giriş yapmış kullanıcılar için -->
+                        <div id="userButtons" class="hidden">
+                            <button id="profileBtn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-2 px-6 rounded-xl neon-glow hover:scale-105 transition-all duration-300">
+                                <span id="userName">Profil</span>
+                            </button>
+                            <button id="logoutBtn" class="text-gray-300 hover:text-red-400 transition-colors font-medium ml-4">
+                                Çıkış Yap
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -759,6 +771,8 @@
         const registerBtn = document.getElementById('registerBtn');
         const profileBtn = document.getElementById('profileBtn');
         const logoutBtn = document.getElementById('logoutBtn');
+        const roadmapBtn = document.getElementById('roadmapBtn');
+        const tournamentBtn = document.getElementById('tournamentBtn');
 
         loginBtn.addEventListener('click', function(e) {
             window.location.href = "/login";
@@ -776,6 +790,14 @@
             localStorage.removeItem('authToken');
             localStorage.removeItem('userData');
             window.location.reload();
+        });
+
+        roadmapBtn.addEventListener('click', function(e) {
+            window.location.href = "/roadmap";
+        });
+
+        tournamentBtn.addEventListener('click', function(e) {
+            window.location.href = "/tournament";
         });
 
         // Sayfa yüklendiğinde kullanıcı durumunu kontrol et

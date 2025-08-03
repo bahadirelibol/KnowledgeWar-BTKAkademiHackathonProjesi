@@ -1,0 +1,1290 @@
+w<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galactic Tournament Arena - Python Combat Zone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #1a1a1a;
+            color: #e5e5e5;
+        }
+
+        .cosmic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+
+        .star {
+            position: absolute;
+            background: #666;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        .star.small { width: 1px; height: 1px; }
+        .star.medium { width: 2px; height: 2px; }
+        .star.large { width: 3px; height: 3px; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+
+        .glass-card-strong {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .tournament-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .tournament-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .countdown-display {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .leaderboard-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid #666;
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-item.first {
+            border-left-color: #fbbf24;
+        }
+
+        .leaderboard-item.second {
+            border-left-color: #9ca3af;
+        }
+
+        .leaderboard-item.third {
+            border-left-color: #d97706;
+        }
+
+        .leaderboard-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .calendar-day {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .calendar-day:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .calendar-day.today {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+        }
+
+        .calendar-day.completed {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+        }
+
+        .calendar-day.locked {
+            background: rgba(107, 114, 128, 0.1);
+            border-color: rgba(107, 114, 128, 0.3);
+            opacity: 0.6;
+        }
+
+        .battle-btn {
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            border: none;
+            color: white;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .battle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #fbbf24;
+        }
+
+        .fade-in-cosmic {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in-cosmic.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .text-accent { color: #3b82f6; }
+        .text-success { color: #22c55e; }
+        .text-warning { color: #fbbf24; }
+        .text-danger { color: #ef4444; }
+        .text-purple { color: #8b5cf6; }
+        .text-cyan { color: #06b6d4; }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <!-- Cosmic Background -->
+    <div class="cosmic-bg">
+        <div class="star-field" id="starField"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="relative z-20 glass-card-strong border-b border-white/20">
+        <div class="container mx-auto px-6 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-6">
+                    <div class="text-3xl font-bold">⚔️ NEXUS ARENA</div>
+                    <div class="text-gray-400">|</div>
+                    <div class="text-xl font-semibold text-accent">Python Combat Zone</div>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="/tournament-admin" class="cosmic-btn px-4 py-2 text-sm">
+                        ⚙️ Admin Paneli
+                    </a>
+                    <button onclick="showCurrentTournamentResults()" class="cosmic-btn px-4 py-2 text-sm">
+                        🏆 Sonuçlar
+                    </button>
+                    <div class="achievement-badge">
+                        <span>🏆</span>
+                        <span>Tournament Warrior</span>
+                    </div>
+                    <div class="glass-card px-4 py-2">
+                        <div class="text-sm text-gray-400 font-mono">RANK</div>
+                        <div class="text-xl font-bold text-warning">#42</div>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-r from-gray-600 to-gray-800 flex items-center justify-center font-bold">
+                        JD
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="relative z-10 container mx-auto px-6 py-8">
+        <!-- Tournament Header -->
+        <div class="text-center mb-12 fade-in-cosmic">
+            <h1 class="text-5xl md:text-7xl font-bold mb-4">
+                GALACTIC TOURNAMENT
+            </h1>
+            <p class="text-2xl text-gray-300 mb-8">
+                ⚡ <span class="text-accent">Daily Python Battles</span> - Prove Your Skills in the Arena!
+            </p>
+        </div>
+
+        <!-- Countdown Timer -->
+        <div class="countdown-display rounded-3xl p-8 mb-12 fade-in-cosmic">
+            <div class="flex items-center justify-center space-x-8 flex-wrap">
+                <div class="text-center">
+                    <div class="text-5xl font-bold font-mono text-accent" id="hours">14</div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wider">Saat</div>
+                </div>
+                <div class="text-4xl text-gray-500">:</div>
+                <div class="text-center">
+                    <div class="text-5xl font-bold font-mono text-accent" id="minutes">32</div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wider">Dakika</div>
+                </div>
+                <div class="text-4xl text-gray-500">:</div>
+                <div class="text-center">
+                    <div class="text-5xl font-bold font-mono text-accent" id="seconds">18</div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wider">Saniye</div>
+                </div>
+            </div>
+            <div class="text-center mt-6">
+                <div class="text-lg text-gray-300">🔥 Bugünkü turnuva bitimine kalan süre</div>
+                <div class="text-sm text-gray-400 mt-2">Katılım için son dakikalar!</div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Today's Challenge -->
+            <div class="lg:col-span-2">
+                <div class="tournament-card rounded-3xl p-8 mb-8 fade-in-cosmic">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-3xl font-bold">🎯 Bugünkü Savaş Alanı</h2>
+                        <div class="achievement-badge">
+                            <span>🔥</span>
+                            <span>127 Savaşçı Katıldı</span>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card p-6 mb-6">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="w-16 h-16 rounded-full bg-gradient-to-r from-gray-600 to-gray-800 flex items-center justify-center text-2xl">
+                                🧬
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold">Data Structures Mastery</h3>
+                                <p class="text-gray-400">Lists, Dictionaries, Sets ve Tuples ile algoritma çözümleri</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div class="glass-card p-3 text-center">
+                                <div class="text-sm text-gray-400">Sorular</div>
+                                <div class="text-xl font-bold text-cyan">15</div>
+                            </div>
+                            <div class="glass-card p-3 text-center">
+                                <div class="text-sm text-gray-400">Süre</div>
+                                <div class="text-xl font-bold text-success">45 dk</div>
+                            </div>
+                            <div class="glass-card p-3 text-center">
+                                <div class="text-sm text-gray-400">Zorluk</div>
+                                <div class="text-xl font-bold text-warning">★★★☆☆</div>
+                            </div>
+                            <div class="glass-card p-3 text-center">
+                                <div class="text-sm text-gray-400">Ödül XP</div>
+                                <div class="text-xl font-bold text-purple">+500</div>
+                            </div>
+                        </div>
+                        
+                        <button class="battle-btn w-full mb-4" onclick="joinTournament()">
+                            ⚔️ Savaşa Katıl!
+                        </button>
+                        
+                        <div class="text-center text-sm text-gray-400">
+                            💡 <strong>İpucu:</strong> Nested data structures ve list comprehensions konularını gözden geçir!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Calendar -->
+                <div class="tournament-card rounded-3xl p-8 fade-in-cosmic">
+                    <h3 class="text-2xl font-bold mb-6">📅 Haftalık Savaş Takvimi</h3>
+                    
+                    <div class="grid grid-cols-7 gap-2">
+                        <div class="calendar-day completed rounded-lg p-4 text-center">
+                            <div class="text-sm text-gray-400">Pzt</div>
+                            <div class="text-lg font-bold text-success">✓</div>
+                            <div class="text-xs text-gray-500">OOP</div>
+                        </div>
+                        <div class="calendar-day completed rounded-lg p-4 text-center">
+                            <div class="text-sm text-gray-400">Sal</div>
+                            <div class="text-lg font-bold text-success">✓</div>
+                            <div class="text-xs text-gray-500">Async</div>
+                        </div>
+                        <div class="calendar-day completed rounded-lg p-4 text-center">
+                            <div class="text-sm text-gray-400">Çar</div>
+                            <div class="text-lg font-bold text-success">✓</div>
+                            <div class="text-xs text-gray-500">Decorators</div>
+                        </div>
+                        <div class="calendar-day today rounded-lg p-4 text-center">
+                            <div class="text-sm text-gray-400">Per</div>
+                            <div class="text-lg font-bold text-accent">🔥</div>
+                            <div class="text-xs text-gray-300">Data Structures</div>
+                        </div>
+                        <div class="calendar-day locked rounded-lg p-4 text-center">
+                            <div class="text-sm text-gray-500">Cum</div>
+                            <div class="text-lg font-bold text-gray-500">🔒</div>
+                            <div class="text-xs text-gray-600">Algorithms</div>
+                        </div>
+                        <div class="calendar-day locked rounded-lg p-4 text-center">
+                            <div class="text-sm text-gray-500">Cmt</div>
+                            <div class="text-lg font-bold text-gray-500">🔒</div>
+                            <div class="text-xs text-gray-600">ML Basics</div>
+                        </div>
+                        <div class="calendar-day locked rounded-lg p-4 text-center">
+                            <div class="text-sm text-gray-500">Paz</div>
+                            <div class="text-lg font-bold text-gray-500">🔒</div>
+                            <div class="text-xs text-gray-600">Final Boss</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 text-center">
+                        <div class="text-sm text-gray-400">
+                            🏆 <strong>Haftalık Şampiyon:</strong> En çok puan toplayan savaşçı özel badge kazanır!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-8">
+                <!-- Live Leaderboard -->
+                <div class="tournament-card rounded-3xl p-6 fade-in-cosmic">
+                    <h3 class="text-xl font-bold mb-6 flex items-center">
+                        🏆 Canlı Sıralama
+                        <span class="ml-2 w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                    </h3>
+                    
+                    <div class="space-y-3">
+                        <div class="leaderboard-item first rounded-lg p-4 flex items-center space-x-4">
+                            <div class="text-2xl">🥇</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-warning">@pythoninja</div>
+                                <div class="text-sm text-gray-400">Skor: 2,850</div>
+                            </div>
+                            <div class="text-warning font-bold">#1</div>
+                        </div>
+                        
+                        <div class="leaderboard-item second rounded-lg p-4 flex items-center space-x-4">
+                            <div class="text-2xl">🥈</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-gray-300">@codemaster</div>
+                                <div class="text-sm text-gray-400">Skor: 2,720</div>
+                            </div>
+                            <div class="text-gray-400 font-bold">#2</div>
+                        </div>
+                        
+                        <div class="leaderboard-item third rounded-lg p-4 flex items-center space-x-4">
+                            <div class="text-2xl">🥉</div>
+                            <div class="flex-1">
+                                <div class="font-bold" style="color: #d97706">@algoqueen</div>
+                                <div class="text-sm text-gray-400">Skor: 2,650</div>
+                            </div>
+                            <div class="font-bold" style="color: #d97706">#3</div>
+                        </div>
+                        
+                        <div class="leaderboard-item rounded-lg p-4 flex items-center space-x-4 bg-blue-500/10 border-blue-500">
+                            <div class="text-2xl">⭐</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-accent">@johndev (Sen)</div>
+                                <div class="text-sm text-gray-400">Skor: 1,340</div>
+                            </div>
+                            <div class="text-accent font-bold">#42</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 text-center">
+                        <button class="glass-card px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition-all">
+                            📊 Tüm Sıralamayı Gör
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tournament Stats -->
+                <div class="tournament-card rounded-3xl p-6 fade-in-cosmic">
+                    <h3 class="text-xl font-bold mb-6">📈 Turnuva İstatistikleri</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="glass-card rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div class="text-gray-400">Toplam Katılımcı</div>
+                                <div class="text-2xl font-bold text-cyan">127</div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div class="text-gray-400">Ortalama Skor</div>
+                                <div class="text-2xl font-bold text-success">68%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div class="text-gray-400">En Yüksek Skor</div>
+                                <div class="text-2xl font-bold text-warning">95%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div class="text-gray-400">Kalan Süre</div>
+                                <div class="text-2xl font-bold text-danger" id="timeLeft">14:32:18</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievement Showcase -->
+                <div class="tournament-card rounded-3xl p-6 fade-in-cosmic">
+                    <h3 class="text-xl font-bold mb-6">🏅 Bu Hafta Kazanılabilir</h3>
+                    
+                    <div class="space-y-3">
+                        <div class="glass-card rounded-lg p-3 flex items-center space-x-3">
+                            <div class="text-2xl">🥇</div>
+                            <div>
+                                <div class="font-bold text-warning">Weekly Champion</div>
+                                <div class="text-xs text-gray-400">1. olarak bitir</div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card rounded-lg p-3 flex items-center space-x-3">
+                            <div class="text-2xl">⚡</div>
+                            <div>
+                                <div class="font-bold text-cyan">Speed Demon</div>
+                                <div class="text-xs text-gray-400">10 dk içinde bitir</div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card rounded-lg p-3 flex items-center space-x-3">
+                            <div class="text-2xl">🎯</div>
+                            <div>
+                                <div class="font-bold text-success">Perfect Score</div>
+                                <div class="text-xs text-gray-400">100% doğruluk</div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card rounded-lg p-3 flex items-center space-x-3">
+                            <div class="text-2xl">🔥</div>
+                            <div>
+                                <div class="font-bold" style="color: #fb923c">Streak Master</div>
+                                <div class="text-xs text-gray-400">7 gün üst üste katıl</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tournament Results Section -->
+        <div id="tournamentResultsSection" class="mt-12 fade-in-cosmic hidden">
+            <div class="tournament-card rounded-3xl p-8">
+                <h2 class="text-3xl font-bold mb-8 text-center">🏆 TURNUVA SONUÇLARI</h2>
+                
+                <!-- Current Tournament Results -->
+                <div id="currentTournamentResults" class="mb-8">
+                    <!-- Results will be loaded here -->
+                </div>
+
+                <!-- Leaderboard -->
+                <div id="tournamentLeaderboard" class="mb-8">
+                    <h3 class="text-2xl font-bold mb-6 text-center">📊 Sıralama</h3>
+                    <div id="leaderboardTable" class="glass-card rounded-2xl p-6">
+                        <!-- Leaderboard will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Your Performance -->
+                <div id="yourPerformance" class="glass-card rounded-2xl p-6 border border-blue-500/50">
+                    <h4 class="text-xl font-bold text-accent mb-4">🎯 Senin Performansın</h4>
+                    <div id="performanceDetails">
+                        <!-- Performance details will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Previous Results Section -->
+        <div class="mt-12 fade-in-cosmic">
+            <div class="tournament-card rounded-3xl p-8">
+                <h2 class="text-3xl font-bold mb-8 text-center">📋 Dünkü Turnuva Sonuçları</h2>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Yesterday's Topic -->
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-r from-gray-600 to-gray-800 flex items-center justify-center text-xl">
+                                🎭
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold">Decorators & Context Managers</h4>
+                                <p class="text-gray-400 text-sm">Çarşamba - 23 Ocak 2025</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-success">89</div>
+                                <div class="text-sm text-gray-400">Katılımcı</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-warning">73%</div>
+                                <div class="text-sm text-gray-400">Ort. Skor</div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center text-sm text-gray-400">
+                            <strong>Şampiyon:</strong> @pythoninja (98% - 12:34)
+                        </div>
+                    </div>
+                    
+                    <!-- Your Performance -->
+                    <div class="glass-card rounded-2xl p-6 border border-blue-500/50">
+                        <h4 class="text-xl font-bold text-accent mb-4">🎯 Senin Performansın</h4>
+                        
+                        <div class="space-y-4">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Final Skor:</span>
+                                <span class="font-bold text-success">87%</span>
+                            </div>
+                            
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Tamamlama Süresi:</span>
+                                <span class="font-bold text-cyan">23:45</span>
+                            </div>
+                            
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Sıralama:</span>
+                                <span class="font-bold text-warning">#12</span>
+                            </div>
+                            
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Kazanılan XP:</span>
+                                <span class="font-bold text-purple">+425</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-green-500/20 rounded-lg border border-green-500/50">
+                            <div class="text-success font-bold text-sm">🏆 Kazanılan Badge:</div>
+                            <div class="text-white">Decorator Master - İleri seviye decorator kullanımı</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Analysis -->
+                <div class="mt-8 glass-card rounded-2xl p-6">
+                    <h4 class="text-xl font-bold mb-4">📊 Detaylı Analiz</h4>
+                    
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">💪</div>
+                            <div class="font-bold text-success">Güçlü Yanların</div>
+                            <div class="text-sm text-gray-400 mt-2">
+                                • Context managers (95%)<br>
+                                • Property decorators (92%)<br>
+                                • Function wrapping (88%)
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">🎯</div>
+                            <div class="font-bold text-warning">Gelişim Alanları</div>
+                            <div class="text-sm text-gray-400 mt-2">
+                                • Class decorators (65%)<br>
+                                • Nested decorators (70%)<br>
+                                • Performance tuning (72%)
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">💡</div>
+                            <div class="font-bold text-cyan">Öneriler</div>
+                            <div class="text-sm text-gray-400 mt-2">
+                                • Functools modülünü çalış<br>
+                                • Metaclass konusuna bak<br>
+                                • Performance profiling öğren
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div id="quizModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="tournament-card rounded-3xl p-8 max-w-4xl mx-4 relative max-h-[90vh] overflow-y-auto">
+            <button id="closeQuizModal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl">&times;</button>
+            
+            <div class="text-center mb-8">
+                <h3 class="text-3xl font-bold">⚔️ TURNUVA BAŞLADI!</h3>
+                <p class="text-gray-400" id="tournamentTitle">Data Structures Mastery Challenge</p>
+                <div class="mt-4 flex items-center justify-center space-x-4">
+                    <div class="glass-card px-4 py-2">
+                        <div class="text-sm text-gray-400">Soru</div>
+                        <div class="text-xl font-bold text-cyan" id="currentQuestion">1/5</div>
+                    </div>
+                    <div class="glass-card px-4 py-2">
+                        <div class="text-sm text-gray-400">Süre</div>
+                        <div class="text-xl font-bold text-warning" id="quizTimer">45:00</div>
+                    </div>
+                    <div class="glass-card px-4 py-2">
+                        <div class="text-sm text-gray-400">Skor</div>
+                        <div class="text-xl font-bold text-success" id="quizScore">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="questionContainer" class="space-y-6">
+                <!-- Questions will be loaded here -->
+            </div>
+            
+            <div class="text-center mt-8">
+                <button id="nextQuestionBtn" class="battle-btn text-xl px-12 py-4 hidden">
+                    Sonraki Soru →
+                </button>
+                <button id="finishQuizBtn" class="battle-btn text-xl px-12 py-4 hidden">
+                    Turnuvayı Bitir 🏆
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        function createStarField() {
+            const starField = document.getElementById('starField');
+            const starCount = 100;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = `star ${['small', 'medium', 'large'][Math.floor(Math.random() * 3)]}`;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                starField.appendChild(star);
+            }
+        }
+
+        function initCountdown() {
+            const hoursEl = document.getElementById('hours');
+            const minutesEl = document.getElementById('minutes');
+            const secondsEl = document.getElementById('seconds');
+            const timeLeftEl = document.getElementById('timeLeft');
+            
+            let totalSeconds = 14 * 3600 + 32 * 60 + 18;
+            
+            function updateTimer() {
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                
+                hoursEl.textContent = hours.toString().padStart(2, '0');
+                minutesEl.textContent = minutes.toString().padStart(2, '0');
+                secondsEl.textContent = seconds.toString().padStart(2, '0');
+                timeLeftEl.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (totalSeconds > 0) {
+                    totalSeconds--;
+                } else {
+                    hoursEl.textContent = '00';
+                    minutesEl.textContent = '00';
+                    secondsEl.textContent = '00';
+                    timeLeftEl.textContent = 'BİTTİ!';
+                }
+            }
+            
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        }
+
+        // Turnuva değişkenleri
+        let currentTournament = null;
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let quizStartTime = null;
+        let quizTimer = null;
+
+        function initModals() {
+            const quizModal = document.getElementById('quizModal');
+            const closeQuizBtn = document.getElementById('closeQuizModal');
+            
+            closeQuizBtn.addEventListener('click', () => {
+                closeQuizModal();
+            });
+            
+            quizModal.addEventListener('click', (e) => {
+                if (e.target === quizModal) {
+                    closeQuizModal();
+                }
+            });
+        }
+
+        async function joinTournament() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    alert('Turnuvaya katılmak için giriş yapmanız gerekiyor');
+                    window.location.href = '/login';
+                    return;
+                }
+
+                // Aktif turnuvaları al
+                const response = await fetch('/api/tournaments', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (!result.success || result.tournaments.length === 0) {
+                    alert('Şu anda aktif turnuva bulunmuyor');
+                    return;
+                }
+
+                // İlk aktif turnuvayı al
+                currentTournament = result.tournaments[0];
+                
+                // Kullanıcının turnuva durumunu kontrol et
+                const statusResponse = await fetch(`/api/user-tournament-status/${currentTournament.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const statusResult = await statusResponse.json();
+                
+                if (statusResult.success) {
+                    const status = statusResult.status;
+                    
+                    if (status.is_completed) {
+                        alert('Bu turnuvayı zaten tamamladınız!');
+                        return;
+                    }
+                    
+                    if (status.has_joined) {
+                        // Zaten katılmış, soruları yükle
+                        await loadTournamentQuestions();
+                        return;
+                    }
+                    
+                    if (!status.can_join) {
+                        if (new Date(status.current_time) < new Date(status.start_time)) {
+                            alert('Turnuva henüz başlamadı!');
+                        } else {
+                            alert('Turnuva süresi dolmuş!');
+                        }
+                        return;
+                    }
+                }
+                
+                // Turnuvaya katıl
+                const joinResponse = await fetch('/api/join-tournament', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        tournament_id: currentTournament.id
+                    })
+                });
+
+                const joinResult = await joinResponse.json();
+                
+                if (joinResult.success) {
+                    // Turnuva sorularını al
+                    await loadTournamentQuestions();
+                } else {
+                    alert(joinResult.error || 'Turnuvaya katılırken hata oluştu');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Bir hata oluştu: ' + error.message);
+            }
+        }
+
+        async function loadTournamentQuestions() {
+            try {
+                const token = localStorage.getItem('authToken');
+                
+                const response = await fetch(`/api/tournament-questions/${currentTournament.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentQuestions = result.questions;
+                    userAnswers = new Array(currentQuestions.length).fill(null);
+                    currentQuestionIndex = 0;
+                    quizStartTime = new Date();
+                    
+                    showQuizModal();
+                    startQuizTimer();
+                    showQuestion(0);
+                } else {
+                    alert('Sorular yüklenirken hata oluştu');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Sorular yüklenirken hata oluştu');
+            }
+        }
+
+        function showQuizModal() {
+            const quizModal = document.getElementById('quizModal');
+            const tournamentTitle = document.getElementById('tournamentTitle');
+            
+            tournamentTitle.textContent = currentTournament.title;
+            quizModal.classList.remove('hidden');
+            quizModal.classList.add('flex');
+        }
+
+        function closeQuizModal() {
+            const quizModal = document.getElementById('quizModal');
+            quizModal.classList.add('hidden');
+            quizModal.classList.remove('flex');
+            
+            if (quizTimer) {
+                clearInterval(quizTimer);
+            }
+        }
+
+        function startQuizTimer() {
+            let timeLeft = 45 * 60; // 45 dakika
+            
+            quizTimer = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                
+                document.getElementById('quizTimer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    finishQuiz();
+                }
+                
+                timeLeft--;
+            }, 1000);
+        }
+
+        function showQuestion(index) {
+            if (index >= currentQuestions.length) {
+                finishQuiz();
+                return;
+            }
+
+            const question = currentQuestions[index];
+            const container = document.getElementById('questionContainer');
+            
+            document.getElementById('currentQuestion').textContent = `${index + 1}/${currentQuestions.length}`;
+            
+            container.innerHTML = `
+                <div class="glass-card rounded-2xl p-6">
+                    <h4 class="text-xl font-bold mb-6">Soru ${index + 1}</h4>
+                    <p class="text-lg text-gray-300 mb-6">${question.question}</p>
+                    
+                    <div class="space-y-4">
+                        ${question.options.map((option, optionIndex) => `
+                            <button onclick="selectAnswer('${String.fromCharCode(65 + optionIndex)}', event)" 
+                                    class="w-full text-left p-4 glass-card rounded-lg hover:bg-white/10 transition-all option-btn"
+                                    data-option="${String.fromCharCode(65 + optionIndex)}">
+                                <span class="font-bold text-cyan mr-3">${String.fromCharCode(65 + optionIndex)}.</span>
+                                ${option}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            // Önceki cevabı seç
+            if (userAnswers[index] !== null) {
+                const selectedBtn = container.querySelector(`[data-option="${userAnswers[index]}"]`);
+                if (selectedBtn) {
+                    selectedBtn.classList.add('bg-blue-500/20', 'border-blue-500');
+                }
+            }
+        }
+
+        function selectAnswer(option, event) {
+            userAnswers[currentQuestionIndex] = option;
+            
+            // Tüm butonları temizle
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-500/20', 'border-blue-500');
+            });
+            
+            // Seçilen butonu işaretle
+            if (event && event.target) {
+                event.target.classList.add('bg-blue-500/20', 'border-blue-500');
+            }
+            
+            // Sonraki soru butonunu göster
+            const nextBtn = document.getElementById('nextQuestionBtn');
+            const finishBtn = document.getElementById('finishQuizBtn');
+            
+            if (currentQuestionIndex < currentQuestions.length - 1) {
+                nextBtn.classList.remove('hidden');
+                finishBtn.classList.add('hidden');
+            } else {
+                nextBtn.classList.add('hidden');
+                finishBtn.classList.remove('hidden');
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            showQuestion(currentQuestionIndex);
+            
+            document.getElementById('nextQuestionBtn').classList.add('hidden');
+            document.getElementById('finishQuizBtn').classList.add('hidden');
+        }
+
+        async function finishQuiz() {
+            try {
+                const token = localStorage.getItem('authToken');
+                let correctCount = 0;
+                
+                // Cevapları gönder
+                for (let i = 0; i < currentQuestions.length; i++) {
+                    if (userAnswers[i] !== null) {
+                        const response = await fetch('/api/answer-question', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                tournament_id: currentTournament.id,
+                                question_id: currentQuestions[i].id,
+                                selected_option: userAnswers[i]
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        if (result.success && result.is_correct) {
+                            correctCount++;
+                        }
+                    }
+                }
+                
+                // Turnuvayı tamamla
+                const completeResponse = await fetch('/api/complete-tournament', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        tournament_id: currentTournament.id
+                    })
+                });
+                
+                const completeResult = await completeResponse.json();
+                
+                if (completeResult.success) {
+                    // Sonuçları hesapla
+                    const score = completeResult.final_score;
+                    const completionTime = Math.round((new Date() - quizStartTime) / 1000);
+                    const minutes = Math.floor(completionTime / 60);
+                    const seconds = completionTime % 60;
+                    const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    
+                    // XP hesapla
+                    const baseXP = 500;
+                    const speedBonus = completionTime < (45 * 60) ? 200 : 0;
+                    const accuracyBonus = score === 100 ? 300 : 0;
+                    const totalXP = baseXP + speedBonus + accuracyBonus;
+                    
+                    // Sonuçları göster
+                    showResults(score, completeResult.correct_answers, timeString, totalXP);
+                } else {
+                    alert(completeResult.error || 'Turnuva tamamlanırken hata oluştu');
+                }
+                
+                // Timer'ı durdur
+                if (quizTimer) {
+                    clearInterval(quizTimer);
+                }
+                
+                // Quiz modal'ını kapat
+                closeQuizModal();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Sonuçlar kaydedilirken hata oluştu');
+            }
+        }
+
+        async function showResults(score, correctCount, timeString, xp) {
+            // Quiz modal'ını kapat
+            closeQuizModal();
+            
+            // Sonuçları ana sayfada göster
+            const resultsSection = document.getElementById('tournamentResultsSection');
+            const currentResults = document.getElementById('currentTournamentResults');
+            const performanceDetails = document.getElementById('performanceDetails');
+            
+            // Mevcut turnuva sonuçlarını göster
+            currentResults.innerHTML = `
+                <div class="glass-card rounded-2xl p-6 mb-6">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-success">${score}%</div>
+                            <div class="text-sm text-gray-400">Final Skor</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-cyan">${correctCount}/${currentQuestions.length}</div>
+                            <div class="text-sm text-gray-400">Doğru Cevap</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-warning">${timeString}</div>
+                            <div class="text-sm text-gray-400">Tamamlama Süresi</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-purple">+${xp}</div>
+                            <div class="text-sm text-gray-400">Kazanılan XP</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        ${score === 100 ? `
+                            <div class="glass-card rounded-lg p-3 border border-yellow-500/50">
+                                <div class="font-bold text-yellow-400">🏆 Perfect Score</div>
+                                <div class="text-sm text-gray-400">Mükemmel performans!</div>
+                            </div>
+                        ` : ''}
+                        ${score >= 80 ? `
+                            <div class="glass-card rounded-lg p-3 border border-green-500/50">
+                                <div class="font-bold text-green-400">⭐ Excellent</div>
+                                <div class="text-sm text-gray-400">Harika bir sonuç!</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            // Performans detaylarını göster
+            performanceDetails.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Final Skor:</span>
+                        <span class="font-bold text-success">${score}%</span>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Tamamlama Süresi:</span>
+                        <span class="font-bold text-cyan">${timeString}</span>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Doğru Cevaplar:</span>
+                        <span class="font-bold text-warning">${correctCount}/${currentQuestions.length}</span>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Kazanılan XP:</span>
+                        <span class="font-bold text-purple">+${xp}</span>
+                    </div>
+                </div>
+            `;
+            
+            // Sonuçlar bölümünü göster
+            resultsSection.classList.remove('hidden');
+            
+            // Sayfayı sonuçlar bölümüne kaydır
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+            
+            // Turnuva sonuçlarını yükle
+            await loadTournamentResults();
+        }
+
+        async function loadTournamentResults() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!currentTournament) return;
+                
+                const response = await fetch(`/api/tournament-results/${currentTournament.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    const leaderboardTable = document.getElementById('leaderboardTable');
+                    
+                    if (result.participants && result.participants.length > 0) {
+                        leaderboardTable.innerHTML = `
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="border-b border-gray-700">
+                                            <th class="text-left py-3 px-4 text-gray-400">Sıra</th>
+                                            <th class="text-left py-3 px-4 text-gray-400">Kullanıcı</th>
+                                            <th class="text-center py-3 px-4 text-gray-400">Skor</th>
+                                            <th class="text-center py-3 px-4 text-gray-400">Doğru</th>
+                                            <th class="text-center py-3 px-4 text-gray-400">Süre</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${result.participants.map((participant, index) => `
+                                            <tr class="border-b border-gray-800/50 hover:bg-white/5">
+                                                <td class="py-3 px-4">
+                                                    <div class="flex items-center">
+                                                        ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 px-4 font-medium">${participant.username}</td>
+                                                <td class="py-3 px-4 text-center">
+                                                    <span class="font-bold ${participant.total_score >= 80 ? 'text-success' : participant.total_score >= 60 ? 'text-warning' : 'text-danger'}">
+                                                        ${participant.total_score}%
+                                                    </span>
+                                                </td>
+                                                <td class="py-3 px-4 text-center text-cyan">${participant.correct_answers}/${participant.total_questions}</td>
+                                                <td class="py-3 px-4 text-center text-gray-400">${participant.completion_time || 'N/A'}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                    } else {
+                        leaderboardTable.innerHTML = `
+                            <div class="text-center text-gray-400 py-8">
+                                Henüz katılımcı bulunmuyor
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading tournament results:', error);
+            }
+        }
+
+        async function showCurrentTournamentResults() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    alert('Sonuçları görmek için giriş yapmanız gerekiyor');
+                    window.location.href = '/login';
+                    return;
+                }
+
+                // Aktif turnuvaları al
+                const response = await fetch('/api/tournaments', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (!result.success || result.tournaments.length === 0) {
+                    alert('Şu anda aktif turnuva bulunmuyor');
+                    return;
+                }
+
+                // İlk aktif turnuvayı al
+                currentTournament = result.tournaments[0];
+                
+                // Sonuçlar bölümünü göster
+                const resultsSection = document.getElementById('tournamentResultsSection');
+                resultsSection.classList.remove('hidden');
+                
+                // Turnuva bilgilerini göster
+                const currentResults = document.getElementById('currentTournamentResults');
+                currentResults.innerHTML = `
+                    <div class="glass-card rounded-2xl p-6 mb-6">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="w-16 h-16 rounded-full bg-gradient-to-r from-gray-600 to-gray-800 flex items-center justify-center text-2xl">
+                                ⚔️
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold">${currentTournament.title}</h3>
+                                <p class="text-gray-400">${currentTournament.content}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Performans detaylarını temizle
+                const performanceDetails = document.getElementById('performanceDetails');
+                performanceDetails.innerHTML = `
+                    <div class="text-center text-gray-400 py-4">
+                        Turnuvaya henüz katılmadınız
+                    </div>
+                `;
+                
+                // Sayfayı sonuçlar bölümüne kaydır
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+                
+                // Turnuva sonuçlarını yükle
+                await loadTournamentResults();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Sonuçlar yüklenirken hata oluştu');
+            }
+        }
+
+        function showEmailPreview() {
+            alert('Email önizleme özelliği yakında eklenecek!');
+        }
+
+        // Event listeners
+        document.getElementById('nextQuestionBtn').addEventListener('click', nextQuestion);
+        document.getElementById('finishQuizBtn').addEventListener('click', finishQuiz);
+
+        function initScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.fade-in-cosmic').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createStarField();
+            initCountdown();
+            initModals();
+            initScrollAnimations();
+            
+            setTimeout(() => {
+                const emailBtn = document.createElement('button');
+                emailBtn.textContent = '📧 Email Önizlemesi';
+                emailBtn.className = 'glass-card px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition-all mt-4';
+                emailBtn.onclick = showEmailPreview;
+                
+                const statsCard = document.querySelector('.tournament-card:has(h3:contains("Turnuva İstatistikleri"))');
+                if (statsCard) {
+                    statsCard.appendChild(emailBtn);
+                }
+            }, 2000);
+            
+            setInterval(() => {
+                const scoreElements = document.querySelectorAll('.leaderboard-item .text-sm');
+                scoreElements.forEach(el => {
+                    if (el.textContent.includes('Skor:')) {
+                        const currentScore = parseInt(el.textContent.match(/\d+/)[0]);
+                        const newScore = currentScore + Math.floor(Math.random() * 10);
+                        el.textContent = `Skor: ${newScore.toLocaleString()}`;
+                    }
+                });
+            }, 10000);
+        });
+    </script>
+</body>
+</html>

@@ -2,3 +2,10 @@ streamlit
 google-generativeai
 python-dotenv
 requests
+flask
+flask-cors
+pyjwt
+selenium
+beautifulsoup4
+webdriver-manager
+google-generativeai

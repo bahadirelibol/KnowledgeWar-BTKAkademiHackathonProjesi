@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python İleri Seviye - Galaktik Öğrenme Yolu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #000212;
+            background-image: 
+                radial-gradient(at 20% 80%, hsla(240, 100%, 20%, 0.3) 0px, transparent 50%),
+                radial-gradient(at 80% 20%, hsla(290, 100%, 25%, 0.3) 0px, transparent 50%),
+                radial-gradient(at 40% 40%, hsla(200, 100%, 30%, 0.2) 0px, transparent 50%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Advanced Background Effects */
+        .cosmic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star-field {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration, 2s) infinite;
+        }
+
+        .star.small { width: 1px; height: 1px; }
+        .star.medium { width: 2px; height: 2px; }
+        .star.large { width: 3px; height: 3px; }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .nebula {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            animation: nebulaDrift 15s ease-in-out infinite;
+            opacity: 0.4;
+        }
+
+        @keyframes nebulaDrift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(100px, -50px) rotate(90deg); }
+            50% { transform: translate(-50px, 100px) rotate(180deg); }
+            75% { transform: translate(-100px, -100px) rotate(270deg); }
+        }
+
+        .particle-system {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(45deg, #00f5ff, #ff00f5);
+            border-radius: 50%;
+            animation: particleFloat 8s linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0px) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(var(--random-x, 0px)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Glass Morphism Enhanced */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 8px 32px rgba(0, 245, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card-strong {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 20px 60px rgba(0, 245, 255, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        /* Neon Effects Enhanced */
+        .neon-text {
+            color: #00f5ff;
+            text-shadow: 
+                0 0 5px #00f5ff,
+                0 0 10px #00f5ff,
+                0 0 20px #00f5ff,
+                0 0 40px #00f5ff;
+            animation: neonPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes neonPulse {
+            0%, 100% { text-shadow: 0 0 5px #00f5ff, 0 0 10px #00f5ff, 0 0 20px #00f5ff; }
+            50% { text-shadow: 0 0 10px #00f5ff, 0 0 20px #00f5ff, 0 0 40px #00f5ff, 0 0 60px #00f5ff; }
+        }
+
+        .hologram-text {
+            background: linear-gradient(45deg, #00f5ff, #ff00f5, #00ff88, #ffaa00);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: hologramShift 3s ease-in-out infinite;
+        }
+
+        @keyframes hologramShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* 3D Card Effects */
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .card-3d:hover {
+            transform: rotateY(10deg) rotateX(5deg) translateZ(20px);
+        }
+
+        .card-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(255, 0, 245, 0.1));
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .card-3d:hover::before {
+            opacity: 1;
+        }
+
+        /* Roadmap Path Advanced */
+        .galactic-path {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: linear-gradient(
+                180deg,
+                transparent 0%,
+                #00f5ff 20%,
+                #ff00f5 40%,
+                #00ff88 60%,
+                #ffaa00 80%,
+                transparent 100%
+            );
+            transform: translateX(-50%);
+            z-index: 5;
+            border-radius: 3px;
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+            animation: pathGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes pathGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 245, 255, 0.5); }
+            25% { box-shadow: 0 0 30px rgba(255, 0, 245, 0.7); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.6); }
+            75% { box-shadow: 0 0 30px rgba(255, 170, 0, 0.7); }
+        }
+
+        .galactic-path::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 12px;
+            height: 100%;
+            background: inherit;
+            transform: translateX(-50%);
+            filter: blur(8px);
+            opacity: 0.6;
+            z-index: -1;
+        }
+
+        /* Step Icons Revolutionary */
+        .step-node {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 20px;
+            position: relative;
+            z-index: 15;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .step-node::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00f5ff, #ff00f5, #00ff88, #ffaa00);
+            background-size: 400% 400%;
+            animation: borderRotate 3s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes borderRotate {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .step-node.completed {
+            background: radial-gradient(circle, #00ff88, #00cc66);
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
+            animation: completedPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes completedPulse {
+            0%, 100% { transform: scale(1.1); box-shadow: 0 0 30px rgba(0, 255, 136, 0.6); }
+            50% { transform: scale(1.2); box-shadow: 0 0 50px rgba(0, 255, 136, 0.8); }
+        }
+
+        .step-node.current {
+            background: radial-gradient(circle, #00f5ff, #0099cc);
+            animation: currentNodePulse 1.5s ease-in-out infinite;
+            transform: scale(1.15);
+        }
+
+        @keyframes currentNodePulse {
+            0%, 100% { 
+                transform: scale(1.15); 
+                box-shadow: 0 0 40px rgba(0, 245, 255, 0.8);
+            }
+            50% { 
+                transform: scale(1.25); 
+                box-shadow: 0 0 60px rgba(0, 245, 255, 1);
+            }
+        }
+
+        .step-node.locked {
+            background: radial-gradient(circle, #333, #111);
+            transform: scale(0.9);
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+
+        .step-node.surprise {
+            background: radial-gradient(circle, #ffaa00, #ff6600);
+            animation: surpriseBounce 1s ease-in-out infinite;
+        }
+
+        @keyframes surpriseBounce {
+            0%, 100% { transform: scale(1.1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(5deg); }
+            75% { transform: scale(1.2) rotate(-5deg); }
+        }
+
+        /* Card Status Enhanced */
+        .step-card {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .step-card:hover::after {
+            left: 100%;
+        }
+
+        .step-card.completed {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(0, 204, 102, 0.1));
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 255, 136, 0.2);
+        }
+
+        .step-card.current {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.15), rgba(0, 153, 204, 0.1));
+            border: 2px solid rgba(0, 245, 255, 0.5);
+            box-shadow: 0 10px 40px rgba(0, 245, 255, 0.3);
+            animation: currentCardGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes currentCardGlow {
+            0%, 100% { box-shadow: 0 10px 40px rgba(0, 245, 255, 0.3); }
+            50% { box-shadow: 0 15px 60px rgba(0, 245, 255, 0.5); }
+        }
+
+        .step-card.locked {
+            background: linear-gradient(135deg, rgba(51, 51, 51, 0.1), rgba(17, 17, 17, 0.1));
+            border: 2px solid rgba(107, 114, 128, 0.2);
+            opacity: 0.6;
+            transform: scale(0.98);
+        }
+
+        .step-card.surprise {
+            background: linear-gradient(135deg, rgba(255, 170, 0, 0.2), rgba(255, 102, 0, 0.15));
+            border: 3px solid rgba(255, 170, 0, 0.5);
+            box-shadow: 0 15px 50px rgba(255, 170, 0, 0.3);
+            animation: surpriseCardGlow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes surpriseCardGlow {
+            0%, 100% { box-shadow: 0 15px 50px rgba(255, 170, 0, 0.3); }
+            50% { box-shadow: 0 20px 70px rgba(255, 170, 0, 0.5); }
+        }
+
+        /* Buttons Revolutionary */
+        .cosmic-btn {
+            background: linear-gradient(45deg, #00f5ff, #ff00f5);
+            border: none;
+            color: white;
+            padding: 16px 32px;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cosmic-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .cosmic-btn:hover::before {
+            left: 100%;
+        }
+
+        .cosmic-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.4);
+        }
+
+        /* Progress Bar Cosmic */
+        .cosmic-progress {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .cosmic-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00f5ff, #ff00f5);
+            background-size: 200% 100%;
+            border-radius: 6px;
+            position: relative;
+            animation: progressFlow 2s linear infinite;
+        }
+
+        @keyframes progressFlow {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .cosmic-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progressShimmer 1.5s ease-in-out infinite;
+        }
+
+        @keyframes progressShimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+
+
+        /* Responsive Animations */
+        .fade-in-cosmic {
+            opacity: 0;
+            transform: translateY(50px) rotateX(20deg);
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .fade-in-cosmic.visible {
+            opacity: 1;
+            transform: translateY(0) rotateX(0deg);
+        }
+
+        /* Achievement Badges */
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(45deg, rgba(255, 170, 0, 0.2), rgba(255, 215, 0, 0.2));
+            border: 1px solid rgba(255, 170, 0, 0.4);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #ffaa00;
+            animation: badgeGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes badgeGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 170, 0, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(255, 170, 0, 0.5); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #00f5ff, #ff00f5);
+            border-radius: 6px;
+            border: 2px solid rgba(0, 2, 18, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #00ff88, #ffaa00);
+        }
+
+        /* Typography */
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Input Glow Effect */
+        .input-glow:focus {
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+            border-color: #00f5ff;
+        }
+
+        /* Utility Classes */
+        .text-cosmic-blue { color: #00f5ff; }
+        .text-cosmic-pink { color: #ff00f5; }
+        .text-cosmic-green { color: #00ff88; }
+        .text-cosmic-orange { color: #ffaa00; }
+    </style>
+</head>
+
+<body class="min-h-screen text-white">
+    <!-- Cosmic Background -->
+    <div class="cosmic-bg">
+        <div class="star-field" id="starField"></div>
+        <div class="nebula" style="top: 10%; left: 10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(0, 245, 255, 0.3), transparent);"></div>
+        <div class="nebula" style="top: 60%; right: 10%; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255, 0, 245, 0.3), transparent);"></div>
+        <div class="nebula" style="bottom: 20%; left: 60%; width: 250px; height: 250px; background: radial-gradient(circle, rgba(0, 255, 136, 0.3), transparent);"></div>
+        <div id="particleContainer"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="relative z-20 glass-card-strong border-b border-white/20">
+        <div class="container mx-auto px-6 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-6">
+                    <div class="text-3xl font-bold hologram-text">NEXUS</div>
+                    <div class="text-gray-400">|</div>
+                    <div class="text-xl font-semibold neon-text">Galaktik Öğrenme Yolu</div>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="/learn" id="headerLearnBtn" class="cosmic-btn text-lg px-6 py-3 pulse-btn">
+                        📚 ÖĞREN
+                    </a>
+                    <div class="glass-card px-6 py-3 rounded-2xl">
+                        <div class="text-sm text-gray-300 font-mono">TOPLAM İLERLEME</div>
+                        <div class="text-2xl font-bold neon-text" id="overallProgress">35%</div>
+                    </div>
+                    <div class="achievement-badge">
+                        <span>🔥</span>
+                        <span>8 Gün Aktif</span>
+                    </div>
+                    <div class="step-node current" style="width: 50px; height: 50px; font-size: 16px; margin: 0;">
+                        <span>JD</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="relative z-10 container mx-auto px-6 py-12">
+        <!-- Course Header -->
+        <div class="text-center mb-16 fade-in-cosmic">
+            <h1 class="text-5xl md:text-7xl font-bold hologram-text mb-6">
+                GALAKTİK ÖĞRENME YOLU
+            </h1>
+            <p class="text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                🤖 <span class="neon-text">Yapay Zeka</span> tarafından sizin için özel olarak tasarlanmış 
+                <span class="text-cosmic-green">kişiselleştirilmiş öğrenme yolu</span>
+            </p>
+            
+            <!-- Öğren Butonu -->
+            <div class="mb-12">
+                                <div class="text-center">
+                    <a href="/learn" id="mainLearnBtn" class="inline-block cosmic-btn text-2xl px-16 py-6 pulse-btn">
+                        🚀 ÖĞRENMEYE BAŞLA
+                    </a>
+                </div>
+                <p class="text-gray-400 mt-4 font-mono text-center">5 soru ile kişisel yol haritanı oluştur</p>
+            </div>
+            
+            <!-- Cosmic Progress -->
+            <div class="max-w-3xl mx-auto" id="progressSection" style="display: none;">
+                <div class="flex justify-between text-lg mb-4">
+                    <span class="font-mono">Galaktik İlerleme</span>
+                    <span class="neon-text font-bold font-mono" id="progressText">0/1 Seviye Tamamlandı</span>
+                </div>
+                <div class="cosmic-progress">
+                    <div class="cosmic-progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between text-sm text-gray-400 mt-2 font-mono">
+                    <span>Başlangıç Seviyesi</span>
+                    <span>Uzman Seviyesi</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Roadmap -->
+        <div class="relative max-w-5xl mx-auto">
+            <div class="galactic-path"></div>
+            
+            <!-- Steps -->
+            <div class="space-y-12">
+                <!-- Step 1: Completed Video -->
+                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
+                    <div class="lg:text-right order-2 lg:order-1">
+                        <div class="glass-card step-card completed card-3d rounded-3xl p-8">
+                            <div class="step-node completed">
+                                <span>🎬</span>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4 text-cosmic-green">1. Python OOP Temelleri</h3>
+                            <p class="text-gray-300 mb-6 leading-relaxed">
+                                Nesne yönelimli programlamanın temel kavramları, 
+                                class yapıları ve inheritance prensipleri
+                            </p>
+                            <div class="text-center">
+                                <a href="https://btkakademi.gov.tr/course/python-oop" target="_blank" 
+                                   id="courseBtn1" class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                    🚀 Kursa Git
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Completed Test -->
+                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
+                    <div class="lg:col-start-2 order-2">
+                        <div class="glass-card step-card completed card-3d rounded-3xl p-8">
+                            <div class="step-node completed">
+                                <span>🧠</span>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4 text-cosmic-green">2. OOP Kavramları Galaktik Testi</h3>
+                            <p class="text-gray-300 mb-6 leading-relaxed">
+                                Class, Object, Inheritance, Polymorphism konularında 
+                                10 zorlu soru ile bilgi pekiştirme
+                            </p>
+                            <div class="text-center">
+                                <a href="https://btkakademi.gov.tr/course/oop-test" target="_blank" 
+                                   id="courseBtn2" class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                    🚀 Teste Git
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Completed Video -->
+                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
+                    <div class="lg:text-right order-2 lg:order-1">
+                        <div class="glass-card step-card completed card-3d rounded-3xl p-8">
+                            <div class="step-node completed">
+                                <span>🎬</span>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4 text-cosmic-green">3. Decorators ve Generators</h3>
+                            <p class="text-gray-300 mb-6 leading-relaxed">
+                                Python'un en güçlü özelliklerinden decorators ve 
+                                memory-efficient generators kullanımı
+                            </p>
+                            <div class="text-center">
+                                <a href="https://btkakademi.gov.tr/course/decorators-generators" target="_blank" 
+                                   id="courseBtn3" class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                    🚀 Kursa Git
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Current Project -->
+                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
+                    <div class="lg:col-start-2 order-2">
+                        <div class="glass-card step-card current card-3d rounded-3xl p-8">
+                            <div class="step-node current">
+                                <span>💻</span>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4 text-cosmic-blue">4. Galaktik Kod Laboratuvarı</h3>
+                            <p class="text-gray-300 mb-6 leading-relaxed">
+                                Decorator ve generator konularında pratik kodlama projesi. 
+                                Kendi decorator'larınızı yazın ve performance optimizasyonu yapın.
+                            </p>
+                            <div class="text-center">
+                                <a href="https://btkakademi.gov.tr/course/code-lab" target="_blank" 
+                                   id="courseBtn4" class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                    🚀 Laboratuvara Git
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Locked Test -->
+                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
+                    <div class="lg:text-right order-2 lg:order-1">
+                        <div class="glass-card step-card locked card-3d rounded-3xl p-8">
+                            <div class="step-node locked">
+                                <span>🔒</span>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4 text-gray-400">5. Async/Await Master Challenge</h3>
+                            <p class="text-gray-400 mb-6 leading-relaxed">
+                                Asenkron programlama ve concurrent execution konularında 
+                                uzman seviye test. Unlocked after project completion.
+                            </p>
+                            <div class="text-center">
+                                <button id="courseBtn5" class="cosmic-btn text-lg px-8 py-3 inline-block opacity-50 cursor-not-allowed" disabled>
+                                    🔒 Kilitli
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 6: Surprise Element -->
+                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
+                    <div class="lg:col-start-2 order-2">
+                        <div class="glass-card step-card surprise card-3d rounded-3xl p-8">
+                            <div class="step-node surprise">
+                                <span>🎁</span>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4 text-cosmic-orange">6. AI Code Review Challenge</h3>
+                            <p class="text-gray-300 mb-6 leading-relaxed">
+                                Yapay zeka ile birlikte kod review yapın! Algoritmalarınızı 
+                                optimize edin ve performance metrikleri analiz edin.
+                            </p>
+                            <div class="text-center">
+                                <a href="https://btkakademi.gov.tr/course/ai-review" target="_blank" 
+                                   id="courseBtn6" class="cosmic-btn text-lg px-8 py-3 inline-block" 
+                                   style="background: linear-gradient(45deg, #ffaa00, #ff6600);">
+                                    🎁 Bonus'u Yakala!
+                                </a>
+                            </div>
+                        </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- More Steps Preview -->
+                <div class="text-center fade-in-cosmic">
+                    <div class="glass-card rounded-3xl p-8 max-w-2xl mx-auto">
+                        <h3 class="text-3xl font-bold mb-6 hologram-text">Ve Daha Fazlası...</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                            <div class="glass-card p-4 rounded-xl">
+                                <div class="text-2xl mb-2">🧬</div>
+                                <div class="font-semibold text-cosmic-pink">Data Science</div>
+                                <div class="text-sm text-gray-400">Pandas & NumPy</div>
+                            </div>
+                            <div class="glass-card p-4 rounded-xl">
+                                <div class="text-2xl mb-2">🚀</div>
+                                <div class="font-semibold text-cosmic-blue">Web APIs</div>
+                                <div class="text-sm text-gray-400">FastAPI & Flask</div>
+                            </div>
+                            <div class="glass-card p-4 rounded-xl">
+                                <div class="text-2xl mb-2">🤖</div>
+                                <div class="font-semibold text-cosmic-green">Machine Learning</div>
+                                <div class="text-sm text-gray-400">TensorFlow & PyTorch</div>
+                            </div>
+                        </div>
+                        <div class="mt-8">
+                            <div class="text-sm text-gray-400 mb-2 font-mono">TOTAl GALACTIC JOURNEY</div>
+                            <div class="text-4xl font-bold neon-text">20 LEVELS</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="mt-20 fade-in-cosmic">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-card rounded-3xl p-8 text-center card-3d">
+                    <div class="text-5xl mb-4">⚡</div>
+                    <div class="text-3xl font-bold neon-text mb-2">127</div>
+                    <div class="text-gray-300">Toplam XP</div>
+                </div>
+                <div class="glass-card rounded-3xl p-8 text-center card-3d">
+                    <div class="text-5xl mb-4">🎯</div>
+                    <div class="text-3xl font-bold text-cosmic-green mb-2">8</div>
+                    <div class="text-gray-300">Günlük Streak</div>
+                </div>
+                <div class="glass-card rounded-3xl p-8 text-center card-3d">
+                    <div class="text-5xl mb-4">🏆</div>
+                    <div class="text-3xl font-bold text-cosmic-orange mb-2">4</div>
+                    <div class="text-gray-300">Kazanılan Badge</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="relative z-20 glass-card-strong border-t border-white/20 mt-20">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                    <div class="text-2xl font-bold hologram-text">NEXUS</div>
+                    <div class="text-gray-400">Powered by Galactic AI</div>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <div class="achievement-badge">
+                        <span>🌟</span>
+                        <span>Python Expert Track</span>
+                    </div>
+                    <div class="text-gray-400 font-mono">v2.1.0</div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+
+
+
+    <script>
+        // Initialize cosmic background effects
+        function createStarField() {
+            const starField = document.getElementById('starField');
+            const starCount = 150;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = `star ${['small', 'medium', 'large'][Math.floor(Math.random() * 3)]}`;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.setProperty('--duration', (Math.random() * 3 + 1) + 's');
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starField.appendChild(star);
+            }
+        }
+
+        function createParticleSystem() {
+            const container = document.getElementById('particleContainer');
+            
+            setInterval(() => {
+                const particle = document.createElement('div');
+                particle.className = 'particle-system';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.setProperty('--random-x', (Math.random() - 0.5) * 200 + 'px');
+                particle.style.animationDelay = '0s';
+                container.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 8000);
+            }, 300);
+        }
+
+        // Intersection Observer for animations
+        function initScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.fade-in-cosmic').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+
+
+        // Dynamic progress updates
+        function updateProgress() {
+            const progressFill = document.querySelector('.cosmic-progress-fill');
+            const progressText = document.getElementById('overallProgress');
+            
+            let currentProgress = 35;
+            const targetProgress = 37;
+            
+            const interval = setInterval(() => {
+                if (currentProgress < targetProgress) {
+                    currentProgress++;
+                    progressFill.style.width = currentProgress + '%';
+                    progressText.textContent = currentProgress + '%';
+                } else {
+                    clearInterval(interval);
+                }
+            }, 100);
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            createStarField();
+            createParticleSystem();
+            initScrollAnimations();
+            
+            // Load user roadmap if exists
+            loadUserRoadmap();
+            
+            // Add some interactivity
+            setTimeout(() => {
+                updateProgress();
+            }, 2000);
+
+            // Add click effects to cards
+            document.querySelectorAll('.step-card').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transform = 'translateY(-5px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+
+
+
+        async function loadUserRoadmap() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    return; // User not logged in
+                }
+                
+                const response = await fetch('/api/get-user-roadmap', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.profile || result.courses.length > 0) {
+                    // Show progress section
+                    document.getElementById('progressSection').style.display = 'block';
+                    
+                    // Update progress
+                    const totalCourses = result.courses.length;
+                    const completedCourses = 0; // For now, all courses are pending
+                    
+                    document.getElementById('progressText').textContent = `${completedCourses}/${totalCourses} Seviye Tamamlandı`;
+                    document.getElementById('progressFill').style.width = `${(completedCourses / totalCourses) * 100}%`;
+                    
+                    // Update roadmap content
+                    updateRoadmapContent(result);
+                }
+                
+            } catch (error) {
+                console.error('Error loading roadmap:', error);
+            }
+        }
+
+        function updateRoadmapContent(roadmapData) {
+            // Update the roadmap steps with real data
+            const stepsContainer = document.querySelector('.space-y-12');
+            const stepCards = stepsContainer.querySelectorAll('.step-card');
+            
+            if (roadmapData.courses.length > 0) {
+                const course = roadmapData.courses[0]; // İlk kursu al
+                
+                // Kurs başlığını güncelle
+                const courseTitle = document.querySelector('.hologram-text');
+                if (courseTitle) {
+                    courseTitle.textContent = course.title.toUpperCase();
+                }
+                
+                // Dinamik bölümleri göster
+                if (course.roadmap_steps && course.roadmap_steps.length > 0) {
+                    // Mevcut kartları temizle
+                    stepCards.forEach(card => card.style.display = 'none');
+                    
+                    // Her bölüm için yeni kart oluştur
+                    course.roadmap_steps.forEach((step, index) => {
+                        if (index < stepCards.length) {
+                            const stepCard = stepCards[index];
+                            stepCard.style.display = 'block';
+                            
+                            // Bölüm başlığını güncelle
+                            const titleElement = stepCard.querySelector('h3');
+                            if (titleElement) titleElement.textContent = step.title;
+                            
+                            // Açıklamayı güncelle
+                            const descElement = stepCard.querySelector('p');
+                            if (descElement) descElement.textContent = step.description;
+                            
+                            // Step node'u güncelle
+                            const stepNode = stepCard.querySelector('.step-node');
+                            if (stepNode) {
+                                stepNode.innerHTML = `<span>${step.icon}</span>`;
+                                stepNode.className = `step-node ${step.status}`;
+                            }
+                            
+                            // Kart durumunu güncelle
+                            stepCard.className = `glass-card step-card ${step.status} card-3d rounded-3xl p-8`;
+                            
+                            // Butonu güncelle
+                            const buttonContainer = stepCard.querySelector('.text-center');
+                            if (buttonContainer) {
+                                if (step.status === 'locked') {
+                                    buttonContainer.innerHTML = `
+                                        <button class="cosmic-btn text-lg px-8 py-3 inline-block opacity-50 cursor-not-allowed" disabled>
+                                            🔒 Kilitli
+                                        </button>
+                                    `;
+                                } else {
+                                    buttonContainer.innerHTML = `
+                                        <a href="${step.link}" target="_blank" 
+                                           id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                            🚀 Bölüme Git
+                                        </a>
+                                    `;
+                                }
+                            }
+                        }
+                    });
+                    
+                    // İlerleme durumunu güncelle
+                    const totalSteps = course.roadmap_steps.length;
+                    const completedSteps = course.roadmap_steps.filter(step => step.status === 'completed').length;
+                    
+                    document.getElementById('progressText').textContent = `${completedSteps}/${totalSteps} Bölüm Tamamlandı`;
+                    document.getElementById('progressFill').style.width = `${(completedSteps / totalSteps) * 100}%`;
+                    document.getElementById('overallProgress').textContent = `${Math.round((completedSteps / totalSteps) * 100)}%`;
+                    
+                } else {
+                    // Eski sistem - sadece kurs bilgilerini göster
+                    roadmapData.courses.forEach((course, index) => {
+                        if (index < stepCards.length) {
+                            const stepCard = stepCards[index];
+                            
+                            const titleElement = stepCard.querySelector('h3');
+                            const descElement = stepCard.querySelector('p');
+                            
+                            if (titleElement) titleElement.textContent = course.title;
+                            if (descElement) descElement.textContent = course.description;
+                            
+                            const stepNode = stepCard.querySelector('.step-node');
+                            if (stepNode) {
+                                stepNode.innerHTML = '<span>📚</span>';
+                                stepNode.className = 'step-node current';
+                            }
+                            
+                            stepCard.className = 'glass-card step-card current card-3d rounded-3xl p-8';
+                            
+                            const buttonContainer = stepCard.querySelector('.text-center');
+                            if (buttonContainer) {
+                                buttonContainer.innerHTML = `
+                                    <a href="${course.link}" target="_blank" 
+                                       id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                        🚀 Kursa Git
+                                    </a>
+                                `;
+                            }
+                        }
+                    });
+                }
+                
+                // Fazla kartları gizle
+                for (let i = Math.max(course.roadmap_steps ? course.roadmap_steps.length : roadmapData.courses.length, 0); i < stepCards.length; i++) {
+                    stepCards[i].style.display = 'none';
+                }
+            }
+        }
+
+        // Add some dynamic achievements
+        setTimeout(() => {
+            const achievementContainer = document.querySelector('.achievement-badge');
+            if (achievementContainer) {
+                const newAchievement = document.createElement('div');
+                newAchievement.className = 'achievement-badge';
+                newAchievement.style.opacity = '0';
+                newAchievement.innerHTML = '<span>🎯</span><span>Focus Master</span>';
+                
+                achievementContainer.parentNode.insertBefore(newAchievement, achievementContainer.nextSibling);
+                
+                setTimeout(() => {
+                    newAchievement.style.transition = 'opacity 0.5s ease';
+                    newAchievement.style.opacity = '1';
+                }, 100);
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

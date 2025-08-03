@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğrenme Yol Haritası - BTK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #00f5ff, #ff00f5);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #00ccff, #ff00cc);
+        }
+        
+        /* Ensure body can scroll */
+        html, body {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        /* Cosmic button styles */
+        .cosmic-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white !important;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .cosmic-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+            color: white !important;
+        }
+
+        .cosmic-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Pulse button animation */
+        .pulse-btn {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            }
+            50% {
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.8), 0 0 0 10px rgba(102, 126, 234, 0.1);
+            }
+            100% {
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            }
+        }
+
+        /* Cosmic background */
+        .cosmic-bg {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+        }
+
+        /* Glass card styles */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Cosmic header */
+        .cosmic-header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Input glow effect */
+        .input-glow:focus {
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Cosmic colors */
+        .text-cosmic-blue {
+            color: #667eea;
+        }
+
+        .text-cosmic-green {
+            color: #10b981;
+        }
+
+        .bg-cosmic-blue {
+            background-color: #667eea;
+        }
+
+        /* Progress bar */
+        .cosmic-progress-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+    </style>
+</head>
+<body class="cosmic-bg min-h-screen overflow-y-auto">
+    <!-- Header -->
+    <header class="cosmic-header">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">
+                        🚀 BTK Akademi
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/roadmap" class="text-gray-300 hover:text-white transition-colors">
+                        ← Yol Haritasına Dön
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12 min-h-screen">
+        <div class="max-w-4xl mx-auto pb-12">
+            <!-- Page Title -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent mb-4">
+                    🎯 Kişisel Öğrenme Yol Haritası
+                </h1>
+                <p class="text-gray-400 text-lg">5 soru ile size özel kurs önerisi alın</p>
+            </div>
+
+            <!-- Form Container -->
+            <div id="formContainer" class="glass-card p-8 rounded-3xl">
+                <form id="learningForm" class="space-y-8">
+                    <!-- Skill Question -->
+                    <div class="space-y-4">
+                        <label class="block text-xl font-semibold text-white">
+                            1. Hangi beceriyi öğrenmek istiyorsun?
+                        </label>
+                        <input type="text" name="skill" required 
+                               class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400"
+                               placeholder="Örnek: Python, JavaScript, React, Veri Analizi...">
+                    </div>
+
+                    <!-- Goal Question -->
+                    <div class="space-y-4">
+                        <label class="block text-xl font-semibold text-white">
+                            2. Öğrenme amacın nedir?
+                        </label>
+                        <input type="text" name="goal" required 
+                               class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400"
+                               placeholder="Örnek: İş bulmak, proje geliştirmek, kariyer değişikliği...">
+                    </div>
+
+                    <!-- Level Question -->
+                    <div class="space-y-4">
+                        <label class="block text-xl font-semibold text-white">
+                            3. Bu konudaki mevcut seviyen nedir?
+                        </label>
+                        <select name="level" required 
+                                class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400">
+                            <option value="">Seviye seçin</option>
+                            <option value="Hiç bilmiyorum">Hiç bilmiyorum</option>
+                            <option value="Temel bilgim var">Temel bilgim var</option>
+                            <option value="Orta seviye">Orta seviye</option>
+                            <option value="İleri seviye">İleri seviye</option>
+                        </select>
+                    </div>
+
+                    <!-- Time Question -->
+                    <div class="space-y-4">
+                        <label class="block text-xl font-semibold text-white">
+                            4. Ne kadar zaman ayırabilirsin?
+                        </label>
+                        <input type="text" name="time" required 
+                               class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400"
+                               placeholder="Örnek: Günde 1 saat, haftada 3 gün, 2 ay...">
+                    </div>
+
+                    <!-- Learning Style Question -->
+                    <div class="space-y-4">
+                        <label class="block text-xl font-semibold text-white">
+                            5. Hangi öğrenme tarzını tercih edersin?
+                        </label>
+                        <select name="learning_style" required 
+                                class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400">
+                            <option value="">Öğrenme tarzı seçin</option>
+                            <option value="Videolu anlatım">Videolu anlatım</option>
+                            <option value="Uygulamalı görevler">Uygulamalı görevler</option>
+                            <option value="Proje odaklı">Proje odaklı</option>
+                            <option value="Metin ve dökümanla öğrenme">Metin ve dökümanla öğrenme</option>
+                        </select>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center pt-6">
+                        <button type="submit" 
+                                class="cosmic-btn text-xl px-12 py-4 pulse-btn">
+                            🤖 Profilimi Analiz Et
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Loading Container -->
+            <div id="loadingContainer" class="glass-card p-8 rounded-3xl hidden">
+                <div class="text-center space-y-6">
+                    <div class="text-3xl">🚀</div>
+                    <h3 class="text-2xl font-bold text-white">Profiliniz Analiz Ediliyor...</h3>
+                    <p class="text-gray-400">BTK Akademi'den en uygun kurslar aranıyor</p>
+                    
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-gray-700 rounded-full h-3">
+                        <div class="cosmic-progress-fill h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    
+                    <p class="text-sm text-gray-500">Bu işlem birkaç saniye sürebilir</p>
+                </div>
+            </div>
+
+            <!-- Results Container -->
+            <div id="resultsContainer" class="glass-card p-8 rounded-3xl hidden">
+                <div class="space-y-8">
+                    <!-- Profile Summary -->
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-4">📊 Profil Özeti</h3>
+                        <div id="profileSummary" class="bg-gray-800 p-6 rounded-xl text-gray-300">
+                            <!-- Profile data will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Course Recommendation -->
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-4">🎯 Önerilen Kurs</h3>
+                        <div id="courseRecommendation" class="bg-gray-800 p-6 rounded-xl">
+                            <!-- Course data will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 pt-6">
+                        <button id="addToRoadmapBtn" 
+                                class="cosmic-btn text-lg px-8 py-3 flex-1">
+                            🗺️ Yol Haritasına Ekle
+                        </button>
+                        <button onclick="resetForm()" 
+                                class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-xl transition-colors flex-1">
+                            🔄 Yeni Analiz
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Form submission
+        document.getElementById('learningForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await analyzeProfile();
+        });
+
+        // Add to roadmap button
+        document.getElementById('addToRoadmapBtn').addEventListener('click', async () => {
+            await addCourseToRoadmap();
+        });
+
+        async function analyzeProfile() {
+            const form = document.getElementById('learningForm');
+            const formData = new FormData(form);
+            
+            const data = {
+                skill: formData.get('skill'),
+                goal: formData.get('goal'),
+                level: formData.get('level'),
+                time: formData.get('time'),
+                learning_style: formData.get('learning_style')
+            };
+            
+            console.log('Sending data:', data);
+            
+            // Show loading
+            document.getElementById('formContainer').classList.add('hidden');
+            document.getElementById('loadingContainer').classList.remove('hidden');
+            
+            // Simulate loading animation
+            const progressBar = document.querySelector('#loadingContainer .cosmic-progress-fill');
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = progress + '%';
+                if (progress >= 90) {
+                    clearInterval(interval);
+                }
+            }, 100);
+            
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    throw new Error('Giriş yapmanız gerekiyor');
+                }
+                
+                console.log('Making API request...');
+                const response = await fetch('/api/analyze-profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                console.log('Response status:', response.status);
+                const result = await response.json();
+                console.log('Response data:', result);
+                
+                if (result.success) {
+                    showResults(result);
+                } else {
+                    throw new Error(result.error || 'Bir hata oluştu');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Hide loading and show form again
+                document.getElementById('loadingContainer').classList.add('hidden');
+                document.getElementById('formContainer').classList.remove('hidden');
+                
+                // Show error message
+                const errorMessage = error.message || 'Bilinmeyen bir hata oluştu';
+                alert('Hata: ' + errorMessage);
+            }
+        }
+
+        function showResults(result) {
+            console.log('Showing results:', result);
+            
+            // Complete the progress bar
+            const progressBar = document.querySelector('#loadingContainer .cosmic-progress-fill');
+            progressBar.style.width = '100%';
+            
+            // Hide loading and show results
+            setTimeout(() => {
+                document.getElementById('loadingContainer').classList.add('hidden');
+                document.getElementById('resultsContainer').classList.remove('hidden');
+                
+                // Show profile summary
+                const profileSummary = document.getElementById('profileSummary');
+                profileSummary.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <strong>Hedef:</strong> ${result.profile.hedef}
+                        </div>
+                        <div>
+                            <strong>Seviye:</strong> ${result.profile.seviye}
+                        </div>
+                        <div>
+                            <strong>Yaklaşım:</strong> ${result.profile.yaklasim}
+                        </div>
+                        <div>
+                            <strong>Süre:</strong> ${result.profile.sure}
+                        </div>
+                    </div>
+                `;
+                
+                // Show course recommendation
+                const courseRecommendation = document.getElementById('courseRecommendation');
+                if (result.recommended_course) {
+                    courseRecommendation.innerHTML = `
+                        <div class="space-y-4">
+                            <h5 class="text-lg font-bold text-cosmic-blue">${result.recommended_course.title}</h5>
+                            <p class="text-gray-400">${result.recommended_course.description}</p>
+                            <p class="text-sm text-cosmic-green"><strong>Neden bu kurs:</strong> ${result.recommended_course.reason}</p>
+                            <a href="${result.recommended_course.link}" target="_blank" class="inline-block bg-cosmic-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                                Kursu İncele
+                            </a>
+                        </div>
+                    `;
+                    
+                    // Store course data for later use
+                    window.currentCourse = result.recommended_course;
+                } else {
+                    courseRecommendation.innerHTML = `
+                        <p class="text-gray-400">Uygun kurs bulunamadı. Lütfen farklı bir beceri deneyin.</p>
+                    `;
+                }
+            }, 500);
+        }
+
+        async function addCourseToRoadmap() {
+            if (!window.currentCourse) {
+                alert('Önce bir kurs analizi yapın');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    throw new Error('Giriş yapmanız gerekiyor');
+                }
+
+                const response = await fetch('/api/add-course-to-roadmap', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        course_title: window.currentCourse.title,
+                        course_link: window.currentCourse.link,
+                        course_description: window.currentCourse.description
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Kurs yol haritasına eklendi!');
+                    window.location.href = '/roadmap';
+                } else {
+                    throw new Error(result.error || 'Kurs eklenirken hata oluştu');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Hata: ' + error.message);
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('resultsContainer').classList.add('hidden');
+            document.getElementById('formContainer').classList.remove('hidden');
+            document.getElementById('learningForm').reset();
+            window.currentCourse = null;
+        }
+
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                alert('Bu sayfayı kullanmak için giriş yapmanız gerekiyor');
+                window.location.href = '/login';
+            }
+        });
+    </script>
+</body>
+</html> 
