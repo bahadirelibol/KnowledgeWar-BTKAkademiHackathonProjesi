@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='profile.css') }}">
 </head>
+
 <body class="min-h-screen text-white bg-gray-900">
     <!-- Animated Background -->
     <div class="stars" id="stars"></div>
@@ -15,17 +17,15 @@
     <div class="floating-orb orb-3"></div>
 
     <!-- Navigation -->
-    <!-- Navigation -->
     <nav class="relative z-10 glass-card border-b border-white/10">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
                     <div class="text-2xl font-black neon-text">ROADMAP</div>
                     <div class="hidden md:flex items-center space-x-6 ml-8">
-                        <a href="#" class="text-gray-300 hover:text-white transition-colors">Dashboard</a>
-                        <a href="#" class="text-white font-semibold">Profile</a>
-                        <a href="#" class="text-gray-300 hover:text-white transition-colors">Courses</a>
-                        <a href="#" class="text-gray-300 hover:text-white transition-colors">Progress</a>
+                        <a href="/" class="text-gray-300 hover:text-white transition-colors">Ana sayfa</a>
+                        <a href="/roadmap" class="text-gray-300 hover:text-white transition-colors">Yol Haritası</a>
+                        <a href="/tournament" class="text-gray-300 hover:text-white transition-colors">Turnuvalar</a>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -43,7 +43,7 @@
                     <div class="relative z-50">
                         <button id="avatarButton"
                             class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center neon-glow focus:outline-none relative z-50">
-                            <span class="text-sm font-bold">JD</span>
+                            <span class="text-sm font-bold ui-avatar"></span>
                         </button>
 
                         <div id="dropdownMenu"
@@ -69,7 +69,7 @@
                     <div class="text-center">
                         <div class="relative inline-block mb-6">
                             <div
-                                class="w-32 h-32 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center neon-glow text-4xl font-bold">
+                                class="ui-avatar w-32 h-32 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center neon-glow text-4xl font-bold">
                                 JD
                             </div>
                             <div
@@ -77,8 +77,8 @@
                                 <div class="w-3 h-3 bg-white rounded-full"></div>
                             </div>
                         </div>
-                        <h2 class="text-3xl font-bold neon-text mb-2">John Doe</h2>
-                        <p class="text-gray-400 mb-4">Full Stack Developer</p>
+                        <h2 class="text-3xl font-bold neon-text mb-2" id="userName"></h2>
+                        <!-- <p class="text-gray-400 mb-4">Full Stack Developer</p> -->
                         <div class="flex items-center justify-center space-x-2 text-sm text-gray-400 mb-6">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -383,25 +383,33 @@
         function checkAuth() {
             const token = localStorage.getItem('authToken');
             const userData = localStorage.getItem('userData');
-            
+
             if (!token || !userData) {
                 window.location.href = '/';
                 return;
             }
-            
+
             // Load user data
             const user = JSON.parse(userData);
-            
+            // Büyük harfli baş harfleri oluştur
+            const initials = `${user.first_name[0].toUpperCase()}${user.last_name[0].toUpperCase()}`;
+
+            // Tüm .ui-avatar sınıfına sahip öğelere yaz
+            document.querySelectorAll('.ui-avatar').forEach(el => {
+                el.textContent = initials;
+            });
+
+
             // Update UI
             document.getElementById('userName').textContent = `${user.first_name} ${user.last_name}`;
             document.getElementById('userFullName').textContent = `${user.first_name} ${user.last_name}`;
             document.getElementById('userEmail').textContent = user.email;
             document.getElementById('userInitials').textContent = `${user.first_name[0]}${user.last_name[0]}`;
-            
+
             // Load additional user data from API
             loadUserProfile();
         }
-        
+
         async function loadUserProfile() {
             try {
                 const token = localStorage.getItem('authToken');
@@ -410,15 +418,15 @@
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                
+
                 if (response.ok) {
                     const data = await response.json();
                     const user = data.user;
-                    
+
                     // Format dates
                     const createdDate = new Date(user.created_at).toLocaleDateString('tr-TR');
                     const lastLoginDate = user.last_login ? new Date(user.last_login).toLocaleDateString('tr-TR') : 'İlk giriş';
-                    
+
                     document.getElementById('userCreatedAt').textContent = createdDate;
                     document.getElementById('userLastLogin').textContent = lastLoginDate;
                 }
@@ -426,15 +434,16 @@
                 console.error('Profil yüklenirken hata:', error);
             }
         }
-        
+
         function logout() {
             localStorage.removeItem('authToken');
             localStorage.removeItem('userData');
             window.location.href = '/';
         }
-        
+
         // Check auth on page load
         document.addEventListener('DOMContentLoaded', checkAuth);
     </script>
 </body>
-</html> 
+
+</html>
