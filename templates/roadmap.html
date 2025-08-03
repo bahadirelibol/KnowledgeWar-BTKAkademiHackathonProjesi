@@ -512,6 +512,25 @@
         .text-cosmic-pink { color: #ff00f5; }
         .text-cosmic-green { color: #00ff88; }
         .text-cosmic-orange { color: #ffaa00; }
+
+        /* İlk kartı kesinlikle görünür yap */
+        .space-y-12 > .fade-in-cosmic:first-child {
+            opacity: 1 !important;
+            transform: translateY(0) rotateX(0deg) !important;
+            visibility: visible !important;
+            z-index: 100 !important;
+        }
+        
+        .space-y-12 > .fade-in-cosmic:first-child .step-card {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+        }
+
+        /* Galactic path z-index'ini düşür */
+        .galactic-path {
+            z-index: 1 !important;
+        }
     </style>
 </head>
 
@@ -527,28 +546,59 @@
 
     <!-- Header -->
     <header class="relative z-20 glass-card-strong border-b border-white/20">
-        <div class="container mx-auto px-6 py-6">
+        <div class="container mx-auto px-8 py-4">
             <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-6">
-                    <div class="text-3xl font-bold hologram-text">NEXUS</div>
-                    <div class="text-gray-400">|</div>
-                    <div class="text-xl font-semibold neon-text">Galaktik Öğrenme Yolu</div>
+                <!-- Sol Taraf - Logo ve Başlık -->
+                <div class="flex items-center space-x-8">
+                    <div class="text-2xl font-bold hologram-text">NEXUS</div>
+                    <div class="hidden md:block w-px h-8 bg-gradient-to-b from-transparent via-white/30 to-transparent"></div>
+                    <div class="text-lg font-medium text-gray-300">Galaktik Öğrenme Yolu</div>
                 </div>
-                <div class="flex items-center space-x-6">
-                    <a href="/learn" id="headerLearnBtn" class="cosmic-btn text-lg px-6 py-3 pulse-btn">
-                        📚 ÖĞREN
+                
+                <!-- Orta - İlerleme -->
+                <div class="hidden lg:flex items-center space-x-8">
+                    <div class="glass-card px-6 py-2 rounded-xl">
+                        <div class="text-xs text-gray-400 font-mono uppercase tracking-wider">İlerleme</div>
+                        <div class="text-xl font-bold neon-text" id="overallProgress">37%</div>
+                    </div>
+                </div>
+                
+                <!-- Sağ Taraf - Butonlar ve Profil -->
+                <div class="flex items-center space-x-4">
+                    <!-- Badge'ler -->
+                    <div class="hidden sm:flex items-center space-x-3">
+                        <div class="achievement-badge text-sm">
+                            <span>🔥</span>
+                            <span>8 Gün</span>
+                        </div>
+                        <div class="achievement-badge text-sm" style="opacity: 1; transition: opacity 0.5s;">
+                            <span>🎯</span>
+                            <span>Focus</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Turnuvalar Butonu -->
+                    <a href="/tournament" id="tournamentBtn" class="cosmic-btn text-base px-6 py-2.5">
+                        🏆 Turnuvalar
                     </a>
-                    <div class="glass-card px-6 py-3 rounded-2xl">
-                        <div class="text-sm text-gray-300 font-mono">TOPLAM İLERLEME</div>
-                        <div class="text-2xl font-bold neon-text" id="overallProgress">35%</div>
-                    </div>
-                    <div class="achievement-badge">
-                        <span>🔥</span>
-                        <span>8 Gün Aktif</span>
-                    </div>
-                    <div class="step-node current" style="width: 50px; height: 50px; font-size: 16px; margin: 0;">
+                    
+                    <!-- Ana Buton -->
+                    <a href="/learn" id="headerLearnBtn" class="cosmic-btn text-base px-6 py-2.5">
+                        📚 Öğren
+                    </a>
+                    
+                    <!-- Profil -->
+                    <div class="step-node current ml-2" style="width: 40px; height: 40px; font-size: 14px;">
                         <span>JD</span>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Mobil İlerleme (Sadece küçük ekranlarda) -->
+            <div class="lg:hidden mt-4">
+                <div class="glass-card px-4 py-3 rounded-xl text-center">
+                    <div class="text-xs text-gray-400 font-mono uppercase tracking-wider mb-1">Toplam İlerleme</div>
+                    <div class="text-2xl font-bold neon-text" id="overallProgressMobile">37%</div>
                 </div>
             </div>
         </div>
@@ -732,33 +782,7 @@
                     </div>
                 </div>
 
-                <!-- More Steps Preview -->
-                <div class="text-center fade-in-cosmic">
-                    <div class="glass-card rounded-3xl p-8 max-w-2xl mx-auto">
-                        <h3 class="text-3xl font-bold mb-6 hologram-text">Ve Daha Fazlası...</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                            <div class="glass-card p-4 rounded-xl">
-                                <div class="text-2xl mb-2">🧬</div>
-                                <div class="font-semibold text-cosmic-pink">Data Science</div>
-                                <div class="text-sm text-gray-400">Pandas & NumPy</div>
-                            </div>
-                            <div class="glass-card p-4 rounded-xl">
-                                <div class="text-2xl mb-2">🚀</div>
-                                <div class="font-semibold text-cosmic-blue">Web APIs</div>
-                                <div class="text-sm text-gray-400">FastAPI & Flask</div>
-                            </div>
-                            <div class="glass-card p-4 rounded-xl">
-                                <div class="text-2xl mb-2">🤖</div>
-                                <div class="font-semibold text-cosmic-green">Machine Learning</div>
-                                <div class="text-sm text-gray-400">TensorFlow & PyTorch</div>
-                            </div>
-                        </div>
-                        <div class="mt-8">
-                            <div class="text-sm text-gray-400 mb-2 font-mono">TOTAl GALACTIC JOURNEY</div>
-                            <div class="text-4xl font-bold neon-text">20 LEVELS</div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </div>
 
@@ -883,6 +907,12 @@
             createParticleSystem();
             initScrollAnimations();
             
+            // İlk kartı kesinlikle görünür yap
+            const firstCard = document.querySelector('.fade-in-cosmic');
+            if (firstCard) {
+                firstCard.classList.add('visible');
+            }
+            
             // Load user roadmap if exists
             loadUserRoadmap();
             
@@ -909,7 +939,9 @@
             try {
                 const token = localStorage.getItem('authToken');
                 if (!token) {
-                    return; // User not logged in
+                    // Token yoksa mevcut kartları göster
+                    showDefaultCards();
+                    return;
                 }
                 
                 const response = await fetch('/api/get-user-roadmap', {
@@ -933,17 +965,46 @@
                     
                     // Update roadmap content
                     updateRoadmapContent(result);
+                } else {
+                    // Veri yoksa mevcut kartları göster
+                    showDefaultCards();
                 }
                 
             } catch (error) {
                 console.error('Error loading roadmap:', error);
+                // Hata durumunda da mevcut kartları göster
+                showDefaultCards();
             }
+        }
+
+        // Mevcut kartları gösteren fonksiyon
+        function showDefaultCards() {
+            const stepCards = document.querySelectorAll('.step-card');
+            stepCards.forEach(card => {
+                card.style.display = 'block';
+                const fadeElement = card.closest('.fade-in-cosmic');
+                if (fadeElement) {
+                    fadeElement.classList.add('visible');
+                }
+            });
         }
 
         function updateRoadmapContent(roadmapData) {
             // Update the roadmap steps with real data
             const stepsContainer = document.querySelector('.space-y-12');
             const stepCards = stepsContainer.querySelectorAll('.step-card');
+            
+            // Eğer veri yoksa veya boşsa mevcut kartları göster
+            if (!roadmapData || !roadmapData.courses || roadmapData.courses.length === 0) {
+                stepCards.forEach(card => {
+                    card.style.display = 'block';
+                    const fadeElement = card.closest('.fade-in-cosmic');
+                    if (fadeElement) {
+                        fadeElement.classList.add('visible');
+                    }
+                });
+                return;
+            }
             
             if (roadmapData.courses.length > 0) {
                 const course = roadmapData.courses[0]; // İlk kursu al
@@ -959,47 +1020,54 @@
                     // Mevcut kartları temizle
                     stepCards.forEach(card => card.style.display = 'none');
                     
-                    // Her bölüm için yeni kart oluştur
+                    // Her bölüm için dinamik kart oluştur
                     course.roadmap_steps.forEach((step, index) => {
+                        let stepCard;
+                        
+                        // Eğer mevcut kart varsa kullan, yoksa yeni oluştur
                         if (index < stepCards.length) {
-                            const stepCard = stepCards[index];
+                            stepCard = stepCards[index];
                             stepCard.style.display = 'block';
-                            
-                            // Bölüm başlığını güncelle
-                            const titleElement = stepCard.querySelector('h3');
-                            if (titleElement) titleElement.textContent = step.title;
-                            
-                            // Açıklamayı güncelle
-                            const descElement = stepCard.querySelector('p');
-                            if (descElement) descElement.textContent = step.description;
-                            
-                            // Step node'u güncelle
-                            const stepNode = stepCard.querySelector('.step-node');
-                            if (stepNode) {
-                                stepNode.innerHTML = `<span>${step.icon}</span>`;
-                                stepNode.className = `step-node ${step.status}`;
-                            }
-                            
-                            // Kart durumunu güncelle
-                            stepCard.className = `glass-card step-card ${step.status} card-3d rounded-3xl p-8`;
-                            
-                            // Butonu güncelle
-                            const buttonContainer = stepCard.querySelector('.text-center');
-                            if (buttonContainer) {
-                                if (step.status === 'locked') {
-                                    buttonContainer.innerHTML = `
-                                        <button class="cosmic-btn text-lg px-8 py-3 inline-block opacity-50 cursor-not-allowed" disabled>
-                                            🔒 Kilitli
-                                        </button>
-                                    `;
-                                } else {
-                                    buttonContainer.innerHTML = `
-                                        <a href="${step.link}" target="_blank" 
-                                           id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                            🚀 Bölüme Git
-                                        </a>
-                                    `;
-                                }
+                        } else {
+                            // Yeni kart oluştur
+                            stepCard = createNewStepCard(step, index);
+                            stepsContainer.appendChild(stepCard);
+                        }
+                        
+                        // Bölüm başlığını güncelle
+                        const titleElement = stepCard.querySelector('h3');
+                        if (titleElement) titleElement.textContent = step.title;
+                        
+                        // Açıklamayı güncelle
+                        const descElement = stepCard.querySelector('p');
+                        if (descElement) descElement.textContent = step.description;
+                        
+                        // Step node'u güncelle
+                        const stepNode = stepCard.querySelector('.step-node');
+                        if (stepNode) {
+                            stepNode.innerHTML = `<span>${step.icon}</span>`;
+                            stepNode.className = `step-node ${step.status}`;
+                        }
+                        
+                        // Kart durumunu güncelle
+                        stepCard.className = `glass-card step-card ${step.status} card-3d rounded-3xl p-8 fade-in-cosmic`;
+                        
+                        // Butonu güncelle
+                        const buttonContainer = stepCard.querySelector('.text-center');
+                        if (buttonContainer) {
+                            if (step.status === 'locked') {
+                                buttonContainer.innerHTML = `
+                                    <button class="cosmic-btn text-lg px-8 py-3 inline-block opacity-50 cursor-not-allowed" disabled>
+                                        🔒 Kilitli
+                                    </button>
+                                `;
+                            } else {
+                                buttonContainer.innerHTML = `
+                                    <a href="${step.link}" target="_blank" 
+                                       id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                        🚀 Bölüme Git
+                                    </a>
+                                `;
                             }
                         }
                     });
@@ -1015,60 +1083,83 @@
                 } else {
                     // Eski sistem - sadece kurs bilgilerini göster
                     roadmapData.courses.forEach((course, index) => {
+                        let stepCard;
+                        
                         if (index < stepCards.length) {
-                            const stepCard = stepCards[index];
-                            
-                            const titleElement = stepCard.querySelector('h3');
-                            const descElement = stepCard.querySelector('p');
-                            
-                            if (titleElement) titleElement.textContent = course.title;
-                            if (descElement) descElement.textContent = course.description;
-                            
-                            const stepNode = stepCard.querySelector('.step-node');
-                            if (stepNode) {
-                                stepNode.innerHTML = '<span>📚</span>';
-                                stepNode.className = 'step-node current';
-                            }
-                            
-                            stepCard.className = 'glass-card step-card current card-3d rounded-3xl p-8';
-                            
-                            const buttonContainer = stepCard.querySelector('.text-center');
-                            if (buttonContainer) {
-                                buttonContainer.innerHTML = `
-                                    <a href="${course.link}" target="_blank" 
-                                       id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                        🚀 Kursa Git
-                                    </a>
-                                `;
-                            }
+                            stepCard = stepCards[index];
+                            stepCard.style.display = 'block';
+                        } else {
+                            stepCard = createNewStepCard(course, index);
+                            stepsContainer.appendChild(stepCard);
+                        }
+                        
+                        const titleElement = stepCard.querySelector('h3');
+                        const descElement = stepCard.querySelector('p');
+                        
+                        if (titleElement) titleElement.textContent = course.title;
+                        if (descElement) descElement.textContent = course.description;
+                        
+                        const stepNode = stepCard.querySelector('.step-node');
+                        if (stepNode) {
+                            stepNode.innerHTML = '<span>📚</span>';
+                            stepNode.className = 'step-node current';
+                        }
+                        
+                        stepCard.className = 'glass-card step-card current card-3d rounded-3xl p-8 fade-in-cosmic';
+                        
+                        const buttonContainer = stepCard.querySelector('.text-center');
+                        if (buttonContainer) {
+                            buttonContainer.innerHTML = `
+                                <a href="${course.link}" target="_blank" 
+                                   id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                    🚀 Kursa Git
+                                </a>
+                            `;
                         }
                     });
                 }
                 
-                // Fazla kartları gizle
-                for (let i = Math.max(course.roadmap_steps ? course.roadmap_steps.length : roadmapData.courses.length, 0); i < stepCards.length; i++) {
-                    stepCards[i].style.display = 'none';
+                // Fazla kartları gizle (sadece eski kartlar için)
+                const allStepCards = stepsContainer.querySelectorAll('.step-card');
+                const maxSteps = course.roadmap_steps ? course.roadmap_steps.length : roadmapData.courses.length;
+                
+                for (let i = maxSteps; i < stepCards.length; i++) {
+                    if (stepCards[i]) {
+                        stepCards[i].style.display = 'none';
+                    }
                 }
             }
         }
 
-        // Add some dynamic achievements
-        setTimeout(() => {
-            const achievementContainer = document.querySelector('.achievement-badge');
-            if (achievementContainer) {
-                const newAchievement = document.createElement('div');
-                newAchievement.className = 'achievement-badge';
-                newAchievement.style.opacity = '0';
-                newAchievement.innerHTML = '<span>🎯</span><span>Focus Master</span>';
-                
-                achievementContainer.parentNode.insertBefore(newAchievement, achievementContainer.nextSibling);
-                
-                setTimeout(() => {
-                    newAchievement.style.transition = 'opacity 0.5s ease';
-                    newAchievement.style.opacity = '1';
-                }, 100);
-            }
-        }, 5000);
+        // Yeni step kartı oluşturma fonksiyonu
+        function createNewStepCard(step, index) {
+            const isEven = index % 2 === 0;
+            const cardHTML = `
+                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
+                    <div class="${isEven ? 'lg:text-right order-2 lg:order-1' : 'lg:col-start-2 order-2'}">
+                        <div class="glass-card step-card card-3d rounded-3xl p-8">
+                            <div class="step-node">
+                                <span>${step.icon || '📚'}</span>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4">${step.title || 'Yeni Bölüm'}</h3>
+                            <p class="text-gray-300 mb-6 leading-relaxed">
+                                ${step.description || 'Bu bölümün açıklaması burada yer alacak.'}
+                            </p>
+                            <div class="text-center">
+                                <a href="${step.link || '#'}" target="_blank" 
+                                   id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                    🚀 Bölüme Git
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = cardHTML;
+            return tempDiv.firstElementChild;
+        }
     </script>
 </body>
 </html>

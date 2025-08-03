@@ -1004,8 +1004,8 @@ def save_tournament():
         
         # Turnuvayı kaydet
         cursor.execute('''
-            INSERT INTO tournaments (title, content, start_time, end_time)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO tournaments (title, content, start_time, end_time, status)
+            VALUES (?, ?, ?, ?, 'active')
         ''', (data['title'], data['content'], data['start_time'], data['end_time']))
         
         tournament_id = cursor.lastrowid
@@ -1043,6 +1043,14 @@ def get_tournaments():
     try:
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
+        
+        # Önce status'u NULL olan turnuvaları 'active' yap
+        cursor.execute('''
+            UPDATE tournaments 
+            SET status = 'active' 
+            WHERE status IS NULL OR status = ''
+        ''')
+        conn.commit()
         
         cursor.execute('''
             SELECT id, title, content, start_time, end_time, status, created_at
@@ -1111,19 +1119,19 @@ def join_tournament():
             conn.close()
             return jsonify({'error': 'Turnuva bulunamadı'}), 404
         
-        start_time = datetime.datetime.fromisoformat(tournament[0].replace('Z', '+00:00'))
-        end_time = datetime.datetime.fromisoformat(tournament[1].replace('Z', '+00:00'))
-        current_time = datetime.datetime.now()
-        
-        # Turnuva başlamamışsa katılıma izin verme
-        if current_time < start_time:
-            conn.close()
-            return jsonify({'error': 'Turnuva henüz başlamadı'}), 400
-        
-        # Turnuva bitmişse katılıma izin verme
-        if current_time > end_time:
-            conn.close()
-            return jsonify({'error': 'Turnuva süresi dolmuş'}), 400
+        # Zaman kontrolü (daha esnek)
+        try:
+            start_time = datetime.datetime.fromisoformat(tournament[0].replace('Z', '+00:00'))
+            end_time = datetime.datetime.fromisoformat(tournament[1].replace('Z', '+00:00'))
+            current_time = datetime.datetime.now()
+            
+            # Turnuva bitmişse katılıma izin verme
+            if current_time > end_time:
+                conn.close()
+                return jsonify({'error': 'Turnuva süresi dolmuş'}), 400
+        except:
+            # Zaman formatı sorunluysa katılıma izin ver
+            pass
         
         # Daha önce katılmış mı kontrol et
         cursor.execute('''
@@ -1416,16 +1424,25 @@ def get_tournament_results(tournament_id):
         participants = cursor.fetchall()
         conn.close()
         
-        results = []
+        participants_list = []
         for i, participant in enumerate(participants):
-            results.append({
+            # Tamamlama süresini hesapla
+            completion_time = "N/A"
+            if participant[5]:  # completed_at varsa
+                try:
+                    completed_time = datetime.datetime.fromisoformat(participant[5].replace('Z', '+00:00'))
+                    # Basit süre hesaplama (gerçek uygulamada daha detaylı olabilir)
+                    completion_time = "Tamamlandı"
+                except:
+                    completion_time = "N/A"
+            
+            participants_list.append({
                 'rank': i + 1,
-                'first_name': participant[0],
-                'last_name': participant[1],
-                'total_score': participant[2],
-                'total_questions': participant[3],
-                'correct_answers': participant[4],
-                'completed_at': participant[5]
+                'username': f"{participant[0]} {participant[1]}",
+                'total_score': participant[2] or 0,
+                'total_questions': participant[3] or 0,
+                'correct_answers': participant[4] or 0,
+                'completion_time': completion_time
             })
         
         return jsonify({
@@ -1437,7 +1454,7 @@ def get_tournament_results(tournament_id):
                 'end_time': tournament[2],
                 'status': tournament[3]
             },
-            'results': results
+            'participants': participants_list
         }), 200
         
     except Exception as e:
@@ -1486,21 +1503,38 @@ def get_user_tournament_status(tournament_id):
         conn.close()
         
         current_time = datetime.datetime.now()
-        start_time = datetime.datetime.fromisoformat(tournament[1].replace('Z', '+00:00'))
-        end_time = datetime.datetime.fromisoformat(tournament[2].replace('Z', '+00:00'))
         
-        status = {
-            'tournament_id': tournament_id,
-            'title': tournament[0],
-            'start_time': tournament[1],
-            'end_time': tournament[2],
-            'status': tournament[3],
-            'current_time': current_time.isoformat(),
-            'has_joined': participant is not None,
-            'can_join': current_time >= start_time and current_time <= end_time,
-            'can_participate': participant is not None and current_time <= end_time,
-            'is_completed': participant and participant[3] is not None
-        }
+        # Zaman kontrolü (daha esnek)
+        try:
+            start_time = datetime.datetime.fromisoformat(tournament[1].replace('Z', '+00:00'))
+            end_time = datetime.datetime.fromisoformat(tournament[2].replace('Z', '+00:00'))
+            
+            status = {
+                'tournament_id': tournament_id,
+                'title': tournament[0],
+                'start_time': tournament[1],
+                'end_time': tournament[2],
+                'status': tournament[3],
+                'current_time': current_time.isoformat(),
+                'has_joined': participant is not None,
+                'can_join': current_time <= end_time,  # Sadece bitiş zamanını kontrol et
+                'can_participate': participant is not None and current_time <= end_time,
+                'is_completed': participant and participant[3] is not None
+            }
+        except:
+            # Zaman formatı sorunluysa varsayılan değerler
+            status = {
+                'tournament_id': tournament_id,
+                'title': tournament[0],
+                'start_time': tournament[1],
+                'end_time': tournament[2],
+                'status': tournament[3],
+                'current_time': current_time.isoformat(),
+                'has_joined': participant is not None,
+                'can_join': True,  # Varsayılan olarak katılıma izin ver
+                'can_participate': participant is not None,
+                'is_completed': participant and participant[3] is not None
+            }
         
         if participant:
             status.update({

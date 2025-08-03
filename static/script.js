@@ -243,6 +243,15 @@ registerFormElement.addEventListener('submit', async function (e) {
     }
 });
 
+// Success message continue button
+const continueButton = successMessage.querySelector('button');
+if (continueButton) {
+    continueButton.addEventListener('click', function() {
+        // Redirect to main page
+        window.location.href = '/';
+    });
+}
+
 // Password strength checker for register form
 if (passwordInput) {
     passwordInput.addEventListener('input', function() {
@@ -271,6 +280,15 @@ function logout() {
 // Check auth status on page load
 document.addEventListener('DOMContentLoaded', function() {
     checkAuthStatus();
+    
+    // Check URL parameter for form type
+    const urlParams = new URLSearchParams(window.location.search);
+    const formType = urlParams.get('form');
+    
+    if (formType === 'register') {
+        // Show register form directly
+        switchToRegister();
+    }
 });
 
 // Create particle effect for button clicks

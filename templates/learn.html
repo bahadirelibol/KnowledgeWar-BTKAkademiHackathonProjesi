@@ -413,6 +413,13 @@
                 return;
             }
 
+            // Butonu loading durumuna geçir
+            const addButton = document.getElementById('addToRoadmapBtn');
+            const originalText = addButton.innerHTML;
+            addButton.innerHTML = '⏳ Hazırlanıyor...';
+            addButton.disabled = true;
+            addButton.classList.add('opacity-50');
+
             try {
                 const token = localStorage.getItem('authToken');
                 if (!token) {
@@ -435,14 +442,27 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    alert('Kurs yol haritasına eklendi!');
-                    window.location.href = '/roadmap';
+                    // Başarı mesajı göster
+                    addButton.innerHTML = '✅ Eklendi!';
+                    addButton.classList.remove('opacity-50');
+                    addButton.classList.add('bg-green-600');
+                    
+                    // 2 saniye sonra yönlendir
+                    setTimeout(() => {
+                        window.location.href = '/roadmap';
+                    }, 2000);
                 } else {
                     throw new Error(result.error || 'Kurs eklenirken hata oluştu');
                 }
 
             } catch (error) {
                 console.error('Error:', error);
+                
+                // Butonu eski haline getir
+                addButton.innerHTML = originalText;
+                addButton.disabled = false;
+                addButton.classList.remove('opacity-50');
+                
                 alert('Hata: ' + error.message);
             }
         }
