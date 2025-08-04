@@ -179,14 +179,15 @@ w<!DOCTYPE html>
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-6">
                     <a href="/" class="text-3xl font-bold hover:text-blue-400 transition-colors cursor-pointer">⚔️ NEXUS</a>
-                    <div class="text-gray-400">|</div>
-                    <div class="text-xl font-semibold text-accent">Python Combat Zone</div>
                 </div>
                 <div class="flex items-center space-x-6">
                     <a href="/tournament-admin" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-4 py-2 text-sm rounded-lg transition-all duration-300 hover:scale-105">
                         ⚙️ Admin Paneli
                     </a>
 
+                    <a href="/" class="text-gray-300 hover:text-white transition-colors">
+                        🏠 Anasayfa
+                    </a>
                     <a href="/roadmap" class="text-gray-300 hover:text-white transition-colors">
                         🗺️ Yol Haritası
                     </a>
@@ -204,9 +205,6 @@ w<!DOCTYPE html>
             <h1 class="text-5xl md:text-7xl font-bold mb-4">
                 GALACTIC TOURNAMENT
             </h1>
-            <p class="text-2xl text-gray-300 mb-8">
-                ⚡ <span class="text-accent">Daily Python Battles</span> - Prove Your Skills in the Arena!
-            </p>
         </div>
 
         <!-- Countdown Timer -->
@@ -240,10 +238,6 @@ w<!DOCTYPE html>
                 <div class="tournament-card rounded-3xl p-8 mb-8 fade-in-cosmic">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-3xl font-bold">🎯 Bugünkü Savaş Alanı</h2>
-                        <div class="achievement-badge">
-                            <span>🔥</span>
-                            <span id="participantCount">- Savaşçı Tamamladı</span>
-                        </div>
                     </div>
                     
                     <div class="glass-card p-6 mb-6">
@@ -278,51 +272,18 @@ w<!DOCTYPE html>
 
                 <!-- Weekly Calendar -->
                 <div class="tournament-card rounded-3xl p-8 fade-in-cosmic">
-                    <h3 class="text-2xl font-bold mb-6">📅 Haftalık Savaş Takvimi</h3>
+                    <h3 class="text-2xl font-bold mb-6">📅 Haftalık Kazanan Listesi</h3>
                     
-                    <div class="grid grid-cols-7 gap-2">
-                        <div class="calendar-day completed rounded-lg p-4 text-center">
-                            <div class="text-sm text-gray-400">Pzt</div>
-                            <div class="text-lg font-bold text-success">✓</div>
-                            <div class="text-xs text-gray-500">OOP</div>
-                        </div>
-                        <div class="calendar-day completed rounded-lg p-4 text-center">
-                            <div class="text-sm text-gray-400">Sal</div>
-                            <div class="text-lg font-bold text-success">✓</div>
-                            <div class="text-xs text-gray-500">Async</div>
-                        </div>
-                        <div class="calendar-day completed rounded-lg p-4 text-center">
-                            <div class="text-sm text-gray-400">Çar</div>
-                            <div class="text-lg font-bold text-success">✓</div>
-                            <div class="text-xs text-gray-500">Decorators</div>
-                        </div>
-                        <div class="calendar-day today rounded-lg p-4 text-center">
-                            <div class="text-sm text-gray-400">Per</div>
-                            <div class="text-lg font-bold text-accent">🔥</div>
-                            <div class="text-xs text-gray-300">Data Structures</div>
-                        </div>
-                        <div class="calendar-day locked rounded-lg p-4 text-center">
-                            <div class="text-sm text-gray-500">Cum</div>
-                            <div class="text-lg font-bold text-gray-500">🔒</div>
-                            <div class="text-xs text-gray-600">Algorithms</div>
-                        </div>
-                        <div class="calendar-day locked rounded-lg p-4 text-center">
-                            <div class="text-sm text-gray-500">Cmt</div>
-                            <div class="text-lg font-bold text-gray-500">🔒</div>
-                            <div class="text-xs text-gray-600">ML Basics</div>
-                        </div>
-                        <div class="calendar-day locked rounded-lg p-4 text-center">
-                            <div class="text-sm text-gray-500">Paz</div>
-                            <div class="text-lg font-bold text-gray-500">🔒</div>
-                            <div class="text-xs text-gray-600">Final Boss</div>
+                    <div id="weeklyCalendarContainer" class="grid grid-cols-7 gap-2">
+                        <!-- Haftalık takvim verileri buraya yüklenecek -->
+                        <div class="text-center text-gray-400 py-8 col-span-7">
+                            <div class="text-3xl mb-4">📅</div>
+                            <div class="text-lg font-bold mb-2">Takvim Yükleniyor...</div>
+                            <div class="text-sm">Lütfen bekleyin</div>
                         </div>
                     </div>
                     
-                    <div class="mt-6 text-center">
-                        <div class="text-sm text-gray-400">
-                            🏆 <strong>Haftalık Şampiyon:</strong> En çok puan toplayan savaşçı özel badge kazanır!
-                        </div>
-                    </div>
+
                 </div>
             </div>
 
@@ -335,124 +296,33 @@ w<!DOCTYPE html>
                         <span class="ml-2 w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
                     </h3>
                     
-                    <div class="space-y-3">
-                        <div class="leaderboard-item first rounded-lg p-4 flex items-center space-x-4">
-                            <div class="text-2xl">🥇</div>
-                            <div class="flex-1">
-                                <div class="font-bold text-warning">@pythoninja</div>
-                                <div class="text-sm text-gray-400">Skor: 2,850</div>
-                            </div>
-                            <div class="text-warning font-bold">#1</div>
-                        </div>
-                        
-                        <div class="leaderboard-item second rounded-lg p-4 flex items-center space-x-4">
-                            <div class="text-2xl">🥈</div>
-                            <div class="flex-1">
-                                <div class="font-bold text-gray-300">@codemaster</div>
-                                <div class="text-sm text-gray-400">Skor: 2,720</div>
-                            </div>
-                            <div class="text-gray-400 font-bold">#2</div>
-                        </div>
-                        
-                        <div class="leaderboard-item third rounded-lg p-4 flex items-center space-x-4">
-                            <div class="text-2xl">🥉</div>
-                            <div class="flex-1">
-                                <div class="font-bold" style="color: #d97706">@algoqueen</div>
-                                <div class="text-sm text-gray-400">Skor: 2,650</div>
-                            </div>
-                            <div class="font-bold" style="color: #d97706">#3</div>
-                        </div>
-                        
-                        <div class="leaderboard-item rounded-lg p-4 flex items-center space-x-4 bg-blue-500/10 border-blue-500">
-                            <div class="text-2xl">⭐</div>
-                            <div class="flex-1">
-                                <div class="font-bold text-accent">@johndev (Sen)</div>
-                                <div class="text-sm text-gray-400">Skor: 1,340</div>
-                            </div>
-                            <div class="text-accent font-bold">#42</div>
+                    <div id="leaderboardContainer" class="space-y-3">
+                        <!-- Sıralama verileri buraya yüklenecek -->
+                        <div class="text-center text-gray-400 py-8">
+                            <div class="text-3xl mb-4">🏆</div>
+                            <div class="text-lg font-bold mb-2">Sıralama Yükleniyor...</div>
+                            <div class="text-sm">Lütfen bekleyin</div>
                         </div>
                     </div>
                     
-                    <div class="mt-4 text-center">
-                        <button class="glass-card px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition-all">
-                            📊 Tüm Sıralamayı Gör
-                        </button>
-                    </div>
+
                 </div>
 
                 <!-- Tournament Stats -->
                 <div class="tournament-card rounded-3xl p-6 fade-in-cosmic">
                     <h3 class="text-xl font-bold mb-6">📈 Turnuva İstatistikleri</h3>
                     
-                    <div class="space-y-4">
-                        <div class="glass-card rounded-lg p-4">
-                            <div class="flex items-center justify-between">
-                                <div class="text-gray-400">Toplam Katılımcı</div>
-                                <div class="text-2xl font-bold text-cyan">127</div>
-                            </div>
-                        </div>
-                        
-                        <div class="glass-card rounded-lg p-4">
-                            <div class="flex items-center justify-between">
-                                <div class="text-gray-400">Ortalama Skor</div>
-                                <div class="text-2xl font-bold text-success">68%</div>
-                            </div>
-                        </div>
-                        
-                        <div class="glass-card rounded-lg p-4">
-                            <div class="flex items-center justify-between">
-                                <div class="text-gray-400">En Yüksek Skor</div>
-                                <div class="text-2xl font-bold text-warning">95%</div>
-                            </div>
-                        </div>
-                        
-                        <div class="glass-card rounded-lg p-4">
-                            <div class="flex items-center justify-between">
-                                <div class="text-gray-400">Kalan Süre</div>
-                                <div class="text-2xl font-bold text-danger" id="timeLeft">14:32:18</div>
-                            </div>
+                    <div id="tournamentStatsContainer" class="space-y-4">
+                        <!-- İstatistikler buraya yüklenecek -->
+                        <div class="text-center text-gray-400 py-8">
+                            <div class="text-3xl mb-4">📊</div>
+                            <div class="text-lg font-bold mb-2">İstatistikler Yükleniyor...</div>
+                            <div class="text-sm">Lütfen bekleyin</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Achievement Showcase -->
-                <div class="tournament-card rounded-3xl p-6 fade-in-cosmic">
-                    <h3 class="text-xl font-bold mb-6">🏅 Bu Hafta Kazanılabilir</h3>
-                    
-                    <div class="space-y-3">
-                        <div class="glass-card rounded-lg p-3 flex items-center space-x-3">
-                            <div class="text-2xl">🥇</div>
-                            <div>
-                                <div class="font-bold text-warning">Weekly Champion</div>
-                                <div class="text-xs text-gray-400">1. olarak bitir</div>
-                            </div>
-                        </div>
-                        
-                        <div class="glass-card rounded-lg p-3 flex items-center space-x-3">
-                            <div class="text-2xl">⚡</div>
-                            <div>
-                                <div class="font-bold text-cyan">Speed Demon</div>
-                                <div class="text-xs text-gray-400">10 dk içinde bitir</div>
-                            </div>
-                        </div>
-                        
-                        <div class="glass-card rounded-lg p-3 flex items-center space-x-3">
-                            <div class="text-2xl">🎯</div>
-                            <div>
-                                <div class="font-bold text-success">Perfect Score</div>
-                                <div class="text-xs text-gray-400">100% doğruluk</div>
-                            </div>
-                        </div>
-                        
-                        <div class="glass-card rounded-lg p-3 flex items-center space-x-3">
-                            <div class="text-2xl">🔥</div>
-                            <div>
-                                <div class="font-bold" style="color: #fb923c">Streak Master</div>
-                                <div class="text-xs text-gray-400">7 gün üst üste katıl</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </div>
 
@@ -474,86 +344,11 @@ w<!DOCTYPE html>
                     </div>
                 </div>
 
-                <!-- Your Performance -->
-                <div id="yourPerformance" class="glass-card rounded-2xl p-6 border border-blue-500/50">
-                    <h4 class="text-xl font-bold text-accent mb-4">🎯 Senin Performansın</h4>
-                    <div id="performanceDetails">
-                        <!-- Performance details will be loaded here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Previous Results Section -->
-        <div class="mt-12 fade-in-cosmic">
-            <div class="tournament-card rounded-3xl p-8">
-                <h2 class="text-3xl font-bold mb-8 text-center">📋 Dünkü Turnuva Sonuçları</h2>
-                
-                <div class="grid md:grid-cols-2 gap-8">
-                    <!-- Yesterday's Topic -->
-                    <div class="glass-card rounded-2xl p-6">
-                        <div class="flex items-center space-x-4 mb-4">
-                            <div class="w-12 h-12 rounded-full bg-gradient-to-r from-gray-600 to-gray-800 flex items-center justify-center text-xl">
-                                🎭
-                            </div>
-                            <div>
-                                <h4 class="text-xl font-bold">Decorators & Context Managers</h4>
-                                <p class="text-gray-400 text-sm">Çarşamba - 23 Ocak 2025</p>
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div class="text-center">
-                                <div class="text-2xl font-bold text-success">89</div>
-                                <div class="text-sm text-gray-400">Katılımcı</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-2xl font-bold text-warning">73%</div>
-                                <div class="text-sm text-gray-400">Ort. Skor</div>
-                            </div>
-                        </div>
-                        
-                        <div class="text-center text-sm text-gray-400">
-                            <strong>Şampiyon:</strong> @pythoninja (98% - 12:34)
-                        </div>
-                    </div>
-                    
-                    <!-- Your Performance -->
-                    <div class="glass-card rounded-2xl p-6 border border-blue-500/50">
-                        <h4 class="text-xl font-bold text-accent mb-4">🎯 Senin Performansın</h4>
-                        
-                        <div class="space-y-4">
-                            <div class="flex justify-between">
-                                <span class="text-gray-400">Final Skor:</span>
-                                <span class="font-bold text-success">87%</span>
-                            </div>
-                            
-                            <div class="flex justify-between">
-                                <span class="text-gray-400">Tamamlama Süresi:</span>
-                                <span class="font-bold text-cyan">23:45</span>
-                            </div>
-                            
-                            <div class="flex justify-between">
-                                <span class="text-gray-400">Sıralama:</span>
-                                <span class="font-bold text-warning">#12</span>
-                            </div>
-                            
-                            <div class="flex justify-between">
-                                <span class="text-gray-400">Kazanılan XP:</span>
-                                <span class="font-bold text-purple">+425</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-4 p-3 bg-green-500/20 rounded-lg border border-green-500/50">
-                            <div class="text-success font-bold text-sm">🏆 Kazanılan Badge:</div>
-                            <div class="text-white">Decorator Master - İleri seviye decorator kullanımı</div>
-                        </div>
-                    </div>
-                </div>
-
 
             </div>
         </div>
+
+
     </div>
 
     <!-- Quiz Modal -->
@@ -1108,10 +903,7 @@ w<!DOCTYPE html>
                             <div class="text-3xl font-bold text-warning">${timeString}</div>
                             <div class="text-sm text-gray-400">Tamamlama Süresi</div>
                         </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-purple">+${xp}</div>
-                            <div class="text-sm text-gray-400">Kazanılan XP</div>
-                        </div>
+
                     </div>
                     
                     <div class="space-y-2">
@@ -1149,10 +941,7 @@ w<!DOCTYPE html>
                         <span class="font-bold text-warning">${correctCount}/${currentQuestions.length}</span>
                     </div>
                     
-                    <div class="flex justify-between">
-                        <span class="text-gray-400">Kazanılan XP:</span>
-                        <span class="font-bold text-purple">+${xp}</span>
-                    </div>
+
                 </div>
             `;
             
@@ -1412,6 +1201,12 @@ w<!DOCTYPE html>
                 // Turnuva kartını güncelle
                 updateTournamentCard(currentTournament);
                 
+                // Sıralamayı yükle
+                loadLeaderboard(currentTournament.id);
+                
+                // Turnuva istatistiklerini yükle
+                loadTournamentStats(currentTournament.id);
+                
             } catch (error) {
                 console.error('Error loading current tournament:', error);
             }
@@ -1540,6 +1335,263 @@ w<!DOCTYPE html>
             }
         }
 
+        async function loadLeaderboard(tournamentId) {
+            console.log('loadLeaderboard çağrıldı, tournamentId:', tournamentId);
+            try {
+                const token = localStorage.getItem('authToken');
+                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                
+                const response = await fetch(`/api/leaderboard/${tournamentId}`, { headers });
+                const result = await response.json();
+                
+                console.log('Leaderboard API response:', result);
+                
+                if (result.success) {
+                    updateLeaderboardUI(result.leaderboard);
+                } else {
+                    console.error('Sıralama yüklenirken hata:', result.error);
+                    showLeaderboardError();
+                }
+            } catch (error) {
+                console.error('Sıralama yüklenirken hata:', error);
+                showLeaderboardError();
+            }
+        }
+
+        function updateLeaderboardUI(leaderboard) {
+            const container = document.getElementById('leaderboardContainer');
+            
+            if (!leaderboard || leaderboard.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-400 py-8">
+                        <div class="text-3xl mb-4">🏆</div>
+                        <div class="text-lg font-bold mb-2">Henüz Katılımcı Yok</div>
+                        <div class="text-sm">Turnuvaya katılan ilk kişi sen ol!</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sadece ilk 5 katılımcıyı göster
+            const top5Leaderboard = leaderboard.slice(0, 5);
+            
+            container.innerHTML = top5Leaderboard.map((user, index) => {
+                const rank = user.rank;
+                const isCurrentUser = user.is_current_user;
+                
+                // Sıralama ikonları
+                let rankIcon = `#${rank}`;
+                let rankClass = '';
+                
+                if (rank === 1) {
+                    rankIcon = '🥇';
+                    rankClass = 'first';
+                } else if (rank === 2) {
+                    rankIcon = '🥈';
+                    rankClass = 'second';
+                } else if (rank === 3) {
+                    rankIcon = '🥉';
+                    rankClass = 'third';
+                }
+                
+                // Kullanıcı özel stil
+                let userClass = '';
+                let usernameClass = '';
+                let rankTextClass = '';
+                
+                if (isCurrentUser) {
+                    userClass = 'bg-blue-500/10 border-blue-500';
+                    usernameClass = 'text-accent';
+                    rankTextClass = 'text-accent';
+                } else if (rank === 1) {
+                    usernameClass = 'text-warning';
+                    rankTextClass = 'text-warning';
+                } else if (rank === 2) {
+                    usernameClass = 'text-gray-300';
+                    rankTextClass = 'text-gray-400';
+                } else if (rank === 3) {
+                    usernameClass = 'text-orange-500';
+                    rankTextClass = 'text-orange-500';
+                }
+                
+                return `
+                    <div class="leaderboard-item ${rankClass} rounded-lg p-4 flex items-center space-x-4 ${userClass}">
+                        <div class="text-2xl">${rankIcon}</div>
+                        <div class="flex-1">
+                            <div class="font-bold ${usernameClass}">${user.username}${isCurrentUser ? ' (Sen)' : ''}</div>
+                            <div class="text-sm text-gray-400">
+                                ${user.correct_answers}/${user.total_questions} doğru • ${user.total_score}% skor
+                            </div>
+                        </div>
+                        <div class="text-cyan font-bold">${user.correct_answers}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showLeaderboardError() {
+            const container = document.getElementById('leaderboardContainer');
+            container.innerHTML = `
+                <div class="text-center text-red-400 py-8">
+                    <div class="text-3xl mb-4">❌</div>
+                    <div class="text-lg font-bold mb-2">Hata Oluştu</div>
+                    <div class="text-sm">Sıralama yüklenirken bir hata oluştu.</div>
+                    <button onclick="loadLeaderboard(currentTournament?.id)" class="mt-4 glass-card px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition-all">
+                        🔄 Tekrar Dene
+                    </button>
+                </div>
+            `;
+        }
+
+        async function loadTournamentStats(tournamentId) {
+            console.log('loadTournamentStats çağrıldı, tournamentId:', tournamentId);
+            try {
+                const token = localStorage.getItem('authToken');
+                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                
+                const response = await fetch(`/api/tournament-stats/${tournamentId}`, { headers });
+                const result = await response.json();
+                
+                console.log('Tournament Stats API response:', result);
+                
+                if (result.success) {
+                    updateTournamentStatsUI(result.stats);
+                } else {
+                    console.error('Turnuva istatistikleri yüklenirken hata:', result.error);
+                    showTournamentStatsError();
+                }
+            } catch (error) {
+                console.error('Turnuva istatistikleri yüklenirken hata:', error);
+                showTournamentStatsError();
+            }
+        }
+
+        function updateTournamentStatsUI(stats) {
+            const container = document.getElementById('tournamentStatsContainer');
+            
+            if (!stats) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-400 py-8">
+                        <div class="text-3xl mb-4">📊</div>
+                        <div class="text-lg font-bold mb-2">İstatistik Bulunamadı</div>
+                        <div class="text-sm">Turnuva verileri mevcut değil</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="glass-card rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="text-gray-400">Toplam Katılımcı</div>
+                        <div class="text-2xl font-bold text-cyan">${stats.total_participants}</div>
+                    </div>
+                </div>
+                
+                <div class="glass-card rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="text-gray-400">Ortalama Skor</div>
+                        <div class="text-2xl font-bold text-success">${stats.average_score}%</div>
+                    </div>
+                </div>
+                
+                <div class="glass-card rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="text-gray-400">En Yüksek Skor</div>
+                        <div class="text-2xl font-bold text-warning">${stats.highest_score}%</div>
+                    </div>
+                </div>
+                
+
+            `;
+        }
+
+        function showTournamentStatsError() {
+            const container = document.getElementById('tournamentStatsContainer');
+            container.innerHTML = `
+                <div class="text-center text-red-400 py-8">
+                    <div class="text-3xl mb-4">❌</div>
+                    <div class="text-lg font-bold mb-2">Hata Oluştu</div>
+                    <div class="text-sm">Turnuva istatistikleri yüklenirken bir hata oluştu.</div>
+                    <button onclick="loadTournamentStats(currentTournament?.id)" class="mt-4 glass-card px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition-all">
+                        🔄 Tekrar Dene
+                    </button>
+                </div>
+            `;
+        }
+
+        async function loadWeeklyCalendar() {
+            console.log('loadWeeklyCalendar çağrıldı');
+            try {
+                const token = localStorage.getItem('authToken');
+                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                
+                const response = await fetch('/api/weekly-tournament-calendar', { headers });
+                const result = await response.json();
+                
+                console.log('Weekly Calendar API response:', result);
+                
+                if (result.success) {
+                    updateWeeklyCalendarUI(result.weekly_calendar);
+                } else {
+                    console.error('Haftalık takvim yüklenirken hata:', result.error);
+                    showWeeklyCalendarError();
+                }
+            } catch (error) {
+                console.error('Haftalık takvim yüklenirken hata:', error);
+                showWeeklyCalendarError();
+            }
+        }
+
+        function updateWeeklyCalendarUI(weeklyCalendar) {
+            const container = document.getElementById('weeklyCalendarContainer');
+            
+            if (!weeklyCalendar || weeklyCalendar.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-400 py-8 col-span-7">
+                        <div class="text-3xl mb-4">📅</div>
+                        <div class="text-lg font-bold mb-2">Takvim Verisi Bulunamadı</div>
+                        <div class="text-sm">Bu hafta için turnuva verisi mevcut değil</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let calendarHTML = '';
+            
+            weeklyCalendar.forEach(day => {
+                const dayClass = `calendar-day ${day.day_status} rounded-lg p-4 text-center`;
+                const dayNameClass = day.day_status === 'upcoming' ? 'text-gray-500' : 'text-gray-400';
+                const iconClass = day.day_status === 'today' ? 'text-accent' : 
+                                 day.day_status === 'completed' ? 'text-success' : 'text-gray-500';
+                
+                calendarHTML += `
+                    <div class="${dayClass}">
+                        <div class="text-sm ${dayNameClass}">${day.day_name}</div>
+                        <div class="text-lg font-bold ${iconClass}">${day.day_icon}</div>
+                        <div class="text-xs ${day.tournament_status === 'none' ? 'text-gray-600' : 'text-gray-500'}">${day.tournament_title}</div>
+                        ${day.winner_name ? `<div class="text-xs text-success mt-1">🏆 ${day.winner_name}</div>` : ''}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = calendarHTML;
+        }
+
+        function showWeeklyCalendarError() {
+            const container = document.getElementById('weeklyCalendarContainer');
+            container.innerHTML = `
+                <div class="text-center text-red-400 py-8 col-span-7">
+                    <div class="text-3xl mb-4">❌</div>
+                    <div class="text-lg font-bold mb-2">Hata Oluştu</div>
+                    <div class="text-sm">Haftalık takvim yüklenirken bir hata oluştu.</div>
+                    <button onclick="loadWeeklyCalendar()" class="mt-4 glass-card px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition-all">
+                        🔄 Tekrar Dene
+                    </button>
+                </div>
+            `;
+        }
+
         function showEmailPreview() {
             alert('Email önizleme özelliği yakında eklenecek!');
         }
@@ -1590,6 +1642,25 @@ w<!DOCTYPE html>
                 loadTournamentResults();
             }, 1000);
             
+            // Sıralamayı yükle
+            setTimeout(() => {
+                if (currentTournament) {
+                    loadLeaderboard(currentTournament.id);
+                }
+            }, 1500);
+            
+            // Turnuva istatistiklerini yükle
+            setTimeout(() => {
+                if (currentTournament) {
+                    loadTournamentStats(currentTournament.id);
+                }
+            }, 2000);
+            
+            // Haftalık takvimi yükle
+            setTimeout(() => {
+                loadWeeklyCalendar();
+            }, 2500);
+            
             setTimeout(() => {
                 const emailBtn = document.createElement('button');
                 emailBtn.textContent = '📧 Email Önizlemesi';
@@ -1609,6 +1680,28 @@ w<!DOCTYPE html>
                     updateParticipantCount(currentTournament.id);
                 }
             }, 30000);
+            
+            // Her 60 saniyede bir sıralamayı güncelle
+            setInterval(() => {
+                if (currentTournament) {
+                    console.log('Otomatik sıralama güncellemesi...');
+                    loadLeaderboard(currentTournament.id);
+                }
+            }, 60000);
+            
+            // Her 60 saniyede bir turnuva istatistiklerini güncelle
+            setInterval(() => {
+                if (currentTournament) {
+                    console.log('Otomatik turnuva istatistikleri güncellemesi...');
+                    loadTournamentStats(currentTournament.id);
+                }
+            }, 60000);
+            
+            // Her 5 dakikada bir haftalık takvimi güncelle
+            setInterval(() => {
+                console.log('Otomatik haftalık takvim güncellemesi...');
+                loadWeeklyCalendar();
+            }, 300000);
             
             setInterval(() => {
                 const scoreElements = document.querySelectorAll('.leaderboard-item .text-sm');

@@ -1891,5 +1891,343 @@ def get_tournament_participant_count(tournament_id):
     except Exception as e:
         return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
 
+@app.route('/api/leaderboard/<int:tournament_id>', methods=['GET'])
+def get_leaderboard(tournament_id):
+    """Turnuva sıralamasını doğru cevap sayısına göre döndür"""
+    try:
+        # Token kontrolü (opsiyonel - genel sıralama için)
+        auth_header = request.headers.get('Authorization')
+        current_user_id = None
+        
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]
+            try:
+                payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+                current_user_id = payload['user_id']
+            except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+                pass  # Token geçersizse sadece genel sıralama göster
+        
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        
+        # Turnuvayı tamamlayan kullanıcıları doğru cevap sayısına göre sırala
+        cursor.execute('''
+            SELECT 
+                tp.user_id,
+                u.first_name,
+                u.last_name,
+                tp.correct_answers,
+                tp.total_questions,
+                tp.total_score,
+                tp.completed_at
+            FROM tournament_participants tp
+            JOIN users u ON tp.user_id = u.id
+            WHERE tp.tournament_id = ? AND tp.completed_at IS NOT NULL
+            ORDER BY tp.correct_answers DESC, tp.completed_at ASC
+            LIMIT 10
+        ''', (tournament_id,))
+        
+        participants = cursor.fetchall()
+        
+        leaderboard = []
+        for i, participant in enumerate(participants):
+            user_id, first_name, last_name, correct_answers, total_questions, total_score, completed_at = participant
+            
+            # Kullanıcı adını oluştur
+            username = f"{first_name} {last_name}"
+            
+            # Sıralama pozisyonu
+            rank = i + 1
+            
+            # Mevcut kullanıcı mı kontrol et
+            is_current_user = current_user_id == user_id
+            
+            leaderboard.append({
+                'rank': rank,
+                'user_id': user_id,
+                'username': username,
+                'correct_answers': correct_answers,
+                'total_questions': total_questions,
+                'total_score': total_score,
+                'completion_time': completed_at,
+                'is_current_user': is_current_user
+            })
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'leaderboard': leaderboard,
+            'tournament_id': tournament_id
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
+
+@app.route('/api/global-leaderboard', methods=['GET'])
+def get_global_leaderboard():
+    """Genel sıralama - tüm turnuvalardaki toplam performansa göre"""
+    try:
+        # Token kontrolü (opsiyonel)
+        auth_header = request.headers.get('Authorization')
+        current_user_id = None
+        
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]
+            try:
+                payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+                current_user_id = payload['user_id']
+            except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+                pass
+        
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        
+        # Tüm turnuvalardaki toplam performansı hesapla
+        cursor.execute('''
+            SELECT 
+                u.id,
+                u.first_name,
+                u.last_name,
+                SUM(tp.correct_answers) as total_correct,
+                SUM(tp.total_questions) as total_questions,
+                AVG(tp.total_score) as avg_score,
+                COUNT(tp.id) as tournaments_completed
+            FROM users u
+            JOIN tournament_participants tp ON u.id = tp.user_id
+            WHERE tp.completed_at IS NOT NULL
+            GROUP BY u.id, u.first_name, u.last_name
+            HAVING total_correct > 0
+            ORDER BY total_correct DESC, avg_score DESC
+            LIMIT 10
+        ''')
+        
+        participants = cursor.fetchall()
+        
+        leaderboard = []
+        for i, participant in enumerate(participants):
+            user_id, first_name, last_name, total_correct, total_questions, avg_score, tournaments_completed = participant
+            
+            username = f"{first_name} {last_name}"
+            rank = i + 1
+            is_current_user = current_user_id == user_id
+            
+            leaderboard.append({
+                'rank': rank,
+                'user_id': user_id,
+                'username': username,
+                'total_correct_answers': total_correct,
+                'total_questions': total_questions,
+                'average_score': round(avg_score, 1),
+                'tournaments_completed': tournaments_completed,
+                'is_current_user': is_current_user
+            })
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'leaderboard': leaderboard
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
+
+@app.route('/api/tournament-stats/<int:tournament_id>', methods=['GET'])
+def get_tournament_stats(tournament_id):
+    """Turnuva istatistiklerini döndür"""
+    try:
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        
+        # Turnuva bilgilerini al
+        cursor.execute('''
+            SELECT start_time, end_time, status
+            FROM tournaments
+            WHERE id = ?
+        ''', (tournament_id,))
+        
+        tournament = cursor.fetchone()
+        if not tournament:
+            conn.close()
+            return jsonify({'error': 'Turnuva bulunamadı'}), 404
+        
+        start_time, end_time, status = tournament
+        
+        # Toplam katılımcı sayısı
+        cursor.execute('''
+            SELECT COUNT(DISTINCT user_id)
+            FROM tournament_participants
+            WHERE tournament_id = ?
+        ''', (tournament_id,))
+        
+        total_participants = cursor.fetchone()[0]
+        
+        # Tamamlanan turnuvaların istatistikleri
+        cursor.execute('''
+            SELECT 
+                COUNT(*) as completed_count,
+                AVG(total_score) as avg_score,
+                MAX(total_score) as max_score,
+                AVG(correct_answers) as avg_correct,
+                MAX(correct_answers) as max_correct
+            FROM tournament_participants
+            WHERE tournament_id = ? AND completed_at IS NOT NULL
+        ''', (tournament_id,))
+        
+        stats = cursor.fetchone()
+        completed_count, avg_score, max_score, avg_correct, max_correct = stats
+        
+        # Ortalama skor hesapla
+        average_score = round(avg_score, 1) if avg_score else 0
+        highest_score = round(max_score, 1) if max_score else 0
+        
+        # Kalan süre hesapla
+        now = datetime.datetime.now()
+        end_datetime = datetime.datetime.fromisoformat(end_time.replace('Z', '+00:00'))
+        
+        if end_datetime > now:
+            time_left = end_datetime - now
+            hours = int(time_left.total_seconds() // 3600)
+            minutes = int((time_left.total_seconds() % 3600) // 60)
+            seconds = int(time_left.total_seconds() % 60)
+            remaining_time = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        else:
+            remaining_time = "00:00:00"
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'stats': {
+                'total_participants': total_participants,
+                'completed_participants': completed_count,
+                'average_score': average_score,
+                'highest_score': highest_score,
+                'average_correct_answers': round(avg_correct, 1) if avg_correct else 0,
+                'max_correct_answers': max_correct if max_correct else 0,
+                'remaining_time': remaining_time,
+                'tournament_status': status
+            },
+            'tournament_id': tournament_id
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
+
+@app.route('/api/weekly-tournament-calendar', methods=['GET'])
+def get_weekly_tournament_calendar():
+    """Haftalık turnuva takvimini döndür"""
+    try:
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        
+        # Bu haftanın başlangıç ve bitiş tarihlerini hesapla
+        now = datetime.datetime.now()
+        start_of_week = now - datetime.timedelta(days=now.weekday())
+        start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_week = start_of_week + datetime.timedelta(days=7)
+        
+        # Haftalık günler
+        days_of_week = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
+        
+        weekly_calendar = []
+        
+        for i in range(7):
+            current_date = start_of_week + datetime.timedelta(days=i)
+            day_name = days_of_week[i]
+            
+            # Bu gün için turnuva var mı kontrol et
+            cursor.execute('''
+                SELECT id, title, status
+                FROM tournaments
+                WHERE DATE(start_time) = DATE(?)
+                ORDER BY start_time ASC
+                LIMIT 1
+            ''', (current_date.strftime('%Y-%m-%d'),))
+            
+            tournament = cursor.fetchone()
+            
+            if tournament:
+                tournament_id, tournament_title, tournament_status = tournament
+                
+                # Bu turnuvanın kazananını bul
+                cursor.execute('''
+                    SELECT u.first_name, u.last_name, tp.correct_answers, tp.total_score
+                    FROM tournament_participants tp
+                    JOIN users u ON tp.user_id = u.id
+                    WHERE tp.tournament_id = ? AND tp.completed_at IS NOT NULL
+                    ORDER BY tp.correct_answers DESC, tp.completed_at ASC
+                    LIMIT 1
+                ''', (tournament_id,))
+                
+                winner = cursor.fetchone()
+                
+                if winner:
+                    winner_name, winner_lastname, correct_answers, total_score = winner
+                    winner_display = f"{winner_name} {winner_lastname}"
+                    winner_score = ""
+                else:
+                    winner_display = "Henüz kazanan yok"
+                    winner_score = ""
+                
+                # Gün durumunu belirle
+                if current_date.date() == now.date():
+                    day_status = "today"
+                    day_icon = "🔥"
+                elif current_date.date() < now.date():
+                    day_status = "completed"
+                    day_icon = "✓"
+                else:
+                    day_status = "upcoming"
+                    day_icon = "🔒"
+                
+                weekly_calendar.append({
+                    'day_name': day_name,
+                    'day_status': day_status,
+                    'day_icon': day_icon,
+                    'tournament_title': tournament_title,
+                    'tournament_status': tournament_status,
+                    'winner_name': winner_display,
+                    'winner_score': winner_score,
+                    'date': current_date.strftime('%Y-%m-%d')
+                })
+            else:
+                # Bu gün için turnuva yok
+                if current_date.date() == now.date():
+                    day_status = "today"
+                    day_icon = "📅"
+                elif current_date.date() < now.date():
+                    day_status = "completed"
+                    day_icon = "✓"
+                else:
+                    day_status = "upcoming"
+                    day_icon = "🔒"
+                
+                weekly_calendar.append({
+                    'day_name': day_name,
+                    'day_status': day_status,
+                    'day_icon': day_icon,
+                    'tournament_title': "Turnuva yok",
+                    'tournament_status': "none",
+                    'winner_name': "",
+                    'winner_score': "",
+                    'date': current_date.strftime('%Y-%m-%d')
+                })
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'weekly_calendar': weekly_calendar,
+            'current_week': {
+                'start_date': start_of_week.strftime('%Y-%m-%d'),
+                'end_date': end_of_week.strftime('%Y-%m-%d')
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000) 

@@ -695,27 +695,11 @@
                     <div class="text-lg font-medium text-gray-300">Galaktik Öğrenme Yolu</div>
                 </div>
 
-                <!-- Orta - İlerleme -->
-                <div class="hidden lg:flex items-center space-x-8">
-                    <div class="glass-card px-6 py-2 rounded-xl">
-                        <div class="text-xs text-gray-400 font-mono uppercase tracking-wider">İlerleme</div>
-                        <div class="text-xl font-bold neon-text" id="overallProgress">37%</div>
-                    </div>
-                </div>
+
 
                 <!-- Sağ Taraf - Butonlar ve Profil -->
                 <div class="flex items-center space-x-4">
-                    <!-- Badge'ler -->
-                    <div class="hidden sm:flex items-center space-x-3">
-                        <div class="achievement-badge text-sm">
-                            <span>🔥</span>
-                            <span>8 Gün</span>
-                        </div>
-                        <div class="achievement-badge text-sm" style="opacity: 1; transition: opacity 0.5s;">
-                            <span>🎯</span>
-                            <span>Focus</span>
-                        </div>
-                    </div>
+
 
                     <!-- Turnuvalar Butonu -->
                     <a href="/tournament" id="tournamentBtn" class="cosmic-btn text-base px-6 py-2.5">
@@ -732,13 +716,7 @@
                 </div>
             </div>
 
-            <!-- Mobil İlerleme (Sadece küçük ekranlarda) -->
-            <div class="lg:hidden mt-4">
-                <div class="glass-card px-4 py-3 rounded-xl text-center">
-                    <div class="text-xs text-gray-400 font-mono uppercase tracking-wider mb-1">Toplam İlerleme</div>
-                    <div class="text-2xl font-bold neon-text" id="overallProgressMobile">37%</div>
-                </div>
-            </div>
+
         </div>
     </header>
 
@@ -789,7 +767,7 @@
                 <!-- Step 1: Completed Video -->
                 <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
                     <div class="lg:text-right order-2 lg:order-1">
-                        <div class="glass-card step-card completed card-3d rounded-3xl p-8">
+                        <div class="glass-card step-card completed card-3d rounded-3xl p-6">
                             <div class="step-node completed">
                                 <span>🎬</span>
                             </div>
@@ -798,11 +776,17 @@
                                 Nesne yönelimli programlamanın temel kavramları,
                                 class yapıları ve inheritance prensipleri
                             </p>
-                            <div class="text-center">
-                                <a href="https://btkakademi.gov.tr/course/python-oop" target="_blank" id="courseBtn1"
-                                    class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                    🚀 Kursa Git
-                                </a>
+                            <div class="text-center space-y-3">
+                                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                                    <a href="https://btkakademi.gov.tr/course/python-oop" target="_blank" id="courseBtn1"
+                                        class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                        🚀 Kursa Git
+                                    </a>
+                                    <button id="completeBtn1" class="cosmic-btn text-lg px-8 py-3 inline-block" 
+                                            style="background: linear-gradient(45deg, #00ff88, #00cc66);">
+                                        ✅ Tamamlandı
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -811,7 +795,7 @@
                 <!-- Step 2: Completed Test -->
                 <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
                     <div class="lg:col-start-2 order-2">
-                        <div class="glass-card step-card completed card-3d rounded-3xl p-8">
+                        <div class="glass-card step-card completed card-3d rounded-3xl p-6">
                             <div class="step-node completed">
                                 <span>🧠</span>
                             </div>
@@ -820,11 +804,17 @@
                                 Class, Object, Inheritance, Polymorphism konularında
                                 10 zorlu soru ile bilgi pekiştirme
                             </p>
-                            <div class="text-center">
-                                <a href="https://btkakademi.gov.tr/course/oop-test" target="_blank" id="courseBtn2"
-                                    class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                    🚀 Teste Git
-                                </a>
+                            <div class="text-center space-y-3">
+                                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                                    <a href="https://btkakademi.gov.tr/course/oop-test" target="_blank" id="courseBtn2"
+                                        class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                        🚀 Teste Git
+                                    </a>
+                                    <button id="completeBtn2" class="cosmic-btn text-lg px-8 py-3 inline-block" 
+                                            style="background: linear-gradient(45deg, #00ff88, #00cc66);">
+                                        ✅ Tamamlandı
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -833,7 +823,7 @@
                 <!-- Step 3: Completed Video -->
                 <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
                     <div class="lg:text-right order-2 lg:order-1">
-                        <div class="glass-card step-card completed card-3d rounded-3xl p-8">
+                        <div class="glass-card step-card completed card-3d rounded-3xl p-6">
                             <div class="step-node completed">
                                 <span>🎬</span>
                             </div>
@@ -842,11 +832,17 @@
                                 Python'un en güçlü özelliklerinden decorators ve
                                 memory-efficient generators kullanımı
                             </p>
-                            <div class="text-center">
-                                <a href="https://btkakademi.gov.tr/course/decorators-generators" target="_blank"
-                                    id="courseBtn3" class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                    🚀 Kursa Git
-                                </a>
+                            <div class="text-center space-y-3">
+                                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                                    <a href="https://btkakademi.gov.tr/course/decorators-generators" target="_blank"
+                                        id="courseBtn3" class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                        🚀 Kursa Git
+                                    </a>
+                                    <button id="completeBtn3" class="cosmic-btn text-lg px-8 py-3 inline-block" 
+                                            style="background: linear-gradient(45deg, #00ff88, #00cc66);">
+                                        ✅ Tamamlandı
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -855,7 +851,7 @@
                 <!-- Step 4: Current Project -->
                 <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
                     <div class="lg:col-start-2 order-2">
-                        <div class="glass-card step-card current card-3d rounded-3xl p-8">
+                        <div class="glass-card step-card current card-3d rounded-3xl p-6">
                             <div class="step-node current">
                                 <span>💻</span>
                             </div>
@@ -864,11 +860,17 @@
                                 Decorator ve generator konularında pratik kodlama projesi.
                                 Kendi decorator'larınızı yazın ve performance optimizasyonu yapın.
                             </p>
-                            <div class="text-center">
-                                <a href="https://btkakademi.gov.tr/course/code-lab" target="_blank" id="courseBtn4"
-                                    class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                    🚀 Laboratuvara Git
-                                </a>
+                            <div class="text-center space-y-3">
+                                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                                    <a href="https://btkakademi.gov.tr/course/code-lab" target="_blank" id="courseBtn4"
+                                        class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                        🚀 Laboratuvara Git
+                                    </a>
+                                    <button id="completeBtn4" class="cosmic-btn text-lg px-8 py-3 inline-block" 
+                                            style="background: linear-gradient(45deg, #00ff88, #00cc66);">
+                                        ✅ Tamamlandı
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -877,7 +879,7 @@
                 <!-- Step 5: Locked Test -->
                 <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
                     <div class="lg:text-right order-2 lg:order-1">
-                        <div class="glass-card step-card locked card-3d rounded-3xl p-8">
+                        <div class="glass-card step-card locked card-3d rounded-3xl p-6">
                             <div class="step-node locked">
                                 <span>🔒</span>
                             </div>
@@ -886,12 +888,18 @@
                                 Asenkron programlama ve concurrent execution konularında
                                 uzman seviye test. Unlocked after project completion.
                             </p>
-                            <div class="text-center">
-                                <button id="courseBtn5"
-                                    class="cosmic-btn text-lg px-8 py-3 inline-block opacity-50 cursor-not-allowed"
-                                    disabled>
-                                    🔒 Kilitli
-                                </button>
+                            <div class="text-center space-y-3">
+                                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                                    <button id="courseBtn5"
+                                        class="cosmic-btn text-lg px-8 py-3 inline-block opacity-50 cursor-not-allowed"
+                                        disabled>
+                                        🔒 Kilitli
+                                    </button>
+                                    <button id="completeBtn5" class="cosmic-btn text-lg px-8 py-3 inline-block" 
+                                            style="background: linear-gradient(45deg, #00ff88, #00cc66);">
+                                        ✅ Tamamlandı
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -900,7 +908,7 @@
                 <!-- Step 6: Surprise Element -->
                 <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
                     <div class="lg:col-start-2 order-2">
-                        <div class="glass-card step-card surprise card-3d rounded-3xl p-8">
+                        <div class="glass-card step-card surprise card-3d rounded-3xl p-6">
                             <div class="step-node surprise">
                                 <span>🎁</span>
                             </div>
@@ -909,12 +917,18 @@
                                 Yapay zeka ile birlikte kod review yapın! Algoritmalarınızı
                                 optimize edin ve performance metrikleri analiz edin.
                             </p>
-                            <div class="text-center">
-                                <a href="https://btkakademi.gov.tr/course/ai-review" target="_blank" id="courseBtn6"
-                                    class="cosmic-btn text-lg px-8 py-3 inline-block"
-                                    style="background: linear-gradient(45deg, #ffaa00, #ff6600);">
-                                    🎁 Bonus'u Yakala!
-                                </a>
+                            <div class="text-center space-y-3">
+                                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                                    <a href="https://btkakademi.gov.tr/course/ai-review" target="_blank" id="courseBtn6"
+                                        class="cosmic-btn text-lg px-8 py-3 inline-block"
+                                        style="background: linear-gradient(45deg, #ffaa00, #ff6600);">
+                                        🎁 Bonus'u Yakala!
+                                    </a>
+                                    <button id="completeBtn6" class="cosmic-btn text-lg px-8 py-3 inline-block" 
+                                            style="background: linear-gradient(45deg, #00ff88, #00cc66);">
+                                        ✅ Tamamlandı
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         </button>
@@ -926,26 +940,7 @@
         </div>
     </div>
 
-    <!-- Stats Section -->
-    <div class="mt-20 fade-in-cosmic">
-        <div class="grid md:grid-cols-3 gap-8">
-            <div class="glass-card rounded-3xl p-8 text-center card-3d">
-                <div class="text-5xl mb-4">⚡</div>
-                <div class="text-3xl font-bold neon-text mb-2">127</div>
-                <div class="text-gray-300">Toplam XP</div>
-            </div>
-            <div class="glass-card rounded-3xl p-8 text-center card-3d">
-                <div class="text-5xl mb-4">🎯</div>
-                <div class="text-3xl font-bold text-cosmic-green mb-2">8</div>
-                <div class="text-gray-300">Günlük Streak</div>
-            </div>
-            <div class="glass-card rounded-3xl p-8 text-center card-3d">
-                <div class="text-5xl mb-4">🏆</div>
-                <div class="text-3xl font-bold text-cosmic-orange mb-2">4</div>
-                <div class="text-gray-300">Kazanılan Badge</div>
-            </div>
-        </div>
-    </div>
+
     </div>
 
     <!-- Footer -->
@@ -954,14 +949,6 @@
             <div class="flex flex-col md:flex-row items-center justify-between">
                 <div class="flex items-center space-x-4 mb-4 md:mb-0">
                     <div class="text-2xl font-bold hologram-text">NEXUS</div>
-                    <div class="text-gray-400">Powered by Galactic AI</div>
-                </div>
-                <div class="flex items-center space-x-6">
-                    <div class="achievement-badge">
-                        <span>🌟</span>
-                        <span>Python Expert Track</span>
-                    </div>
-                    <div class="text-gray-400 font-mono">v2.1.0</div>
                 </div>
             </div>
         </div>
@@ -1190,23 +1177,39 @@
                         }
 
                         // Kart durumunu güncelle
-                        stepCard.className = `glass-card step-card ${step.status} card-3d rounded-3xl p-8 fade-in-cosmic`;
+                        stepCard.className = `glass-card step-card ${step.status} card-3d rounded-3xl p-6 fade-in-cosmic`;
 
                         // Butonu güncelle
                         const buttonContainer = stepCard.querySelector('.text-center');
                         if (buttonContainer) {
                             if (step.status === 'locked') {
                                 buttonContainer.innerHTML = `
-                                    <button class="cosmic-btn text-lg px-8 py-3 inline-block opacity-50 cursor-not-allowed" disabled>
-                                        🔒 Kilitli
-                                    </button>
+                                    <div class="text-center space-y-3">
+                                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                                            <button class="cosmic-btn text-lg px-8 py-3 inline-block opacity-50 cursor-not-allowed" disabled>
+                                                🔒 Kilitli
+                                            </button>
+                                            <button id="completeBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block" 
+                                                    style="background: linear-gradient(45deg, #00ff88, #00cc66);">
+                                                ✅ Tamamlandı
+                                            </button>
+                                        </div>
+                                    </div>
                                 `;
                             } else {
                                 buttonContainer.innerHTML = `
-                                    <a href="${step.link}" target="_blank" 
-                                       id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                        🚀 Bölüme Git
-                                    </a>
+                                    <div class="text-center space-y-3">
+                                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                                            <a href="${step.link}" target="_blank" 
+                                               id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                                🚀 Bölüme Git
+                                            </a>
+                                            <button id="completeBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block" 
+                                                    style="background: linear-gradient(45deg, #00ff88, #00cc66);">
+                                                ✅ Tamamlandı
+                                            </button>
+                                        </div>
+                                    </div>
                                 `;
                             }
                         }
@@ -1245,15 +1248,23 @@
                             stepNode.className = 'step-node current';
                         }
 
-                        stepCard.className = 'glass-card step-card current card-3d rounded-3xl p-8 fade-in-cosmic';
+                        stepCard.className = 'glass-card step-card current card-3d rounded-3xl p-6 fade-in-cosmic';
 
                         const buttonContainer = stepCard.querySelector('.text-center');
                         if (buttonContainer) {
                             buttonContainer.innerHTML = `
-                                <a href="${course.link}" target="_blank" 
-                                   id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                    🚀 Kursa Git
-                                </a>
+                                <div class="text-center space-y-3">
+                                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                                        <a href="${course.link}" target="_blank" 
+                                           id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                            🚀 Kursa Git
+                                        </a>
+                                        <button id="completeBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block" 
+                                                style="background: linear-gradient(45deg, #00ff88, #00cc66);">
+                                            ✅ Tamamlandı
+                                        </button>
+                                    </div>
+                                </div>
                             `;
                         }
                     });
@@ -1277,7 +1288,7 @@
             const cardHTML = `
                 <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
                     <div class="${isEven ? 'lg:text-right order-2 lg:order-1' : 'lg:col-start-2 order-2'}">
-                        <div class="glass-card step-card card-3d rounded-3xl p-8">
+                        <div class="glass-card step-card card-3d rounded-3xl p-6">
                             <div class="step-node">
                                 <span>${step.icon || '📚'}</span>
                             </div>
@@ -1285,11 +1296,17 @@
                             <p class="text-gray-300 mb-6 leading-relaxed">
                                 ${step.description || 'Bu bölümün açıklaması burada yer alacak.'}
                             </p>
-                            <div class="text-center">
-                                <a href="${step.link || '#'}" target="_blank" 
-                                   id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                    🚀 Bölüme Git
-                                </a>
+                            <div class="text-center space-y-3">
+                                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                                    <a href="${step.link || '#'}" target="_blank" 
+                                       id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
+                                        🚀 Bölüme Git
+                                    </a>
+                                    <button id="completeBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block" 
+                                            style="background: linear-gradient(45deg, #00ff88, #00cc66);">
+                                        ✅ Tamamlandı
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
