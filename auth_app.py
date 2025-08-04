@@ -414,6 +414,10 @@ def learn():
 def tournament_admin():
     return render_template('tournament-admin.html')
 
+@app.route('/battle')
+def battle():
+    return render_template('battle.html')
+
 
 
 @app.route('/api/register', methods=['POST'])
@@ -835,107 +839,238 @@ def get_user_roadmap():
     except Exception as e:
         return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
 
+def clean_and_fix_json(json_text):
+    """JSON metnini temizler ve eksik kapanan tırnak işaretlerini düzeltir"""
+    try:
+        # Önce normal JSON parse dene
+        json.loads(json_text)
+        return json_text
+    except json.JSONDecodeError as e:
+        print(f"JSON temizleme gerekli: {e}")
+        
+        # Eksik kapanan tırnak işaretlerini düzelt
+        lines = json_text.split('\n')
+        fixed_lines = []
+        
+        for line in lines:
+            # Satırda açık tırnak işareti varsa ve kapanmamışsa
+            if '"' in line:
+                quote_count = line.count('"')
+                if quote_count % 2 != 0:  # Tek sayıda tırnak işareti varsa
+                    # Satırın sonuna tırnak işareti ekle
+                    if not line.strip().endswith('"'):
+                        line = line.rstrip() + '"'
+                    # Eğer satır virgülle bitmiyorsa ve sonraki satır yoksa virgül ekle
+                    if not line.strip().endswith(',') and not line.strip().endswith(']') and not line.strip().endswith('}'):
+                        line = line.rstrip() + ','
+            
+            fixed_lines.append(line)
+        
+        # Eksik kapanan parantezleri düzelt
+        fixed_text = '\n'.join(fixed_lines)
+        
+        # Eğer JSON hala tamamlanmamışsa, basit bir yapı oluştur
+        if not fixed_text.strip().endswith('}'):
+            # Son soruyu tamamla
+            if not fixed_text.strip().endswith(']'):
+                fixed_text = fixed_text.rstrip().rstrip(',') + ']'
+            if not fixed_text.strip().endswith('}'):
+                fixed_text = fixed_text.rstrip().rstrip(',') + '}'
+        
+        return fixed_text
+        
+    except Exception as e:
+        print(f"JSON temizleme hatası: {e}")
+        return json_text
+
+def extract_questions_from_text(text, topic, max_questions=15):
+    """AI yanıtından soruları manuel olarak çıkarır"""
+    try:
+        questions = []
+        lines = text.split('\n')
+        
+        current_question = None
+        current_options = []
+        option_count = 0
+        
+        for line in lines:
+            line = line.strip()
+            
+            # Soru satırını bul
+            if '"question"' in line or 'question' in line.lower():
+                # Önceki soruyu kaydet
+                if current_question and len(current_options) == 4:
+                    questions.append({
+                        "question": current_question,
+                        "options": current_options,
+                        "correct_option": "A"  # Varsayılan
+                    })
+                
+                # Yeni soru başlat
+                current_question = extract_quoted_text(line)
+                current_options = []
+                option_count = 0
+                
+            # Seçenek satırını bul
+            elif '"options"' in line or 'options' in line.lower():
+                continue
+            elif line.startswith('"') and ('"' in line[1:]) and option_count < 4:
+                option_text = extract_quoted_text(line)
+                if option_text:
+                    current_options.append(option_text)
+                    option_count += 1
+        
+        # Son soruyu ekle
+        if current_question and len(current_options) == 4:
+            questions.append({
+                "question": current_question,
+                "options": current_options,
+                "correct_option": "A"  # Varsayılan
+            })
+        
+        # Soru sayısını sınırla
+        if len(questions) > max_questions:
+            questions = questions[:max_questions]
+        
+        return questions
+        
+    except Exception as e:
+        print(f"Soru çıkarma hatası: {e}")
+        return []
+
+def extract_quoted_text(line):
+    """Satırdan tırnak işaretleri arasındaki metni çıkarır"""
+    try:
+        # İlk tırnak işaretini bul
+        start = line.find('"')
+        if start == -1:
+            return None
+        
+        # İkinci tırnak işaretini bul
+        end = line.find('"', start + 1)
+        if end == -1:
+            return None
+        
+        return line[start + 1:end]
+    except:
+        return None
+
 # Turnuva API'leri
-def generate_questions_with_gemini(topic):
+def generate_questions_with_gemini(topic, question_count=15):
     """Gemini API ile soru üret"""
     try:
+        # Gemini API anahtarını kontrol et
         if GEMINI_API_KEY == "your_gemini_api_key_here":
-            # Demo sorular döndür
-            return get_demo_questions(topic)
+            print("UYARI: Gemini API anahtarı ayarlanmamış. Lütfen GEMINI_API_KEY environment variable'ını ayarlayın.")
+            # Demo yerine basit hata mesajı döndür
+            return [{
+                "question": f"Gemini API anahtarı ayarlanmamış. {topic} için sorular üretilemedi.",
+                "options": ["API anahtarı gerekli", "Lütfen ayarlayın", "Environment variable", "GEMINI_API_KEY"],
+                "correct_option": "A"
+            }]
         
         model = genai.GenerativeModel('gemini-2.0-flash-exp')
         
         prompt = f"""
-        {topic} konusu için 10 adet çoktan seçmeli soru üret. 
-        Her soru için 4 şık olmalı (A, B, C, D) ve sadece bir doğru cevap olmalı.
-        
-        Yanıtı şu JSON formatında ver:
+{topic} konusu için {question_count} adet çoktan seçmeli soru üret. 
+Her soru için 4 şık olmalı (A, B, C, D) ve sadece bir doğru cevap olmalı.
+
+ÖNEMLİ: Yanıtı SADECE JSON formatında ver, başka hiçbir metin ekleme:
+
+{{
+    "questions": [
         {{
-            "questions": [
-                {{
-                    "question": "Soru metni",
-                    "options": ["A şıkkı", "B şıkkı", "C şıkkı", "D şıkkı"],
-                    "correct_option": "A"
-                }}
-            ]
+            "question": "Soru metni",
+            "options": ["A şıkkı", "B şıkkı", "C şıkkı", "D şıkkı"],
+            "correct_option": "A"
         }}
-        
-        Sorular Türkçe olmalı ve Python programlama ile ilgili olmalı.
-        """
+    ]
+}}
+
+KURALLAR:
+- Sorular Türkçe olmalı ve tamamen "{topic}" konusu ile ilgili olmalı
+- Soruların zorluk seviyesi orta düzeyde olsun
+- Her soru net, anlaşılır ve tek doğru cevabı olsun
+- Yanıt sadece JSON olmalı, markdown kod bloğu kullanma
+- Başka açıklama ekleme, sadece JSON döndür
+- Tüm tırnak işaretlerinin doğru kapatıldığından emin ol
+- JSON formatının tam ve geçerli olduğundan emin ol
+- Her soru için 4 seçenek olduğundan emin ol
+- correct_option değeri A, B, C veya D olmalı
+"""
         
         response = model.generate_content(prompt)
         
         # JSON parse et
         import json
+        import re
+        
         try:
-            result = json.loads(response.text)
-            return result.get("questions", [])
-        except:
-            # JSON parse edilemezse demo sorular döndür
-            return get_demo_questions(topic)
+            response_text = response.text.strip()
+            
+            # Markdown kod bloğu varsa temizle
+            if response_text.startswith('```json'):
+                # ```json ile başlayıp ``` ile bitenleri bul
+                json_match = re.search(r'```json\s*(.*?)\s*```', response_text, re.DOTALL)
+                if json_match:
+                    response_text = json_match.group(1).strip()
+                else:
+                    # ```json varsa ama ``` yoksa, ```json'dan sonrasını al
+                    response_text = response_text[7:].strip()  # ```json kısmını çıkar
+            elif response_text.startswith('```'):
+                # Sadece ``` ile başlıyorsa
+                json_match = re.search(r'```\s*(.*?)\s*```', response_text, re.DOTALL)
+                if json_match:
+                    response_text = json_match.group(1).strip()
+                else:
+                    response_text = response_text[3:].strip()  # ``` kısmını çıkar
+            
+            # JSON'u temizle ve tamamla
+            response_text = clean_and_fix_json(response_text)
+            
+            # JSON parse et
+            result = json.loads(response_text)
+            questions = result.get("questions", [])
+            
+            # Soru sayısını kontrol et ve gerekirse kırp veya tamamla
+            if len(questions) > question_count:
+                questions = questions[:question_count]
+            elif len(questions) < question_count:
+                print(f"Uyarı: İstenen {question_count} soru yerine {len(questions)} soru üretildi")
+            
+            return questions
+            
+        except json.JSONDecodeError as e:
+            print(f"JSON parse hatası: {e}")
+            print(f"Temizlenmiş AI yanıtı: {response_text[:500]}...")
+            print(f"Orijinal AI yanıtı: {response.text[:500]}...")
+            
+            # Son bir deneme: Manuel JSON oluştur
+            try:
+                # AI yanıtından soruları çıkarmaya çalış
+                questions = extract_questions_from_text(response.text, topic, question_count)
+                if questions:
+                    print(f"Manuel çıkarma başarılı: {len(questions)} soru bulundu")
+                    return questions
+            except Exception as extract_error:
+                print(f"Manuel çıkarma hatası: {extract_error}")
+            
+            # JSON parse edilemezse basit bir soru döndür
+            return [{
+                "question": f"{topic} konusunda JSON parse hatası oluştu. Lütfen tekrar deneyin.",
+                "options": ["API yanıtı hatalı", "JSON formatı bozuk", "Tekrar deneyin", "Sistem hatası"],
+                "correct_option": "C"
+            }]
             
     except Exception as e:
         print(f"Gemini API hatası: {e}")
-        return get_demo_questions(topic)
+        return [{
+            "question": f"{topic} için soru üretilirken hata oluştu: {str(e)}",
+            "options": ["API hatası", "Bağlantı sorunu", "Tekrar deneyin", "Sistem hatası"],
+            "correct_option": "C"
+        }]
 
-def get_demo_questions(topic):
-    """Demo sorular döndür"""
-    if "data" in topic.lower() or "veri" in topic.lower():
-        return [
-            {
-                "question": "Python'da bir liste oluşturmak için hangi syntax kullanılır?",
-                "options": ["list()", "array()", "vector()", "sequence()"],
-                "correct_option": "A"
-            },
-            {
-                "question": "Hangi veri yapısı key-value çiftleri saklar?",
-                "options": ["List", "Tuple", "Dictionary", "Set"],
-                "correct_option": "C"
-            },
-            {
-                "question": "Set veri yapısının özelliği nedir?",
-                "options": ["Sıralı elemanlar", "Tekrarlanan elemanlar", "Benzersiz elemanlar", "Değiştirilemez elemanlar"],
-                "correct_option": "C"
-            },
-            {
-                "question": "List comprehension syntax'ı nedir?",
-                "options": ["[x for x in range(10)]", "(x for x in range(10))", "{x for x in range(10)}", "<x for x in range(10)>"],
-                "correct_option": "A"
-            },
-            {
-                "question": "Hangi metod liste elemanlarını tersine çevirir?",
-                "options": ["reverse()", "sort()", "flip()", "invert()"],
-                "correct_option": "A"
-            }
-        ]
-    else:
-        return [
-            {
-                "question": "Python'da fonksiyon tanımlamak için hangi keyword kullanılır?",
-                "options": ["function", "def", "func", "define"],
-                "correct_option": "B"
-            },
-            {
-                "question": "Hangi veri tipi ondalık sayıları temsil eder?",
-                "options": ["int", "float", "decimal", "real"],
-                "correct_option": "B"
-            },
-            {
-                "question": "String'leri birleştirmek için hangi operatör kullanılır?",
-                "options": ["+", "&", "|", "||"],
-                "correct_option": "A"
-            },
-            {
-                "question": "Hangi döngü türü en az bir kez çalışır?",
-                "options": ["for", "while", "do-while", "repeat"],
-                "correct_option": "C"
-            },
-            {
-                "question": "Exception handling için hangi blok kullanılır?",
-                "options": ["try-except", "catch-throw", "error-handle", "exception-catch"],
-                "correct_option": "A"
-            }
-        ]
+
 
 @app.route('/api/generate-questions', methods=['POST'])
 def generate_questions():
@@ -962,7 +1097,7 @@ def generate_questions():
             return jsonify({'error': 'Turnuva içeriği gereklidir'}), 400
         
         # Soruları üret
-        questions = generate_questions_with_gemini(data['content'])
+        questions = generate_questions_with_gemini(data['content'], data.get('question_count', 15))
         
         return jsonify({
             'success': True,
@@ -1004,9 +1139,9 @@ def save_tournament():
         
         # Turnuvayı kaydet
         cursor.execute('''
-            INSERT INTO tournaments (title, content, start_time, end_time, status)
-            VALUES (?, ?, ?, ?, 'active')
-        ''', (data['title'], data['content'], data['start_time'], data['end_time']))
+            INSERT INTO tournaments (title, content, question_count, duration_minutes, start_time, end_time, status)
+            VALUES (?, ?, ?, ?, ?, ?, 'active')
+        ''', (data['title'], data['content'], data['question_count'], data['duration_minutes'], data['start_time'], data['end_time']))
         
         tournament_id = cursor.lastrowid
         
@@ -1053,7 +1188,7 @@ def get_tournaments():
         conn.commit()
         
         cursor.execute('''
-            SELECT id, title, content, start_time, end_time, status, created_at
+            SELECT id, title, content, question_count, duration_minutes, start_time, end_time, status, created_at
             FROM tournaments 
             WHERE status = 'active'
             ORDER BY created_at DESC
@@ -1068,10 +1203,12 @@ def get_tournaments():
                 'id': tournament[0],
                 'title': tournament[1],
                 'content': tournament[2],
-                'start_time': tournament[3],
-                'end_time': tournament[4],
-                'status': tournament[5],
-                'created_at': tournament[6]
+                'question_count': tournament[3],
+                'duration_minutes': tournament[4],
+                'start_time': tournament[5],
+                'end_time': tournament[6],
+                'status': tournament[7],
+                'created_at': tournament[8]
             })
         
         return jsonify({
@@ -1145,8 +1282,8 @@ def join_tournament():
         
         # Katılımı kaydet
         cursor.execute('''
-            INSERT INTO tournament_participants (user_id, tournament_id)
-            VALUES (?, ?)
+            INSERT INTO tournament_participants (user_id, tournament_id, total_questions, correct_answers)
+            VALUES (?, ?, 0, 0)
         ''', (payload['user_id'], data['tournament_id']))
         
         conn.commit()
@@ -1517,8 +1654,8 @@ def get_user_tournament_status(tournament_id):
                 'status': tournament[3],
                 'current_time': current_time.isoformat(),
                 'has_joined': participant is not None,
-                'can_join': current_time <= end_time,  # Sadece bitiş zamanını kontrol et
-                'can_participate': participant is not None and current_time <= end_time,
+                'can_join': start_time <= current_time <= end_time,  # Hem başlangıç hem bitiş zamanını kontrol et
+                'can_participate': participant is not None and start_time <= current_time <= end_time,
                 'is_completed': participant and participant[3] is not None
             }
         except:
@@ -1576,7 +1713,7 @@ def get_tournament(tournament_id):
         
         # Turnuva bilgileri
         cursor.execute('''
-            SELECT id, title, content, start_time, end_time, status
+            SELECT id, title, content, question_count, duration_minutes, start_time, end_time, status
             FROM tournaments WHERE id = ?
         ''', (tournament_id,))
         
@@ -1610,9 +1747,11 @@ def get_tournament(tournament_id):
                 'id': tournament[0],
                 'title': tournament[1],
                 'content': tournament[2],
-                'start_time': tournament[3],
-                'end_time': tournament[4],
-                'status': tournament[5],
+                'question_count': tournament[3],
+                'duration_minutes': tournament[4],
+                'start_time': tournament[5],
+                'end_time': tournament[6],
+                'status': tournament[7],
                 'questions': questions_list
             }
         }), 200
@@ -1722,6 +1861,32 @@ def delete_tournament(tournament_id):
         conn.close()
         
         return jsonify({'success': True, 'message': 'Turnuva başarıyla silindi'}), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
+
+@app.route('/api/tournament-participant-count/<int:tournament_id>', methods=['GET'])
+def get_tournament_participant_count(tournament_id):
+    """Turnuvayı tamamlayan kişi sayısını döndür"""
+    try:
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        
+        # Turnuvayı tamamlayan kişi sayısını al (completed_at NULL değil)
+        cursor.execute('''
+            SELECT COUNT(*) 
+            FROM tournament_participants 
+            WHERE tournament_id = ? AND completed_at IS NOT NULL
+        ''', (tournament_id,))
+        
+        participant_count = cursor.fetchone()[0]
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'participant_count': participant_count
+        }), 200
         
     except Exception as e:
         return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500

@@ -178,32 +178,21 @@ w<!DOCTYPE html>
         <div class="container mx-auto px-6 py-6">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-6">
-                    <div class="text-3xl font-bold">⚔️ NEXUS ARENA</div>
+                    <a href="/" class="text-3xl font-bold hover:text-blue-400 transition-colors cursor-pointer">⚔️ NEXUS</a>
                     <div class="text-gray-400">|</div>
                     <div class="text-xl font-semibold text-accent">Python Combat Zone</div>
                 </div>
                 <div class="flex items-center space-x-6">
-                    <a href="/tournament-admin" class="cosmic-btn px-4 py-2 text-sm">
+                    <a href="/tournament-admin" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-4 py-2 text-sm rounded-lg transition-all duration-300 hover:scale-105">
                         ⚙️ Admin Paneli
                     </a>
-                    <button onclick="showCurrentTournamentResults()" class="cosmic-btn px-4 py-2 text-sm" id="showResultsBtn">
-                        🏆 Sonuçlar
-                    </button>
+
                     <a href="/roadmap" class="text-gray-300 hover:text-white transition-colors">
                         🗺️ Yol Haritası
                     </a>
                     <a href="/profile" class="text-gray-300 hover:text-white transition-colors">
                         👤 Profil
                     </a>
-                    <div class="achievement-badge">
-                        <span>🏆</span>
-                        <span>Tournament Warrior</span>
-                    </div>
-                    <div class="glass-card px-4 py-2">
-                        <div class="text-sm text-gray-400 font-mono">RANK</div>
-                        <div class="text-xl font-bold text-warning">#42</div>
-                    </div>
-                </div>
             </div>
         </div>
     </header>
@@ -253,7 +242,7 @@ w<!DOCTYPE html>
                         <h2 class="text-3xl font-bold">🎯 Bugünkü Savaş Alanı</h2>
                         <div class="achievement-badge">
                             <span>🔥</span>
-                            <span>127 Savaşçı Katıldı</span>
+                            <span id="participantCount">- Savaşçı Tamamladı</span>
                         </div>
                     </div>
                     
@@ -268,22 +257,14 @@ w<!DOCTYPE html>
                             </div>
                         </div>
                         
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="grid grid-cols-2 gap-4 mb-6">
                             <div class="glass-card p-3 text-center">
                                 <div class="text-sm text-gray-400">Sorular</div>
-                                <div class="text-xl font-bold text-cyan">15</div>
+                                <div class="text-xl font-bold text-cyan" id="tournamentQuestionCount">-</div>
                             </div>
                             <div class="glass-card p-3 text-center">
                                 <div class="text-sm text-gray-400">Süre</div>
-                                <div class="text-xl font-bold text-success">45 dk</div>
-                            </div>
-                            <div class="glass-card p-3 text-center">
-                                <div class="text-sm text-gray-400">Zorluk</div>
-                                <div class="text-xl font-bold text-warning">★★★☆☆</div>
-                            </div>
-                            <div class="glass-card p-3 text-center">
-                                <div class="text-sm text-gray-400">Ödül XP</div>
-                                <div class="text-xl font-bold text-purple">+500</div>
+                                <div class="text-xl font-bold text-success" id="tournamentDuration">- dk</div>
                             </div>
                         </div>
                         
@@ -291,9 +272,7 @@ w<!DOCTYPE html>
                             ⚔️ Savaşa Katıl!
                         </button>
                         
-                        <div class="text-center text-sm text-gray-400">
-                            💡 <strong>İpucu:</strong> Nested data structures ve list comprehensions konularını gözden geçir!
-                        </div>
+
                     </div>
                 </div>
 
@@ -478,7 +457,7 @@ w<!DOCTYPE html>
         </div>
 
         <!-- Tournament Results Section -->
-        <div id="tournamentResultsSection" class="mt-12 fade-in-cosmic hidden">
+        <div id="tournamentResultsSection" class="mt-12 fade-in-cosmic">
             <div class="tournament-card rounded-3xl p-8">
                 <h2 class="text-3xl font-bold mb-8 text-center">🏆 TURNUVA SONUÇLARI</h2>
                 
@@ -572,42 +551,7 @@ w<!DOCTYPE html>
                     </div>
                 </div>
 
-                <!-- Detailed Analysis -->
-                <div class="mt-8 glass-card rounded-2xl p-6">
-                    <h4 class="text-xl font-bold mb-4">📊 Detaylı Analiz</h4>
-                    
-                    <div class="grid md:grid-cols-3 gap-6">
-                        <div class="text-center">
-                            <div class="text-3xl mb-2">💪</div>
-                            <div class="font-bold text-success">Güçlü Yanların</div>
-                            <div class="text-sm text-gray-400 mt-2">
-                                • Context managers (95%)<br>
-                                • Property decorators (92%)<br>
-                                • Function wrapping (88%)
-                            </div>
-                        </div>
-                        
-                        <div class="text-center">
-                            <div class="text-3xl mb-2">🎯</div>
-                            <div class="font-bold text-warning">Gelişim Alanları</div>
-                            <div class="text-sm text-gray-400 mt-2">
-                                • Class decorators (65%)<br>
-                                • Nested decorators (70%)<br>
-                                • Performance tuning (72%)
-                            </div>
-                        </div>
-                        
-                        <div class="text-center">
-                            <div class="text-3xl mb-2">💡</div>
-                            <div class="font-bold text-cyan">Öneriler</div>
-                            <div class="text-sm text-gray-400 mt-2">
-                                • Functools modülünü çalış<br>
-                                • Metaclass konusuna bak<br>
-                                • Performance profiling öğren
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>
@@ -667,36 +611,108 @@ w<!DOCTYPE html>
             }
         }
 
-        function initCountdown() {
+        async function initCountdown() {
             const hoursEl = document.getElementById('hours');
             const minutesEl = document.getElementById('minutes');
             const secondsEl = document.getElementById('seconds');
-            const timeLeftEl = document.getElementById('timeLeft');
+            const countdownTitleEl = document.querySelector('.text-lg.text-gray-300');
+            const countdownSubtitleEl = document.querySelector('.text-sm.text-gray-400.mt-2');
             
-            let totalSeconds = 14 * 3600 + 32 * 60 + 18;
-            
-            function updateTimer() {
-                const hours = Math.floor(totalSeconds / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                const seconds = totalSeconds % 60;
+            try {
+                // Aktif turnuvayı al
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/tournaments', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 
-                hoursEl.textContent = hours.toString().padStart(2, '0');
-                minutesEl.textContent = minutes.toString().padStart(2, '0');
-                secondsEl.textContent = seconds.toString().padStart(2, '0');
-                timeLeftEl.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                const result = await response.json();
                 
-                if (totalSeconds > 0) {
-                    totalSeconds--;
-                } else {
+                if (!result.success || result.tournaments.length === 0) {
+                    // Turnuva yoksa varsayılan değerler
                     hoursEl.textContent = '00';
                     minutesEl.textContent = '00';
                     secondsEl.textContent = '00';
-                    timeLeftEl.textContent = 'BİTTİ!';
+                    countdownTitleEl.textContent = '🔥 Aktif turnuva bulunmuyor';
+                    countdownSubtitleEl.textContent = 'Admin panelinden turnuva oluşturun';
+                    return;
                 }
+                
+                const tournament = result.tournaments[0];
+                const currentTime = new Date();
+                const startTime = new Date(tournament.start_time);
+                const endTime = new Date(tournament.end_time);
+                
+                let targetTime;
+                let isCountingToStart = false;
+                
+                if (currentTime < startTime) {
+                    // Turnuva henüz başlamadı, başlangıç zamanına geri say
+                    targetTime = startTime;
+                    isCountingToStart = true;
+                    countdownTitleEl.textContent = '🔥 Turnuvanın başlamasına kalan süre';
+                    countdownSubtitleEl.textContent = 'Turnuva henüz başlamadı!';
+                } else if (currentTime >= startTime && currentTime <= endTime) {
+                    // Turnuva aktif, bitiş zamanına geri say
+                    targetTime = endTime;
+                    isCountingToStart = false;
+                    countdownTitleEl.textContent = '🔥 Bugünkü turnuva bitimine kalan süre';
+                    countdownSubtitleEl.textContent = 'Katılım için son dakikalar!';
+                } else {
+                    // Turnuva süresi dolmuş
+                    hoursEl.textContent = '00';
+                    minutesEl.textContent = '00';
+                    secondsEl.textContent = '00';
+                    countdownTitleEl.textContent = '🔥 Turnuva süresi dolmuş';
+                    countdownSubtitleEl.textContent = 'Yeni turnuva bekleniyor';
+                    return;
+                }
+                
+                function updateTimer() {
+                    const now = new Date();
+                    const timeDiff = targetTime - now;
+                    
+                    if (timeDiff <= 0) {
+                        hoursEl.textContent = '00';
+                        minutesEl.textContent = '00';
+                        secondsEl.textContent = '00';
+                        
+                        if (isCountingToStart) {
+                            countdownTitleEl.textContent = '🔥 Turnuva başladı!';
+                            countdownSubtitleEl.textContent = 'Şimdi katılabilirsiniz!';
+                            // Sayfayı yenile veya turnuva durumunu güncelle
+                            setTimeout(() => {
+                                location.reload();
+                            }, 2000);
+                        } else {
+                            countdownTitleEl.textContent = '🔥 Turnuva süresi dolmuş';
+                            countdownSubtitleEl.textContent = 'Sonuçlar yakında açıklanacak';
+                        }
+                        return;
+                    }
+                    
+                    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+                    
+                    hoursEl.textContent = hours.toString().padStart(2, '0');
+                    minutesEl.textContent = minutes.toString().padStart(2, '0');
+                    secondsEl.textContent = seconds.toString().padStart(2, '0');
+                }
+                
+                updateTimer();
+                setInterval(updateTimer, 1000);
+                
+            } catch (error) {
+                console.error('Countdown başlatılırken hata:', error);
+                // Hata durumunda varsayılan değerler
+                hoursEl.textContent = '00';
+                minutesEl.textContent = '00';
+                secondsEl.textContent = '00';
+                countdownTitleEl.textContent = '🔥 Hata oluştu';
+                countdownSubtitleEl.textContent = 'Lütfen sayfayı yenileyin';
             }
-            
-            updateTimer();
-            setInterval(updateTimer, 1000);
         }
 
         // Turnuva değişkenleri
@@ -769,16 +785,25 @@ w<!DOCTYPE html>
                     }
                     
                     if (status.has_joined) {
-                        // Zaten katılmış, soruları yükle
-                        await loadTournamentQuestions();
+                        // Zaten katılmış, savaş sayfasına yönlendir
+                        window.location.href = `/battle?tournament_id=${currentTournament.id}`;
                         return;
                     }
                     
                     if (!status.can_join) {
-                        if (new Date(status.current_time) < new Date(status.start_time)) {
-                            alert('Turnuva henüz başlamadı!');
-                        } else {
+                        const currentTime = new Date(status.current_time);
+                        const startTime = new Date(status.start_time);
+                        const endTime = new Date(status.end_time);
+                        
+                        if (currentTime < startTime) {
+                            const timeDiff = startTime - currentTime;
+                            const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+                            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                            alert(`Turnuva henüz başlamadı! Başlamasına ${hours} saat ${minutes} dakika kaldı.`);
+                        } else if (currentTime > endTime) {
                             alert('Turnuva süresi dolmuş!');
+                        } else {
+                            alert('Turnuva şu anda aktif değil!');
                         }
                         return;
                     }
@@ -800,9 +825,8 @@ w<!DOCTYPE html>
                 console.log('Join result:', joinResult);
                 
                 if (joinResult.success) {
-                    alert('Turnuvaya başarıyla katıldınız!');
-                    // Turnuva sorularını al
-                    await loadTournamentQuestions();
+                    // Başarıyla katıldı, savaş sayfasına yönlendir
+                    window.location.href = `/battle?tournament_id=${currentTournament.id}`;
                 } else {
                     alert(joinResult.error || 'Turnuvaya katılırken hata oluştu');
                 }
@@ -1145,7 +1169,23 @@ w<!DOCTYPE html>
         async function loadTournamentResults() {
             try {
                 const token = localStorage.getItem('authToken');
-                if (!currentTournament) return;
+                if (!token) return;
+                
+                // Eğer currentTournament yoksa, aktif turnuvayı al
+                if (!currentTournament) {
+                    const response = await fetch('/api/tournaments', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success && result.tournaments.length > 0) {
+                        currentTournament = result.tournaments[0];
+                    } else {
+                        return; // Aktif turnuva yoksa çık
+                    }
+                }
                 
                 const response = await fetch(`/api/tournament-results/${currentTournament.id}`, {
                     headers: {
@@ -1169,7 +1209,6 @@ w<!DOCTYPE html>
                                             <th class="text-left py-3 px-4 text-gray-400">Kullanıcı</th>
                                             <th class="text-center py-3 px-4 text-gray-400">Skor</th>
                                             <th class="text-center py-3 px-4 text-gray-400">Doğru</th>
-                                            <th class="text-center py-3 px-4 text-gray-400">Durum</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1187,9 +1226,6 @@ w<!DOCTYPE html>
                                                     </span>
                                                 </td>
                                                 <td class="py-3 px-4 text-center text-cyan">${participant.correct_answers}/${participant.total_questions}</td>
-                                                <td class="py-3 px-4 text-center text-gray-400">
-                                                    <span class="text-success">✅ ${participant.completion_time}</span>
-                                                </td>
                                             </tr>
                                         `).join('')}
                                     </tbody>
@@ -1398,7 +1434,42 @@ w<!DOCTYPE html>
                         <div class="text-sm text-gray-500">Admin panelinden yeni turnuva oluşturulmasını bekleyin</div>
                     </div>
                 `;
+                
+                // Statik alanları da güncelle
+                document.getElementById('tournamentQuestionCount').textContent = '-';
+                document.getElementById('tournamentDuration').textContent = '- dk';
+                
+                // Katılımcı sayısını sıfırla
+                const participantCountEl = document.getElementById('participantCount');
+                if (participantCountEl) {
+                    participantCountEl.textContent = '0 Savaşçı Tamamladı';
+                }
                 return;
+            }
+
+            // Turnuva zamanını kontrol et
+            const currentTime = new Date();
+            const startTime = new Date(tournament.start_time);
+            const endTime = new Date(tournament.end_time);
+            const isActive = currentTime >= startTime && currentTime <= endTime;
+            
+            // Buton durumunu belirle
+            let buttonHtml = '';
+            if (isActive) {
+                buttonHtml = `<button class="battle-btn w-full mb-4" onclick="joinTournament()" id="joinTournamentBtn">
+                    ⚔️ Savaşa Katıl!
+                </button>`;
+            } else if (currentTime < startTime) {
+                const timeDiff = startTime - currentTime;
+                const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+                const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                buttonHtml = `<button class="battle-btn w-full mb-4 opacity-50 cursor-not-allowed" disabled>
+                    ⏰ ${hours}s ${minutes}dk sonra başlayacak
+                </button>`;
+            } else {
+                buttonHtml = `<button class="battle-btn w-full mb-4 opacity-50 cursor-not-allowed" disabled>
+                    ❌ Turnuva süresi dolmuş
+                </button>`;
             }
 
             // Turnuva varsa kartı güncelle
@@ -1413,33 +1484,60 @@ w<!DOCTYPE html>
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="grid grid-cols-2 gap-4 mb-6">
                     <div class="glass-card p-3 text-center">
                         <div class="text-sm text-gray-400">Sorular</div>
-                        <div class="text-xl font-bold text-cyan">15</div>
+                        <div class="text-xl font-bold text-cyan">${tournament.question_count || 15}</div>
                     </div>
                     <div class="glass-card p-3 text-center">
                         <div class="text-sm text-gray-400">Süre</div>
-                        <div class="text-xl font-bold text-success">45 dk</div>
-                    </div>
-                    <div class="glass-card p-3 text-center">
-                        <div class="text-sm text-gray-400">Zorluk</div>
-                        <div class="text-xl font-bold text-warning">★★★☆☆</div>
-                    </div>
-                    <div class="glass-card p-3 text-center">
-                        <div class="text-sm text-gray-400">Ödül XP</div>
-                        <div class="text-xl font-bold text-purple">+500</div>
+                        <div class="text-xl font-bold text-success">${tournament.duration_minutes || 45} dk</div>
                     </div>
                 </div>
                 
-                <button class="battle-btn w-full mb-4" onclick="joinTournament()" id="joinTournamentBtn">
-                    ⚔️ Savaşa Katıl!
-                </button>
-                
-                <div class="text-center text-sm text-gray-400">
-                    💡 <strong>İpucu:</strong> Nested data structures ve list comprehensions konularını gözden geçir!
-                </div>
+                ${buttonHtml}
             `;
+            
+            // Statik alanları da güncelle
+            document.getElementById('tournamentQuestionCount').textContent = tournament.question_count || 15;
+            document.getElementById('tournamentDuration').textContent = (tournament.duration_minutes || 45) + ' dk';
+            
+            // Katılımcı sayısını güncelle
+            console.log('updateTournamentCard içinde updateParticipantCount çağrılıyor, tournament.id:', tournament.id);
+            updateParticipantCount(tournament.id);
+        }
+
+        async function updateParticipantCount(tournamentId) {
+            console.log('updateParticipantCount çağrıldı, tournamentId:', tournamentId);
+            try {
+                const response = await fetch(`/api/tournament-participant-count/${tournamentId}`);
+                console.log('API response status:', response.status);
+                const result = await response.json();
+                console.log('API response result:', result);
+                
+                if (result.success) {
+                    const participantCountEl = document.getElementById('participantCount');
+                    console.log('participantCountEl bulundu:', participantCountEl);
+                    if (participantCountEl) {
+                        participantCountEl.textContent = `${result.participant_count} Savaşçı Tamamladı`;
+                        console.log('Katılımcı sayısı güncellendi:', result.participant_count);
+                    } else {
+                        console.error('participantCountEl elementi bulunamadı');
+                    }
+                } else {
+                    console.error('Katılımcı sayısı alınamadı:', result.error);
+                    const participantCountEl = document.getElementById('participantCount');
+                    if (participantCountEl) {
+                        participantCountEl.textContent = '0 Savaşçı Tamamladı';
+                    }
+                }
+            } catch (error) {
+                console.error('Katılımcı sayısı güncellenirken hata:', error);
+                const participantCountEl = document.getElementById('participantCount');
+                if (participantCountEl) {
+                    participantCountEl.textContent = '0 Savaşçı Tamamladı';
+                }
+            }
         }
 
         function showEmailPreview() {
@@ -1462,16 +1560,35 @@ w<!DOCTYPE html>
             });
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             createStarField();
-            initCountdown();
+            await initCountdown();
             initModals();
             initScrollAnimations();
             
             console.log('Tournament page loaded successfully');
             
+            // URL parametrelerini kontrol et
+            const urlParams = new URLSearchParams(window.location.search);
+            const refresh = urlParams.get('refresh');
+            
             // Sayfa yüklendiğinde turnuva verilerini yükle
             loadCurrentTournament();
+            
+            // Eğer refresh parametresi varsa, katılımcı sayısını güncelle
+            if (refresh === 'true') {
+                setTimeout(() => {
+                    if (currentTournament) {
+                        console.log('Refresh parametresi tespit edildi, katılımcı sayısı güncelleniyor...');
+                        updateParticipantCount(currentTournament.id);
+                    }
+                }, 500);
+            }
+            
+            // Sayfa yüklendiğinde turnuva sonuçlarını da yükle
+            setTimeout(() => {
+                loadTournamentResults();
+            }, 1000);
             
             setTimeout(() => {
                 const emailBtn = document.createElement('button');
@@ -1484,6 +1601,14 @@ w<!DOCTYPE html>
                     statsCard.appendChild(emailBtn);
                 }
             }, 2000);
+            
+            // Her 30 saniyede bir katılımcı sayısını güncelle
+            setInterval(() => {
+                if (currentTournament) {
+                    console.log('Otomatik katılımcı sayısı güncellemesi...');
+                    updateParticipantCount(currentTournament.id);
+                }
+            }, 30000);
             
             setInterval(() => {
                 const scoreElements = document.querySelectorAll('.leaderboard-item .text-sm');

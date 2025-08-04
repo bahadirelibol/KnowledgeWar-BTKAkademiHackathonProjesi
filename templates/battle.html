@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savaş Alanı - BTK Turnuva</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e5e5e5;
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+
+        .battle-btn {
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            border: none;
+            color: white;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .battle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .battle-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .option-btn.selected {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+        }
+
+        .timer {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-6 py-8">
+        <!-- Header -->
+        <div class="glass-card p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold">⚔️ Savaş Alanı</h1>
+                    <p class="text-gray-400" id="tournamentTitle">Turnuva yükleniyor...</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="timer" id="timeRemaining">--:--</div>
+                    <a href="/tournament" class="text-gray-400 hover:text-white">← Geri Dön</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="glass-card p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div class="text-lg font-semibold">
+                    Soru <span id="currentQuestionNum">1</span> / <span id="totalQuestions">-</span>
+                </div>
+                <div class="text-lg font-semibold">
+                    Skor: <span id="currentScore">0</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loadingSection" class="glass-card p-8 text-center">
+            <div class="text-3xl mb-4">🚀</div>
+            <h2 class="text-2xl font-bold mb-4">Savaş Hazırlanıyor...</h2>
+            <p class="text-gray-400">Sorular yükleniyor ve turnuva başlatılıyor</p>
+        </div>
+
+        <!-- Question Section -->
+        <div id="questionSection" class="glass-card p-8 hidden">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-6" id="questionText">Soru yükleniyor...</h2>
+                <div class="space-y-4" id="optionsContainer">
+                    <!-- Options will be loaded here -->
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button id="nextBtn" class="battle-btn px-8 py-3 hidden" onclick="nextQuestion()">
+                    Sonraki Soru →
+                </button>
+                <button id="finishBtn" class="battle-btn px-8 py-3 hidden" onclick="finishBattle()">
+                    Savaşı Bitir 🏆
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="glass-card p-8 text-center hidden">
+            <div class="text-6xl mb-4">🏆</div>
+            <h2 class="text-3xl font-bold mb-4">Savaş Tamamlandı!</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="glass-card p-4">
+                    <div class="text-2xl font-bold text-green-400" id="finalScore">-</div>
+                    <div class="text-sm text-gray-400">Final Skor</div>
+                </div>
+                <div class="glass-card p-4">
+                    <div class="text-2xl font-bold text-blue-400" id="correctAnswers">-</div>
+                    <div class="text-sm text-gray-400">Doğru Cevap</div>
+                </div>
+                <div class="glass-card p-4">
+                    <div class="text-2xl font-bold text-yellow-400" id="completionTime">-</div>
+                    <div class="text-sm text-gray-400">Süre</div>
+                </div>
+                <div class="glass-card p-4">
+                    <div class="text-2xl font-bold text-purple-400" id="earnedXP">-</div>
+                    <div class="text-sm text-gray-400">Kazanılan XP</div>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <button onclick="returnToTournament()" class="battle-btn px-8 py-3">
+                    🏠 Ana Sayfaya Dön
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentTournament = null;
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let startTime = null;
+        let timer = null;
+        let score = 0;
+
+        // Initialize battle page
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initializeBattle();
+        });
+
+        async function initializeBattle() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    alert('Giriş yapmanız gerekiyor');
+                    window.location.href = '/login';
+                    return;
+                }
+
+                // Get tournament data from URL params or localStorage
+                const urlParams = new URLSearchParams(window.location.search);
+                const tournamentId = urlParams.get('tournament_id');
+                
+                if (!tournamentId) {
+                    alert('Turnuva ID bulunamadı');
+                    window.location.href = '/tournament';
+                    return;
+                }
+
+                // Load tournament data
+                await loadTournament(tournamentId, token);
+                
+                // Load questions
+                await loadQuestions(tournamentId, token);
+                
+                // Start battle
+                startBattle();
+
+            } catch (error) {
+                console.error('Battle initialization error:', error);
+                alert('Savaş başlatılırken hata oluştu: ' + error.message);
+                window.location.href = '/tournament';
+            }
+        }
+
+        async function loadTournament(tournamentId, token) {
+            const response = await fetch(`/api/tournaments/${tournamentId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Turnuva bilgileri alınamadı');
+            }
+
+            currentTournament = result.tournament;
+            
+            // Update UI
+            document.getElementById('tournamentTitle').textContent = currentTournament.title;
+            document.getElementById('totalQuestions').textContent = currentTournament.question_count || 15;
+        }
+
+        async function loadQuestions(tournamentId, token) {
+            const response = await fetch(`/api/tournament-questions/${tournamentId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Sorular yüklenemedi');
+            }
+
+            questions = result.questions;
+            userAnswers = new Array(questions.length).fill(null);
+            
+            console.log('Loaded questions:', questions);
+            console.log('Questions count:', questions.length);
+        }
+
+        function startBattle() {
+            // Hide loading, show question section
+            document.getElementById('loadingSection').classList.add('hidden');
+            document.getElementById('questionSection').classList.remove('hidden');
+            
+            // Start timer with tournament duration
+            const durationMinutes = currentTournament.duration_minutes || 45;
+            startTimer(durationMinutes * 60); // Convert to seconds
+            
+            // Start time tracking
+            startTime = new Date();
+            
+            // Show first question
+            showQuestion(0);
+        }
+
+        function startTimer(totalSeconds) {
+            let remainingSeconds = totalSeconds;
+            
+            timer = setInterval(() => {
+                const minutes = Math.floor(remainingSeconds / 60);
+                const seconds = remainingSeconds % 60;
+                
+                document.getElementById('timeRemaining').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (remainingSeconds <= 0) {
+                    clearInterval(timer);
+                    finishBattle();
+                    return;
+                }
+                
+                remainingSeconds--;
+            }, 1000);
+        }
+
+        function showQuestion(index) {
+            if (index >= questions.length) {
+                finishBattle();
+                return;
+            }
+
+            const question = questions[index];
+            currentQuestionIndex = index;
+            
+            // Update progress
+            document.getElementById('currentQuestionNum').textContent = index + 1;
+            const progress = ((index + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Show question
+            document.getElementById('questionText').textContent = question.question;
+            
+            // Show options
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, optionIndex) => {
+                const optionBtn = document.createElement('button');
+                optionBtn.className = 'option-btn w-full';
+                optionBtn.innerHTML = `
+                    <span class="font-bold text-blue-400 mr-3">${String.fromCharCode(65 + optionIndex)}.</span>
+                    ${option}
+                `;
+                optionBtn.onclick = () => selectOption(String.fromCharCode(65 + optionIndex), optionBtn);
+                optionsContainer.appendChild(optionBtn);
+            });
+            
+            // Reset buttons
+            document.getElementById('nextBtn').classList.add('hidden');
+            document.getElementById('finishBtn').classList.add('hidden');
+        }
+
+        function selectOption(selectedOption, buttonElement) {
+            // Remove previous selections
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Mark current selection
+            buttonElement.classList.add('selected');
+            
+            // Store answer
+            userAnswers[currentQuestionIndex] = selectedOption;
+            
+            console.log(`Question ${currentQuestionIndex + 1} answered:`, selectedOption);
+            console.log('Current answers array:', userAnswers);
+            
+            // Show next/finish button
+            if (currentQuestionIndex < questions.length - 1) {
+                document.getElementById('nextBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('finishBtn').classList.remove('hidden');
+            }
+        }
+
+        function nextQuestion() {
+            showQuestion(currentQuestionIndex + 1);
+        }
+
+        async function finishBattle() {
+            try {
+                if (timer) {
+                    clearInterval(timer);
+                }
+
+                const token = localStorage.getItem('authToken');
+                let correctCount = 0;
+
+                // Submit answers
+                console.log('Submitting answers for', questions.length, 'questions');
+                console.log('User answers:', userAnswers);
+                
+                for (let i = 0; i < questions.length; i++) {
+                    if (userAnswers[i] !== null) {
+                        console.log(`Submitting answer ${i + 1}:`, {
+                            tournament_id: currentTournament.id,
+                            question_id: questions[i].id,
+                            selected_option: userAnswers[i]
+                        });
+                        
+                        const response = await fetch('/api/answer-question', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                tournament_id: currentTournament.id,
+                                question_id: questions[i].id,
+                                selected_option: userAnswers[i]
+                            })
+                        });
+
+                        const result = await response.json();
+                        console.log(`Answer ${i + 1} result:`, result);
+                        
+                        if (!result.success) {
+                            console.error(`Error submitting answer ${i + 1}:`, result.error);
+                        } else if (result.is_correct) {
+                            correctCount++;
+                        }
+                    } else {
+                        console.log(`Skipping question ${i + 1} - no answer provided`);
+                    }
+                }
+                
+                console.log('Total correct answers:', correctCount);
+
+                // Complete tournament
+                const completeResponse = await fetch('/api/complete-tournament', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        tournament_id: currentTournament.id
+                    })
+                });
+
+                const completeResult = await completeResponse.json();
+                console.log('Complete tournament result:', completeResult);
+                
+                if (completeResult.success) {
+                    showResults(completeResult.final_score, correctCount);
+                } else {
+                    console.error('Complete tournament error:', completeResult.error);
+                    
+                    // Eğer hiç soru cevaplanmamış hatası alıyorsak, manuel hesaplama yap
+                    if (completeResult.error && completeResult.error.includes('Hiç soru cevaplanmamış')) {
+                        console.log('Fallback: Calculating score manually');
+                        const answeredCount = userAnswers.filter(answer => answer !== null).length;
+                        const manualScore = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+                        
+                        alert(`Cevaplar kaydedilemedi, ancak manuel hesaplama: ${correctCount}/${answeredCount} doğru (${manualScore}%)`);
+                        showResults(manualScore, correctCount);
+                    } else {
+                        throw new Error(completeResult.error || 'Turnuva tamamlanırken hata oluştu');
+                    }
+                }
+
+            } catch (error) {
+                console.error('Finish battle error:', error);
+                alert('Savaş tamamlanırken hata oluştu: ' + error.message);
+            }
+        }
+
+        function showResults(finalScore, correctCount) {
+            // Hide question section, show results
+            document.getElementById('questionSection').classList.add('hidden');
+            document.getElementById('resultsSection').classList.remove('hidden');
+            
+            // Calculate completion time
+            const endTime = new Date();
+            const completionTimeMs = endTime - startTime;
+            const completionMinutes = Math.floor(completionTimeMs / 60000);
+            const completionSeconds = Math.floor((completionTimeMs % 60000) / 1000);
+            const timeString = `${completionMinutes}:${completionSeconds.toString().padStart(2, '0')}`;
+            
+            // Calculate XP
+            const baseXP = 500;
+            const accuracyBonus = finalScore === 100 ? 300 : 0;
+            const speedBonus = completionTimeMs < (30 * 60000) ? 200 : 0; // 30 minutes
+            const totalXP = baseXP + accuracyBonus + speedBonus;
+            
+            // Update results display
+            document.getElementById('finalScore').textContent = finalScore + '%';
+            document.getElementById('correctAnswers').textContent = `${correctCount}/${questions.length}`;
+            document.getElementById('completionTime').textContent = timeString;
+            document.getElementById('earnedXP').textContent = '+' + totalXP;
+        }
+
+        function returnToTournament() {
+            // Turnuva sayfasına dönerken katılımcı sayısını güncellemek için parametre ekle
+            window.location.href = '/tournament?refresh=true';
+        }
+    </script>
+</body>
+</html>

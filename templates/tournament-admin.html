@@ -229,6 +229,29 @@
                         <p class="text-sm text-gray-400">Bu alana yazdığınız konulara göre AI sorular üretecektir.</p>
                     </div>
 
+                    <!-- Tournament Settings -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <label class="block text-xl font-semibold text-white">
+                                🔢 Soru Sayısı
+                            </label>
+                            <input type="number" name="question_count" min="5" max="50" value="15" required 
+                                   class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400"
+                                   placeholder="15">
+                            <p class="text-sm text-gray-400">Turnuvada kaç soru olacağını belirleyin (5-50 arası)</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <label class="block text-xl font-semibold text-white">
+                                ⏱️ Süre (Dakika)
+                            </label>
+                            <input type="number" name="duration_minutes" min="10" max="180" value="45" required 
+                                   class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400"
+                                   placeholder="45">
+                            <p class="text-sm text-gray-400">Turnuva süresi (10-180 dakika arası)</p>
+                        </div>
+                    </div>
+
                     <!-- Date and Time Selection -->
                     <div class="grid md:grid-cols-2 gap-6">
                         <div class="space-y-4">
@@ -331,6 +354,8 @@
             const data = {
                 title: formData.get('title'),
                 content: formData.get('content'),
+                question_count: parseInt(formData.get('question_count')),
+                duration_minutes: parseInt(formData.get('duration_minutes')),
                 start_time: formData.get('start_time'),
                 end_time: formData.get('end_time')
             };
@@ -517,6 +542,8 @@
                     body: JSON.stringify({
                         title: window.currentTournament.title,
                         content: window.currentTournament.content,
+                        question_count: window.currentTournament.question_count,
+                        duration_minutes: window.currentTournament.duration_minutes,
                         start_time: window.currentTournament.start_time,
                         end_time: window.currentTournament.end_time,
                         questions: updatedQuestions
