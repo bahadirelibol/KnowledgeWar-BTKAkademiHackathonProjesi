@@ -28,31 +28,13 @@
                         <a href="/tournament" class="text-gray-300 hover:text-white transition-colors">Turnuvalar</a>
                     </div>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <!-- Notification Icon -->
-                    <button class="relative p-2 text-gray-400 hover:text-white transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 17h5l-5-5h5M10 19H5l5-5H5m5 0V5a2 2 0 00-2-2H5a2 2 0 00-2 2v9a2 2 0 002 2h3">
-                            </path>
-                        </svg>
-                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-                    </button>
-
-                    <!-- Avatar with Dropdown -->
-                    <div class="relative z-50">
-                        <button id="avatarButton"
-                            class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center neon-glow focus:outline-none relative z-50">
-                            <span class="text-sm font-bold ui-avatar"></span>
-                        </button>
-
-                        <div id="dropdownMenu"
-                            class="fixed top-16 right-14 w-40 bg-gray-800/80 backdrop-blur-md border border-white/10 rounded-xl py-2 shadow-2xl z-[9999] opacity-0 scale-95 pointer-events-none transition-all duration-200">
-                            <a onclick="logout()"
-                                class="block px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors">Logout</a>
-                        </div>
-                    </div>
-                </div>
+                <button
+                  id="logoutBtn"
+                  onclick="logout()"
+                  class="ml-auto text-gray-300 hover:text-red-400 transition-colors font-medium ml-6"
+                >
+                  Çıkış Yap
+                </button>
             </div>
         </div>
     </nav>
@@ -78,21 +60,6 @@
                             </div>
                         </div>
                         <h2 class="text-3xl font-bold neon-text mb-2" id="userName"></h2>
-                        <!-- <p class="text-gray-400 mb-4">Full Stack Developer</p> -->
-                        <div class="flex items-center justify-center space-x-2 text-sm text-gray-400 mb-6">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                </path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            <span>Istanbul, Turkey</span>
-                        </div>
-                        <button
-                            class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-8 rounded-xl neon-glow hover:scale-105 transition-all duration-300 mb-6">
-                            Edit Profile
-                        </button>
                     </div>
 
                     <!-- Stats -->
