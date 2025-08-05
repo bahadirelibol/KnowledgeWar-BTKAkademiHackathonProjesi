@@ -57,6 +57,8 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             content TEXT,
+            question_count INTEGER DEFAULT 15,
+            duration_minutes INTEGER DEFAULT 45,
             start_time DATETIME NOT NULL,
             end_time DATETIME NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -144,8 +146,35 @@ def init_db():
     conn.commit()
     conn.close()
 
+def update_database_schema():
+    """Mevcut veritabanı şemasını güncelle"""
+    try:
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        
+        # Mevcut sütunları kontrol et
+        cursor.execute("PRAGMA table_info(tournaments)")
+        columns = [column[1] for column in cursor.fetchall()]
+        
+        # Eksik sütunları ekle
+        if 'question_count' not in columns:
+            cursor.execute('ALTER TABLE tournaments ADD COLUMN question_count INTEGER DEFAULT 15')
+            print("question_count sütunu eklendi")
+            
+        if 'duration_minutes' not in columns:
+            cursor.execute('ALTER TABLE tournaments ADD COLUMN duration_minutes INTEGER DEFAULT 45')
+            print("duration_minutes sütunu eklendi")
+        
+        conn.commit()
+        conn.close()
+        print("Veritabanı şeması güncellendi")
+        
+    except Exception as e:
+        print(f"Veritabanı güncelleme hatası: {e}")
+
 # Veritabanını başlat
 init_db()
+update_database_schema()
 
 # BTK Akademi entegrasyonu için fonksiyonlar
 def search_btk_courses(query):
