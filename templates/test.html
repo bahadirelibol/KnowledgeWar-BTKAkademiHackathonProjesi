@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Çöz - NEXUS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e5e5e5;
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+
+        .test-btn {
+            background: linear-gradient(45deg, #8b5cf6, #a855f7);
+            border: none;
+            color: white;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+        }
+
+        .test-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .option-btn.selected {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+        }
+
+        .timer {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #8b5cf6, #a855f7);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .cosmic-btn {
+            background: linear-gradient(45deg, #00f5ff, #ff00f5);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cosmic-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 245, 255, 0.3);
+        }
+
+        .topic-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            width: 100%;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .topic-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .topic-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .suggested-topic {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 4px;
+            display: inline-block;
+        }
+
+        .suggested-topic:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-6 py-8">
+        <!-- Header -->
+        <div class="glass-card p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold">📝 Test Çöz</h1>
+                    <p class="text-gray-400" id="testTitle">Konu seçin ve test başlayın</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="timer" id="timeRemaining">--:--</div>
+                    <a href="/roadmap" class="text-gray-400 hover:text-white">← Geri Dön</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topic Selection Section -->
+        <div id="topicSelectionSection" class="glass-card p-8">
+            <div class="text-center mb-8">
+                <div class="text-4xl mb-4">🎯</div>
+                <h2 class="text-2xl font-bold mb-4">Hangi Konuda Test Çözmek İstiyorsunuz?</h2>
+                <p class="text-gray-400 mb-6">Konu başlığını yazın veya önerilen konulardan birini seçin</p>
+            </div>
+
+            <div class="max-w-2xl mx-auto">
+                <div class="mb-6">
+                    <input 
+                        type="text" 
+                        id="topicInput" 
+                        class="topic-input" 
+                        placeholder="Örnek: Git ve GitHub, Python Programlama, JavaScript, HTML CSS..."
+                        maxlength="100"
+                    >
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-4 text-center">Önerilen Konular:</h3>
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <div class="suggested-topic" onclick="selectTopic('Git ve GitHub')">Git ve GitHub</div>
+                        <div class="suggested-topic" onclick="selectTopic('Python Programlama')">Python Programlama</div>
+                        <div class="suggested-topic" onclick="selectTopic('JavaScript')">JavaScript</div>
+                        <div class="suggested-topic" onclick="selectTopic('HTML ve CSS')">HTML ve CSS</div>
+                        <div class="suggested-topic" onclick="selectTopic('React.js')">React.js</div>
+                        <div class="suggested-topic" onclick="selectTopic('Node.js')">Node.js</div>
+                        <div class="suggested-topic" onclick="selectTopic('Veritabanı Yönetimi')">Veritabanı Yönetimi</div>
+                        <div class="suggested-topic" onclick="selectTopic('Siber Güvenlik')">Siber Güvenlik</div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button id="startTestBtn" class="test-btn px-8 py-3" onclick="startTestGeneration()">
+                        🚀 Test Oluştur ve Başla
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="glass-card p-6 mb-8" id="progressSection" style="display: none;">
+            <div class="flex items-center justify-between mb-4">
+                <div class="text-lg font-semibold">
+                    Soru <span id="currentQuestionNum">1</span> / <span id="totalQuestions">5</span>
+                </div>
+                <div class="text-lg font-semibold">
+                    Skor: <span id="currentScore">0</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loadingSection" class="glass-card p-8 text-center" style="display: none;">
+            <div class="text-3xl mb-4">🤖</div>
+            <h2 class="text-2xl font-bold mb-4">Test Hazırlanıyor...</h2>
+            <p class="text-gray-400">Gemini AI <span id="loadingTopic">konu</span> hakkında sorular oluşturuyor</p>
+        </div>
+
+        <!-- Question Section -->
+        <div id="questionSection" class="glass-card p-8" style="display: none;">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-6" id="questionText">Soru yükleniyor...</h2>
+                <div class="space-y-4" id="optionsContainer">
+                    <!-- Options will be loaded here -->
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button id="nextBtn" class="test-btn px-8 py-3" style="display: none;" onclick="nextQuestion()">
+                    Sonraki Soru →
+                </button>
+                <button id="finishBtn" class="test-btn px-8 py-3" style="display: none;" onclick="finishTest()">
+                    Testi Bitir 🏆
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="glass-card p-8 text-center" style="display: none;">
+            <div class="text-6xl mb-4">🎯</div>
+            <h2 class="text-3xl font-bold mb-4">Test Tamamlandı!</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                <div class="glass-card p-4">
+                    <div class="text-2xl font-bold text-green-400" id="finalScore">-</div>
+                    <div class="text-sm text-gray-400">Final Skor</div>
+                </div>
+                <div class="glass-card p-4">
+                    <div class="text-2xl font-bold text-blue-400" id="correctAnswers">-</div>
+                    <div class="text-sm text-gray-400">Doğru Cevap</div>
+                </div>
+                <div class="glass-card p-4">
+                    <div class="text-2xl font-bold text-purple-400" id="completionTime">-</div>
+                    <div class="text-sm text-gray-400">Süre</div>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <button onclick="returnToTopicSelection()" class="cosmic-btn px-8 py-3">
+                    🔄 Yeni Test Çöz
+                </button>
+                <button onclick="returnToRoadmap()" class="cosmic-btn px-8 py-3">
+                    🏠 Roadmap'e Dön
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let startTime = null;
+        let timer = null;
+        let score = 0;
+        let testTopic = '';
+
+        // Initialize test page
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initializeTest();
+        });
+
+        async function initializeTest() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    alert('Giriş yapmanız gerekiyor');
+                    window.location.href = '/login';
+                    return;
+                }
+
+                // Get test topic from URL params if exists
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlTopic = urlParams.get('topic');
+                
+                if (urlTopic) {
+                    document.getElementById('topicInput').value = urlTopic;
+                    testTopic = urlTopic;
+                }
+
+            } catch (error) {
+                console.error('Test initialization error:', error);
+                alert('Test başlatılırken hata oluştu: ' + error.message);
+                window.location.href = '/roadmap';
+            }
+        }
+
+        function selectTopic(topic) {
+            document.getElementById('topicInput').value = topic;
+            testTopic = topic;
+        }
+
+        async function startTestGeneration() {
+            try {
+                const topicInput = document.getElementById('topicInput').value.trim();
+                
+                if (!topicInput) {
+                    alert('Lütfen bir konu başlığı girin');
+                    return;
+                }
+
+                testTopic = topicInput;
+                
+                // Hide topic selection, show loading
+                document.getElementById('topicSelectionSection').style.display = 'none';
+                document.getElementById('loadingSection').style.display = 'block';
+                document.getElementById('loadingTopic').textContent = testTopic;
+                
+                // Update UI
+                document.getElementById('testTitle').textContent = `${testTopic} - Test`;
+                
+                const token = localStorage.getItem('authToken');
+                
+                // Generate questions using Gemini
+                await generateQuestions(token);
+                
+                // Start test
+                startTest();
+
+            } catch (error) {
+                console.error('Test generation error:', error);
+                alert('Test oluşturulurken hata oluştu: ' + error.message);
+                returnToTopicSelection();
+            }
+        }
+
+        async function generateQuestions(token) {
+            try {
+                const response = await fetch('/api/generate-test-questions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        topic: testTopic,
+                        difficulty: 'medium',
+                        count: 5
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Sorular oluşturulamadı');
+                }
+
+                questions = result.questions;
+                userAnswers = new Array(questions.length).fill(null);
+                
+                console.log('Generated questions:', questions);
+                console.log('Questions count:', questions.length);
+
+            } catch (error) {
+                console.error('Error generating questions:', error);
+                throw new Error('Sorular oluşturulurken hata oluştu: ' + error.message);
+            }
+        }
+
+        function startTest() {
+            // Hide loading, show question section and progress
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('questionSection').style.display = 'block';
+            document.getElementById('progressSection').style.display = 'block';
+            
+            // Start timer (15 minutes for 5 questions)
+            startTimer(15 * 60); // 15 minutes in seconds
+            
+            // Start time tracking
+            startTime = new Date();
+            
+            // Show first question
+            showQuestion(0);
+        }
+
+        function startTimer(totalSeconds) {
+            let remainingSeconds = totalSeconds;
+            
+            timer = setInterval(() => {
+                const minutes = Math.floor(remainingSeconds / 60);
+                const seconds = remainingSeconds % 60;
+                
+                document.getElementById('timeRemaining').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (remainingSeconds <= 0) {
+                    clearInterval(timer);
+                    finishTest();
+                    return;
+                }
+                
+                remainingSeconds--;
+            }, 1000);
+        }
+
+        function showQuestion(index) {
+            if (index >= questions.length) {
+                finishTest();
+                return;
+            }
+
+            const question = questions[index];
+            currentQuestionIndex = index;
+            
+            // Update progress
+            document.getElementById('currentQuestionNum').textContent = index + 1;
+            document.getElementById('totalQuestions').textContent = questions.length;
+            const progress = ((index + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Show question
+            document.getElementById('questionText').textContent = question.question;
+            
+            // Show options
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, optionIndex) => {
+                const optionBtn = document.createElement('button');
+                optionBtn.className = 'option-btn w-full';
+                optionBtn.innerHTML = `
+                    <span class="font-bold text-purple-400 mr-3">${String.fromCharCode(65 + optionIndex)}.</span>
+                    ${option}
+                `;
+                optionBtn.onclick = () => selectOption(String.fromCharCode(65 + optionIndex), optionBtn);
+                optionsContainer.appendChild(optionBtn);
+            });
+            
+            // Reset buttons
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('finishBtn').style.display = 'none';
+        }
+
+        function selectOption(selectedOption, buttonElement) {
+            // Remove previous selections
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Mark current selection
+            buttonElement.classList.add('selected');
+            
+            // Store answer
+            userAnswers[currentQuestionIndex] = selectedOption;
+            
+            console.log(`Question ${currentQuestionIndex + 1} answered:`, selectedOption);
+            console.log('Current answers array:', userAnswers);
+            
+            // Show next/finish button
+            if (currentQuestionIndex < questions.length - 1) {
+                document.getElementById('nextBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('finishBtn').style.display = 'inline-block';
+            }
+        }
+
+        function nextQuestion() {
+            showQuestion(currentQuestionIndex + 1);
+        }
+
+        async function finishTest() {
+            try {
+                if (timer) {
+                    clearInterval(timer);
+                }
+
+                let correctCount = 0;
+
+                // Check answers
+                for (let i = 0; i < questions.length; i++) {
+                    if (userAnswers[i] !== null && userAnswers[i] === questions[i].correct_answer) {
+                        correctCount++;
+                    }
+                }
+                
+                console.log('Total correct answers:', correctCount);
+                const finalScore = Math.round((correctCount / questions.length) * 100);
+
+                // Test sonuçlarını göster (veritabanına kaydetme yok)
+                showResults(finalScore, correctCount);
+
+            } catch (error) {
+                console.error('Finish test error:', error);
+                alert('Test tamamlanırken hata oluştu: ' + error.message);
+            }
+        }
+
+        function showResults(finalScore, correctCount) {
+            // Hide question section, show results
+            document.getElementById('questionSection').style.display = 'none';
+            document.getElementById('progressSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'block';
+            
+            // Calculate completion time
+            const endTime = new Date();
+            const completionTimeMs = endTime - startTime;
+            const completionMinutes = Math.floor(completionTimeMs / 60000);
+            const completionSeconds = Math.floor((completionTimeMs % 60000) / 1000);
+            const timeString = `${completionMinutes}:${completionSeconds.toString().padStart(2, '0')}`;
+            
+            // Update results display
+            document.getElementById('finalScore').textContent = finalScore + '%';
+            document.getElementById('correctAnswers').textContent = `${correctCount}/${questions.length}`;
+            document.getElementById('completionTime').textContent = timeString;
+        }
+
+        function returnToTopicSelection() {
+            // Reset everything
+            questions = [];
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            startTime = null;
+            score = 0;
+            testTopic = '';
+            
+            if (timer) {
+                clearInterval(timer);
+            }
+            
+            // Show topic selection, hide everything else
+            document.getElementById('topicSelectionSection').style.display = 'block';
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('questionSection').style.display = 'none';
+            document.getElementById('progressSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'none';
+            
+            // Reset UI
+            document.getElementById('topicInput').value = '';
+            document.getElementById('testTitle').textContent = 'Konu seçin ve test başlayın';
+            document.getElementById('timeRemaining').textContent = '--:--';
+        }
+
+        function returnToRoadmap() {
+            window.location.href = '/roadmap';
+        }
+
+        // Enter key to start test
+        document.getElementById('topicInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                startTestGeneration();
+            }
+        });
+    </script>
+</body>
+</html> 

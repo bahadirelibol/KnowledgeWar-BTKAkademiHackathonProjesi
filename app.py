@@ -98,6 +98,8 @@ def init_db():
         )
     ''')
     
+
+    
     # Kullanıcı cevapları tablosu
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS user_answers (
@@ -398,7 +400,102 @@ def scrape_btk_course_sections(course_url):
         else:
             return ["1. Tanıtım", "2. Temel Kavramlar", "3. Uygulama", "4. Test", "5. Proje"]
 
-def create_dynamic_roadmap(course_title, course_link, sections):
+def generate_project_suggestion(skill, level):
+    """Gemini API ile proje önerisi oluştur"""
+    try:
+        # Gemini API anahtarını kontrol et
+        if GEMINI_API_KEY == "your_gemini_api_key_here":
+            print("UYARI: Gemini API anahtarı ayarlanmamış. Demo proje önerisi döndürülüyor.")
+            return {
+                'title': f"{skill} ile Basit Proje",
+                'description': f"{skill} öğrendiklerinizi pekiştirmek için basit bir proje yapın.",
+                'icon': '🚀',
+                'status': 'locked'
+            }
+        
+        model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        
+        prompt = f"""
+{skill} programlama dili için {level} seviyesinde bir proje önerisi oluştur.
+
+ÖNEMLİ: Yanıtı SADECE JSON formatında ver, başka hiçbir metin ekleme:
+
+{{
+    "title": "Proje başlığı (kısa ve net)",
+    "description": "Proje açıklaması (2-3 cümle, ne yapılacağını açıklasın)",
+    "icon": "Uygun emoji (🚀, 💻, 🎮, 📊, 🌐, 🤖, 📱, 🎨 gibi)",
+    "status": "locked"
+}}
+
+KURALLAR:
+- Proje {level} seviyesinde olmalı (başlangıç/orta/ileri)
+- {skill} ile yapılabilecek pratik bir proje olmalı
+- Başlık kısa ve net olmalı
+- Açıklama 2-3 cümle olmalı
+- Yanıt sadece JSON olmalı, markdown kod bloğu kullanma
+- Başka açıklama ekleme, sadece JSON döndür
+- Tüm tırnak işaretlerinin doğru kapatıldığından emin ol
+- JSON formatının tam ve geçerli olduğundan emin ol
+"""
+        
+        response = model.generate_content(prompt)
+        
+        # JSON parse et
+        import json
+        import re
+        
+        try:
+            response_text = response.text.strip()
+            
+            # Markdown kod bloğu varsa temizle
+            if response_text.startswith('```json'):
+                json_match = re.search(r'```json\s*(.*?)\s*```', response_text, re.DOTALL)
+                if json_match:
+                    response_text = json_match.group(1).strip()
+                else:
+                    response_text = response_text[7:].strip()
+            elif response_text.startswith('```'):
+                json_match = re.search(r'```\s*(.*?)\s*```', response_text, re.DOTALL)
+                if json_match:
+                    response_text = json_match.group(1).strip()
+                else:
+                    response_text = response_text[3:].strip()
+            
+            # JSON'u temizle ve tamamla
+            response_text = clean_and_fix_json(response_text)
+            
+            # JSON parse et
+            result = json.loads(response_text)
+            
+            return {
+                'title': result.get('title', f'{skill} ile Proje'),
+                'description': result.get('description', f'{skill} öğrendiklerinizi pekiştirmek için bir proje yapın.'),
+                'icon': result.get('icon', '🚀'),
+                'status': 'locked'
+            }
+            
+        except json.JSONDecodeError as e:
+            print(f"JSON parse hatası: {e}")
+            print(f"AI yanıtı: {response_text[:200]}...")
+            
+            # JSON parse edilemezse varsayılan proje döndür
+            return {
+                'title': f"{skill} ile Basit Proje",
+                'description': f"{skill} öğrendiklerinizi pekiştirmek için basit bir proje yapın.",
+                'icon': '🚀',
+                'status': 'locked'
+            }
+            
+    except Exception as e:
+        print(f"Proje önerisi oluşturma hatası: {e}")
+        return {
+            'title': f"{skill} ile Proje",
+            'description': f"{skill} öğrendiklerinizi pekiştirmek için bir proje yapın.",
+            'icon': '🚀',
+            'status': 'locked'
+        }
+
+def create_dynamic_roadmap(course_title, course_link, sections, skill=None, level=None):
     """Dinamik yol haritası oluştur"""
     roadmap_steps = []
     
@@ -412,6 +509,19 @@ def create_dynamic_roadmap(course_title, course_link, sections):
             'icon': '📚'
         }
         roadmap_steps.append(step)
+    
+    # En sona proje kartı ekle
+    if skill and level:
+        project_suggestion = generate_project_suggestion(skill, level)
+        project_step = {
+            'id': len(roadmap_steps) + 1,
+            'title': project_suggestion['title'],
+            'description': project_suggestion['description'],
+            'link': '#',
+            'status': project_suggestion['status'],
+            'icon': project_suggestion['icon']
+        }
+        roadmap_steps.append(project_step)
     
     return roadmap_steps
 
@@ -446,6 +556,10 @@ def tournament_admin():
 @app.route('/battle')
 def battle():
     return render_template('battle.html')
+
+@app.route('/test')
+def test():
+    return render_template('test.html')
 
 
 
@@ -768,16 +882,26 @@ def add_course_to_roadmap():
             if not data.get(field):
                 return jsonify({'error': f'{field} alanı gereklidir'}), 400
         
+        # Veritabanı bağlantısını aç
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        
+        # Kullanıcının profil bilgilerini al
+        cursor.execute('''
+            SELECT skill, level FROM user_profiles 
+            WHERE user_id = ? ORDER BY created_at DESC LIMIT 1
+        ''', (payload['user_id'],))
+        
+        profile = cursor.fetchone()
+        skill = profile[0] if profile else None
+        level = profile[1] if profile else None
+        
         # BTK Akademi'den kurs bölümlerini çek
         print(f"BTK Akademi'den bölümler çekiliyor: {data['course_link']}")
         sections = scrape_btk_course_sections(data['course_link'])
         
-        # Dinamik yol haritası oluştur
-        roadmap_steps = create_dynamic_roadmap(data['course_title'], data['course_link'], sections)
-        
-        # Kursu veritabanına kaydet
-        conn = sqlite3.connect('database.db')
-        cursor = conn.cursor()
+        # Dinamik yol haritası oluştur (proje kartı ile birlikte)
+        roadmap_steps = create_dynamic_roadmap(data['course_title'], data['course_link'], sections, skill, level)
         
         cursor.execute('''
             INSERT INTO user_courses (user_id, course_title, course_link, course_description, roadmap_sections)
@@ -864,6 +988,72 @@ def get_user_roadmap():
             })
         
         return jsonify(roadmap_data), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
+
+@app.route('/api/update-user-progress', methods=['POST'])
+def update_user_progress():
+    """Kullanıcının yol haritası ilerlemesini güncelle"""
+    try:
+        # Token kontrolü
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'error': 'Token gereklidir'}), 401
+        
+        token = auth_header.split(' ')[1]
+        
+        try:
+            payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token süresi dolmuş'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Geçersiz token'}), 401
+        
+        data = request.get_json()
+        
+        # Veri doğrulama
+        if 'completed_step' not in data or 'roadmap_steps' not in data:
+            return jsonify({'error': 'completed_step ve roadmap_steps alanları gereklidir'}), 400
+        
+        # Veritabanına kaydet
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        
+        # Kullanıcının en son kursunu bul
+        cursor.execute('''
+            SELECT id, course_title, roadmap_sections
+            FROM user_courses 
+            WHERE user_id = ? 
+            ORDER BY added_at DESC 
+            LIMIT 1
+        ''', (payload['user_id'],))
+        
+        course = cursor.fetchone()
+        if not course:
+            conn.close()
+            return jsonify({'error': 'Kullanıcının aktif kursu bulunamadı'}), 404
+        
+        course_id, course_title, existing_roadmap = course
+        
+        # Mevcut roadmap'i güncelle
+        updated_roadmap = json.dumps(data['roadmap_steps'])
+        
+        cursor.execute('''
+            UPDATE user_courses 
+            SET roadmap_sections = ?
+            WHERE id = ?
+        ''', (updated_roadmap, course_id))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'İlerleme başarıyla kaydedildi',
+            'completed_step': data['completed_step'],
+            'course_title': course_title
+        }), 200
         
     except Exception as e:
         return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
@@ -1135,6 +1325,59 @@ def generate_questions():
         
     except Exception as e:
         return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
+
+@app.route('/api/generate-test-questions', methods=['POST'])
+def generate_test_questions():
+    """Test için soru üret"""
+    try:
+        # Token kontrolü
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'error': 'Token gereklidir'}), 401
+        
+        token = auth_header.split(' ')[1]
+        
+        try:
+            payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token süresi dolmuş'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Geçersiz token'}), 401
+        
+        data = request.get_json()
+        
+        # Veri doğrulama
+        if 'topic' not in data:
+            return jsonify({'error': 'Konu başlığı gereklidir'}), 400
+        
+        topic = data['topic']
+        difficulty = data.get('difficulty', 'medium')
+        count = data.get('count', 5)
+        
+        # Gemini ile test soruları üret
+        questions = generate_questions_with_gemini(topic, count)
+        
+        # Soruları test formatına dönüştür
+        test_questions = []
+        for q in questions:
+            test_questions.append({
+                'question': q['question'],
+                'options': q['options'],
+                'correct_answer': q['correct_option']
+            })
+        
+        return jsonify({
+            'success': True,
+            'questions': test_questions,
+            'topic': topic,
+            'difficulty': difficulty,
+            'count': len(test_questions)
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Test soruları üretme hatası: {str(e)}'}), 500
+
+
 
 @app.route('/api/save-tournament', methods=['POST'])
 def save_tournament():

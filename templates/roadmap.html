@@ -397,6 +397,33 @@
             }
         }
 
+        /* Proje kartı özel stilleri */
+        .step-node.project {
+            background: radial-gradient(circle, #ff6b6b, #ee5a24);
+            animation: projectGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes projectGlow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+                transform: scale(1.1);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(255, 107, 107, 0.8);
+                transform: scale(1.2);
+            }
+        }
+
+        .step-card.project {
+            border: 2px solid rgba(255, 107, 107, 0.3);
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(238, 90, 36, 0.1));
+        }
+
+        .step-card.project:hover {
+            border-color: rgba(255, 107, 107, 0.6);
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(238, 90, 36, 0.2));
+        }
+
         /* Card Status Enhanced */
         .step-card {
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -689,7 +716,7 @@
             <div class="flex items-center justify-between">
                 <!-- Sol Taraf - Logo ve Başlık -->
                 <div class="flex items-center space-x-8">
-                    <div class="text-2xl font-bold hologram-text">NEXUS</div>
+                    <a href="/" class="text-2xl font-bold hologram-text hover:text-cosmic-green transition-colors">NEXUS</a>
                     <div class="hidden md:block w-px h-8 bg-gradient-to-b from-transparent via-white/30 to-transparent">
                     </div>
                     <div class="text-lg font-medium text-gray-300">Galaktik Öğrenme Yolu</div>
@@ -707,9 +734,6 @@
                     </a>
 
                     <!-- Ana Buton -->
-                    <a href="/learn" id="headerLearnBtn" class="cosmic-btn text-base px-6 py-2.5">
-                        📚 Öğren
-                    </a>
                     <a href="/" id="headerLearnBtn" class="cosmic-btn text-base px-6 py-2.5">
                         🏠 Ana sayfa
                     </a>
@@ -724,11 +748,8 @@
     <div class="relative z-10 container mx-auto px-6 py-12">
         <!-- Course Header -->
         <div class="text-center mb-16 fade-in-cosmic">
-            <h1 class="text-5xl md:text-7xl font-bold hologram-text mb-6">
-                GALAKTİK ÖĞRENME YOLU
-            </h1>
             <p class="text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
-                🤖 <span class="neon-text">Yapay Zeka</span> tarafından sizin için özel olarak tasarlanmış
+                 <span class="neon-text">Yapay Zeka</span> tarafından sizin için özel olarak tasarlanmış
                 <span class="text-cosmic-green">kişiselleştirilmiş öğrenme yolu</span>
             </p>
 
@@ -740,6 +761,16 @@
                     </a>
                 </div>
                 <p class="text-gray-400 mt-4 font-mono text-center">4 soru ile kişisel yol haritanı oluştur</p>
+                
+                <!-- Test Çöz Butonu -->
+                <div class="text-center mt-6">
+                    <a href="/test" id="testButton" class="inline-block cosmic-btn text-lg px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                        <span class="flex items-center gap-2">
+                            <span class="text-xl">📝</span>
+                            <span>Test Çöz</span>
+                        </span>
+                    </a>
+                </div>
             </div>
 
             <!-- Cosmic Progress -->
@@ -763,184 +794,39 @@
             <div class="galactic-path"></div>
 
             <!-- Steps -->
-            <div class="space-y-12">
-                <!-- Step 1: Completed Video -->
-                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
+            <div class="space-y-12" id="roadmapStepsContainer">
+                <!-- Step Template (Gizli) -->
+                <div class="grid lg:grid-cols-2 gap-8 items-center fade-in-cosmic step-template" style="display:none;">
                     <div class="lg:text-right order-2 lg:order-1">
-                        <div class="glass-card step-card completed card-3d rounded-3xl p-6">
-                            <div class="step-node completed">
+                        <div class="glass-card step-card card-3d rounded-2xl p-4">
+                            <div class="step-node step-icon">
                                 <span>🎬</span>
                             </div>
-                            <h3 class="text-2xl font-bold mb-4 text-cosmic-green">Örnek kartlar : 1. Python OOP Temelleri</h3>
-                            <p class="text-gray-300 mb-6 leading-relaxed">
-                                Nesne yönelimli programlamanın temel kavramları,
-                                class yapıları ve inheritance prensipleri
+                            <h3 class="text-xl font-bold mb-3 step-title text-cosmic-green">Başlık</h3>
+                            <p class="text-gray-300 mb-4 leading-relaxed text-sm step-description">
+                                Açıklama
                             </p>
-                            <div class="text-center space-y-3">
-                                <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                                    <a href="/learn" target="_blank" id="courseBtn1"
-                                        class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                        🚀 Kursa Git
+                            <div class="text-center space-y-2">
+                                <div class="flex flex-col sm:flex-row gap-2 justify-center">
+                                    <a href="#" target="_blank" class="cosmic-btn text-base px-6 py-2 inline-block step-button">
+                                        🚀 Bölüme Git
                                     </a>
-                                    <button id="completeBtn1" class="cosmic-btn text-lg px-8 py-3 inline-block" 
-                                            style="background: linear-gradient(45deg, #00ff88, #00cc66);">
-                                        ✅ Tamamlandı
+                                    <button class="cosmic-btn text-base px-6 py-2 inline-block step-complete-btn transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                                            style="background: linear-gradient(45deg, #00ff88, #00cc66); box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);">
+                                        <span class="flex items-center gap-2">
+                                            <span class="text-lg">✅</span>
+                                            <span>Tamamlandı</span>
+                                        </span>
                                     </button>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Step 2: Completed Test -->
-                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
-                    <div class="lg:col-start-2 order-2">
-                        <div class="glass-card step-card completed card-3d rounded-3xl p-6">
-                            <div class="step-node completed">
-                                <span>🧠</span>
-                            </div>
-                            <h3 class="text-2xl font-bold mb-4 text-cosmic-green">2. OOP Kavramları Galaktik Testi</h3>
-                            <p class="text-gray-300 mb-6 leading-relaxed">
-                                Class, Object, Inheritance, Polymorphism konularında
-                                10 zorlu soru ile bilgi pekiştirme
-                            </p>
-                            <div class="text-center space-y-3">
-                                <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                                    <a href="/learn" target="_blank" id="courseBtn2"
-                                        class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                        🚀 Teste Git
-                                    </a>
-                                    <button id="completeBtn2" class="cosmic-btn text-lg px-8 py-3 inline-block" 
-                                            style="background: linear-gradient(45deg, #00ff88, #00cc66);">
-                                        ✅ Tamamlandı
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 3: Completed Video -->
-                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
-                    <div class="lg:text-right order-2 lg:order-1">
-                        <div class="glass-card step-card completed card-3d rounded-3xl p-6">
-                            <div class="step-node completed">
-                                <span>🎬</span>
-                            </div>
-                            <h3 class="text-2xl font-bold mb-4 text-cosmic-green">3. Decorators ve Generators</h3>
-                            <p class="text-gray-300 mb-6 leading-relaxed">
-                                Python'un en güçlü özelliklerinden decorators ve
-                                memory-efficient generators kullanımı
-                            </p>
-                            <div class="text-center space-y-3">
-                                <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                                    <a href="/learn" target="_blank"
-                                        id="courseBtn3" class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                        🚀 Kursa Git
-                                    </a>
-                                    <button id="completeBtn3" class="cosmic-btn text-lg px-8 py-3 inline-block" 
-                                            style="background: linear-gradient(45deg, #00ff88, #00cc66);">
-                                        ✅ Tamamlandı
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 4: Current Project -->
-                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
-                    <div class="lg:col-start-2 order-2">
-                        <div class="glass-card step-card current card-3d rounded-3xl p-6">
-                            <div class="step-node current">
-                                <span>💻</span>
-                            </div>
-                            <h3 class="text-2xl font-bold mb-4 text-cosmic-blue">4. Galaktik Kod Laboratuvarı</h3>
-                            <p class="text-gray-300 mb-6 leading-relaxed">
-                                Decorator ve generator konularında pratik kodlama projesi.
-                                Kendi decorator'larınızı yazın ve performance optimizasyonu yapın.
-                            </p>
-                            <div class="text-center space-y-3">
-                                <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                                    <a href="/learn" target="_blank" id="courseBtn4"
-                                        class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                        🚀 Laboratuvara Git
-                                    </a>
-                                    <button id="completeBtn4" class="cosmic-btn text-lg px-8 py-3 inline-block" 
-                                            style="background: linear-gradient(45deg, #00ff88, #00cc66);">
-                                        ✅ Tamamlandı
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 5: Locked Test -->
-                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
-                    <div class="lg:text-right order-2 lg:order-1">
-                        <div class="glass-card step-card locked card-3d rounded-3xl p-6">
-                            <div class="step-node locked">
-                                <span>🔒</span>
-                            </div>
-                            <h3 class="text-2xl font-bold mb-4 text-gray-400">5. Async/Await Master Challenge</h3>
-                            <p class="text-gray-400 mb-6 leading-relaxed">
-                                Asenkron programlama ve concurrent execution konularında
-                                uzman seviye test. Unlocked after project completion.
-                            </p>
-                            <div class="text-center space-y-3">
-                                <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                                    <button id="courseBtn5"
-                                        class="cosmic-btn text-lg px-8 py-3 inline-block opacity-50 cursor-not-allowed"
-                                        disabled>
-                                        🔒 Kilitli
-                                    </button>
-                                    <button id="completeBtn5" class="cosmic-btn text-lg px-8 py-3 inline-block" 
-                                            style="background: linear-gradient(45deg, #00ff88, #00cc66);">
-                                        ✅ Tamamlandı
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 6: Surprise Element -->
-                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
-                    <div class="lg:col-start-2 order-2">
-                        <div class="glass-card step-card surprise card-3d rounded-3xl p-6">
-                            <div class="step-node surprise">
-                                <span>🎁</span>
-                            </div>
-                            <h3 class="text-2xl font-bold mb-4 text-cosmic-orange">6. AI Code Review Challenge</h3>
-                            <p class="text-gray-300 mb-6 leading-relaxed">
-                                Yapay zeka ile birlikte kod review yapın! Algoritmalarınızı
-                                optimize edin ve performance metrikleri analiz edin.
-                            </p>
-                            <div class="text-center space-y-3">
-                                <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                                    <a href="/learn" target="_blank" id="courseBtn6"
-                                        class="cosmic-btn text-lg px-8 py-3 inline-block"
-                                        style="background: linear-gradient(45deg, #ffaa00, #ff6600);">
-                                        🎁 Bonus'u Yakala!
-                                    </a>
-                                    <button id="completeBtn6" class="cosmic-btn text-lg px-8 py-3 inline-block" 
-                                            style="background: linear-gradient(45deg, #00ff88, #00cc66);">
-                                        ✅ Tamamlandı
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        </button>
                     </div>
                 </div>
             </div>
 
 
         </div>
-    </div>
-
-
     </div>
 
     <!-- Footer -->
@@ -1114,208 +1000,274 @@
                     fadeElement.classList.add('visible');
                 }
             });
+            
+            // Test butonunu ayarla
+            const testButton = document.getElementById('testButton');
+            if (testButton) {
+                testButton.href = '/test';
+            }
         }
 
         function updateRoadmapContent(roadmapData) {
-            // Update the roadmap steps with real data
-            const stepsContainer = document.querySelector('.space-y-12');
-            const stepCards = stepsContainer.querySelectorAll('.step-card');
+            const stepsContainer = document.getElementById('roadmapStepsContainer');
+            const stepTemplate = stepsContainer.querySelector('.step-template');
+            // Önce tüm eski kartları temizle (şablon hariç)
+            stepsContainer.innerHTML = '';
+            stepsContainer.appendChild(stepTemplate); // Şablon gizli kalacak
 
-            // Eğer veri yoksa veya boşsa mevcut kartları göster
             if (!roadmapData || !roadmapData.courses || roadmapData.courses.length === 0) {
-                stepCards.forEach(card => {
-                    card.style.display = 'block';
-                    const fadeElement = card.closest('.fade-in-cosmic');
-                    if (fadeElement) {
-                        fadeElement.classList.add('visible');
-                    }
-                });
+                // Hiç veri yoksa test butonunu ayarla
+                const testButton = document.getElementById('testButton');
+                if (testButton) {
+                    testButton.href = '/test';
+                }
                 return;
             }
 
-            if (roadmapData.courses.length > 0) {
-                const course = roadmapData.courses[0]; // İlk kursu al
+            const course = roadmapData.courses[0];
 
-                // Kurs başlığını güncelle
-                const courseTitle = document.querySelector('.hologram-text');
-                if (courseTitle) {
-                    courseTitle.textContent = course.title.toUpperCase();
-                }
-
-                // Dinamik bölümleri göster
-                if (course.roadmap_steps && course.roadmap_steps.length > 0) {
-                    // Mevcut kartları temizle
-                    stepCards.forEach(card => card.style.display = 'none');
-
-                    // Her bölüm için dinamik kart oluştur
-                    course.roadmap_steps.forEach((step, index) => {
-                        let stepCard;
-
-                        // Eğer mevcut kart varsa kullan, yoksa yeni oluştur
-                        if (index < stepCards.length) {
-                            stepCard = stepCards[index];
-                            stepCard.style.display = 'block';
-                        } else {
-                            // Yeni kart oluştur
-                            stepCard = createNewStepCard(step, index);
-                            stepsContainer.appendChild(stepCard);
-                        }
-
-                        // Bölüm başlığını güncelle
-                        const titleElement = stepCard.querySelector('h3');
-                        if (titleElement) titleElement.textContent = step.title;
-
-                        // Açıklamayı güncelle
-                        const descElement = stepCard.querySelector('p');
-                        if (descElement) descElement.textContent = step.description;
-
-                        // Step node'u güncelle
-                        const stepNode = stepCard.querySelector('.step-node');
-                        if (stepNode) {
-                            stepNode.innerHTML = `<span>${step.icon}</span>`;
-                            stepNode.className = `step-node ${step.status}`;
-                        }
-
-                        // Kart durumunu güncelle
-                        stepCard.className = `glass-card step-card ${step.status} card-3d rounded-3xl p-6 fade-in-cosmic`;
-
-                        // Butonu güncelle
-                        const buttonContainer = stepCard.querySelector('.text-center');
-                        if (buttonContainer) {
-                            if (step.status === 'locked') {
-                                buttonContainer.innerHTML = `
-                                    <div class="text-center space-y-3">
-                                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                                            <button class="cosmic-btn text-lg px-8 py-3 inline-block opacity-50 cursor-not-allowed" disabled>
-                                                🔒 Kilitli
-                                            </button>
-                                            <button id="completeBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block" 
-                                                    style="background: linear-gradient(45deg, #00ff88, #00cc66);">
-                                                ✅ Tamamlandı
-                                            </button>
-                                        </div>
-                                    </div>
-                                `;
-                            } else {
-                                buttonContainer.innerHTML = `
-                                    <div class="text-center space-y-3">
-                                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                                            <a href="${step.link}" target="_blank" 
-                                               id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                                🚀 Bölüme Git
-                                            </a>
-                                            <button id="completeBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block" 
-                                                    style="background: linear-gradient(45deg, #00ff88, #00cc66);">
-                                                ✅ Tamamlandı
-                                            </button>
-                                        </div>
-                                    </div>
-                                `;
-                            }
-                        }
-                    });
-
-                    // İlerleme durumunu güncelle
-                    const totalSteps = course.roadmap_steps.length;
-                    const completedSteps = course.roadmap_steps.filter(step => step.status === 'completed').length;
-
-                    document.getElementById('progressText').textContent = `${completedSteps}/${totalSteps} Bölüm Tamamlandı`;
-                    document.getElementById('progressFill').style.width = `${(completedSteps / totalSteps) * 100}%`;
-                    document.getElementById('overallProgress').textContent = `${Math.round((completedSteps / totalSteps) * 100)}%`;
-
-                } else {
-                    // Eski sistem - sadece kurs bilgilerini göster
-                    roadmapData.courses.forEach((course, index) => {
-                        let stepCard;
-
-                        if (index < stepCards.length) {
-                            stepCard = stepCards[index];
-                            stepCard.style.display = 'block';
-                        } else {
-                            stepCard = createNewStepCard(course, index);
-                            stepsContainer.appendChild(stepCard);
-                        }
-
-                        const titleElement = stepCard.querySelector('h3');
-                        const descElement = stepCard.querySelector('p');
-
-                        if (titleElement) titleElement.textContent = course.title;
-                        if (descElement) descElement.textContent = course.description;
-
-                        const stepNode = stepCard.querySelector('.step-node');
-                        if (stepNode) {
-                            stepNode.innerHTML = '<span>📚</span>';
-                            stepNode.className = 'step-node current';
-                        }
-
-                        stepCard.className = 'glass-card step-card current card-3d rounded-3xl p-6 fade-in-cosmic';
-
-                        const buttonContainer = stepCard.querySelector('.text-center');
-                        if (buttonContainer) {
-                            buttonContainer.innerHTML = `
-                                <div class="text-center space-y-3">
-                                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                                        <a href="${course.link}" target="_blank" 
-                                           id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                            🚀 Kursa Git
-                                        </a>
-                                        <button id="completeBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block" 
-                                                style="background: linear-gradient(45deg, #00ff88, #00cc66);">
-                                            ✅ Tamamlandı
-                                        </button>
-                                    </div>
-                                </div>
-                            `;
-                        }
-                    });
-                }
-
-                // Fazla kartları gizle (sadece eski kartlar için)
-                const allStepCards = stepsContainer.querySelectorAll('.step-card');
-                const maxSteps = course.roadmap_steps ? course.roadmap_steps.length : roadmapData.courses.length;
-
-                for (let i = maxSteps; i < stepCards.length; i++) {
-                    if (stepCards[i]) {
-                        stepCards[i].style.display = 'none';
+            if (course.roadmap_steps && course.roadmap_steps.length > 0) {
+                // Proje kartının durumunu kontrol et ve güncelle
+                const steps = course.roadmap_steps;
+                const projectIndex = steps.findIndex(step => 
+                    ['🚀', '💻', '🎮', '📊', '🌐', '🤖', '📱', '🎨'].includes(step.icon)
+                );
+                
+                if (projectIndex !== -1) {
+                    // Proje kartından önceki tüm kartlar tamamlanmış mı kontrol et
+                    const allPreviousCompleted = steps.slice(0, projectIndex).every(step => step.status === 'completed');
+                    if (allPreviousCompleted && steps[projectIndex].status === 'locked') {
+                        steps[projectIndex].status = 'current';
                     }
+                }
+                
+                course.roadmap_steps.forEach((step, index) => {
+                    const card = stepTemplate.cloneNode(true);
+                    card.style.display = '';
+                    card.classList.remove('step-template');
+
+                    // Sıra düzeni (sağ/sol)
+                    const gridDiv = card;
+                    const innerDiv = card.querySelector('div');
+                    if (index % 2 === 0) {
+                        innerDiv.className = 'lg:text-right order-2 lg:order-1';
+                    } else {
+                        innerDiv.className = 'lg:col-start-2 order-2';
+                    }
+
+                    // Kart ana class
+                    const cardDiv = card.querySelector('.step-card');
+                    const isProject = step.icon && ['🚀', '💻', '🎮', '📊', '🌐', '🤖', '📱', '🎨'].includes(step.icon);
+                    cardDiv.className = `glass-card step-card card-3d rounded-2xl p-4 ${step.status}${isProject ? ' project' : ''}`;
+
+                    // İkon
+                    const iconDiv = card.querySelector('.step-node');
+                    iconDiv.innerHTML = `<span>${step.icon || '🎬'}</span>`;
+                    iconDiv.className = `step-node ${step.status} step-icon${isProject ? ' project' : ''}`;
+
+                    // Başlık
+                    const titleEl = card.querySelector('.step-title');
+                    titleEl.textContent = step.title;
+                    // Renk
+                    titleEl.className = `text-xl font-bold mb-3 step-title ${step.status === 'current' ? 'text-cosmic-blue' : step.status === 'surprise' ? 'text-cosmic-orange' : step.status === 'locked' ? 'text-gray-400' : 'text-cosmic-green'}`;
+
+                    // Açıklama
+                    const descEl = card.querySelector('.step-description');
+                    descEl.textContent = step.description;
+                    descEl.className = `text-gray-300 mb-4 leading-relaxed text-sm step-description${step.status === 'locked' ? ' text-gray-400' : ''}`;
+
+                    // Butonlar
+                    const btn = card.querySelector('.step-button');
+                    const completeBtn = card.querySelector('.step-complete-btn');
+                    
+                    if (isProject) {
+                        // Proje kartı için özel butonlar
+                        btn.style.display = '';
+                        btn.href = '#';
+                        btn.innerHTML = '🎯 Projeyi Başlat';
+                        btn.style.background = 'linear-gradient(45deg, #ff6b6b, #ee5a24)';
+                        btn.style.boxShadow = '0 4px 15px rgba(255, 107, 107, 0.3)';
+                        
+                        if (step.status === 'locked') {
+                            completeBtn.innerHTML = '🔒 Önceki Bölümleri Tamamlayın';
+                            completeBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            completeBtn.disabled = true;
+                        } else if (step.status === 'completed') {
+                            completeBtn.innerHTML = `
+                                <span class="flex items-center gap-2">
+                                    <span class="text-lg">🎉</span>
+                                    <span>Proje Tamamlandı!</span>
+                                </span>
+                            `;
+                            completeBtn.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
+                            completeBtn.style.boxShadow = '0 4px 15px rgba(0, 255, 136, 0.3)';
+                            completeBtn.classList.add('opacity-75', 'cursor-not-allowed');
+                            completeBtn.disabled = true;
+                        } else {
+                            completeBtn.innerHTML = `
+                                <span class="flex items-center gap-2">
+                                    <span class="text-lg">✅</span>
+                                    <span>Projeyi Tamamla</span>
+                                </span>
+                            `;
+                            completeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            completeBtn.disabled = false;
+                        }
+                    } else {
+                        // Normal kartlar için mevcut butonlar
+                        if (step.status === 'locked') {
+                            btn.style.display = 'none';
+                            completeBtn.innerHTML = '🔒 Kilitli';
+                            completeBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                            completeBtn.disabled = true;
+                        } else if (step.status === 'completed') {
+                            btn.style.display = '';
+                            btn.href = step.link || '#';
+                            btn.innerHTML = '🚀 Bölüme Git';
+                            completeBtn.innerHTML = `
+                                <span class="flex items-center gap-2">
+                                    <span class="text-lg">🎉</span>
+                                    <span>Tamamlandı!</span>
+                                </span>
+                            `;
+                            completeBtn.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
+                            completeBtn.style.boxShadow = '0 4px 15px rgba(0, 255, 136, 0.3)';
+                            completeBtn.classList.add('opacity-75', 'cursor-not-allowed');
+                            completeBtn.disabled = true;
+                        } else {
+                            btn.style.display = '';
+                            btn.href = step.link || '#';
+                            btn.innerHTML = '🚀 Bölüme Git';
+                            completeBtn.innerHTML = `
+                                <span class="flex items-center gap-2">
+                                    <span class="text-lg">✅</span>
+                                    <span>Tamamlandı</span>
+                                </span>
+                            `;
+                            completeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            completeBtn.disabled = false;
+                        }
+                    }
+
+                    // Tamamlandı butonuna tıklama olayı ekle
+                    completeBtn.addEventListener('click', function(event) {
+                        // Tıklanan butonu hemen güncelle
+                        const clickedButton = event.target;
+                        clickedButton.innerHTML = `
+                            <span class="flex items-center gap-2">
+                                <span class="text-xl animate-pulse">🎉</span>
+                                <span>Tamamlandı!</span>
+                            </span>
+                        `;
+                        clickedButton.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
+                        clickedButton.style.boxShadow = '0 8px 25px rgba(0, 255, 136, 0.5)';
+                        clickedButton.style.transform = 'scale(1.05)';
+                        clickedButton.disabled = true;
+                        clickedButton.classList.add('animate-pulse');
+                        
+                        completeStep(index, course.roadmap_steps);
+                    });
+
+                    stepsContainer.appendChild(card);
+                });
+
+                // İlerleme durumunu güncelle
+                const totalSteps = course.roadmap_steps.length;
+                const completedSteps = course.roadmap_steps.filter(step => step.status === 'completed').length;
+                document.getElementById('progressText').textContent = `${completedSteps}/${totalSteps} Bölüm Tamamlandı`;
+                document.getElementById('progressFill').style.width = `${(completedSteps / totalSteps) * 100}%`;
+                document.getElementById('overallProgress').textContent = `${Math.round((completedSteps / totalSteps) * 100)}%`;
+                
+                // Test butonunu güncelle - dinamik konu başlığı ile
+                const testButton = document.getElementById('testButton');
+                if (testButton && course.title) {
+                    // Test sayfasına yönlendir, konu seçimi orada yapılacak
+                    testButton.href = `/test`;
                 }
             }
         }
 
-        // Yeni step kartı oluşturma fonksiyonu
-        function createNewStepCard(step, index) {
-            const isEven = index % 2 === 0;
-            const cardHTML = `
-                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in-cosmic">
-                    <div class="${isEven ? 'lg:text-right order-2 lg:order-1' : 'lg:col-start-2 order-2'}">
-                        <div class="glass-card step-card card-3d rounded-3xl p-6">
-                            <div class="step-node">
-                                <span>${step.icon || '📚'}</span>
-                            </div>
-                            <h3 class="text-2xl font-bold mb-4">${step.title || 'Yeni Bölüm'}</h3>
-                            <p class="text-gray-300 mb-6 leading-relaxed">
-                                ${step.description || 'Bu bölümün açıklaması burada yer alacak.'}
-                            </p>
-                            <div class="text-center space-y-3">
-                                <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                                    <a href="${step.link || '#'}" target="_blank" 
-                                       id="courseBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block">
-                                        🚀 Bölüme Git
-                                    </a>
-                                    <button id="completeBtn${index + 1}" class="cosmic-btn text-lg px-8 py-3 inline-block" 
-                                            style="background: linear-gradient(45deg, #00ff88, #00cc66);">
-                                        ✅ Tamamlandı
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+        // Bölüm tamamlama fonksiyonu
+        async function completeStep(stepIndex, steps) {
+            try {
+                // Mevcut bölümü tamamlandı olarak işaretle
+                steps[stepIndex].status = 'completed';
+                
+                // Bir sonraki bölümün kilidini aç
+                if (stepIndex + 1 < steps.length) {
+                    steps[stepIndex + 1].status = 'current';
+                }
+                
+                // Proje kartı kontrolü - sadece diğer tüm kartlar tamamlandığında proje kartını aç
+                const isProjectCard = (stepIndex + 1) === steps.length && steps[stepIndex + 1] && 
+                                    ['🚀', '💻', '🎮', '📊', '🌐', '🤖', '📱', '🎨'].includes(steps[stepIndex + 1].icon);
+                
+                if (isProjectCard) {
+                    // Proje kartı için özel kontrol - önceki tüm kartlar tamamlanmış mı?
+                    const allPreviousCompleted = steps.slice(0, stepIndex + 1).every(step => step.status === 'completed');
+                    if (allPreviousCompleted) {
+                        steps[stepIndex + 1].status = 'current';
+                    }
+                }
+                
+                // Veritabanına kaydet
+                const token = localStorage.getItem('authToken');
+                if (token) {
+                    const response = await fetch('/api/update-user-progress', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            completed_step: stepIndex,
+                            roadmap_steps: steps
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        showNotification('İlerleme kaydedildi!', 'success');
+                    } else {
+                        showNotification('İlerleme kaydedilemedi!', 'error');
+                    }
+                }
+                
+                // Kullanıcıya bildirim göster
+                const isProject = steps[stepIndex] && ['🚀', '💻', '🎮', '📊', '🌐', '🤖', '📱', '🎨'].includes(steps[stepIndex].icon);
+                if (isProject) {
+                    showNotification('Proje tamamlandı! Tebrikler! 🎉', 'success');
+                } else {
+                    showNotification('Bölüm tamamlandı! Bir sonraki bölüm açıldı.', 'success');
+                }
+                
+                // Kısa bir gecikme ile kartları güncelle
+                setTimeout(() => {
+                    updateRoadmapContent({ courses: [{ roadmap_steps: steps }] });
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error completing step:', error);
+                showNotification('Bir hata oluştu!', 'error');
+            }
+        }
 
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = cardHTML;
-            return tempDiv.firstElementChild;
+        // Bildirim gösterme fonksiyonu
+        function showNotification(message, type = 'info') {
+            // Basit bir bildirim oluştur
+            const notification = document.createElement('div');
+            let bgColor = 'bg-blue-500';
+            if (type === 'success') bgColor = 'bg-green-500';
+            if (type === 'error') bgColor = 'bg-red-500';
+            
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg text-white font-bold ${bgColor} shadow-lg`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
         }
     </script>
 </body>
