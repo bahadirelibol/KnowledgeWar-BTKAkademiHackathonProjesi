@@ -21,6 +21,16 @@ from bs4 import BeautifulSoup
 import time
 import google.generativeai as genai
 
+# RAG sistemi için gerekli importlar
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_chroma import Chroma
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.chains import create_retrieval_chain
+from langchain_core.prompts import ChatPromptTemplate
+from langchain.chains.combine_documents import create_stuff_documents_chain
+
 # SSL uyarılarını kapat
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -28,6 +38,71 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "your_gemini_api_key_here")
 if GEMINI_API_KEY != "your_gemini_api_key_here":
     genai.configure(api_key=GEMINI_API_KEY)
+
+# RAG sistemi için global değişkenler
+rag_vectorstore = None
+rag_chain = None
+
+def initialize_rag_system():
+    """RAG sistemini başlat"""
+    global rag_vectorstore, rag_chain
+    
+    try:
+        # PDF'den veri yükleme ve parçalama
+        pdf_path = "togu_pdf.pdf"  # PDF dosyanızın adı
+        if os.path.exists(pdf_path):
+            loader = PyPDFLoader(pdf_path)
+            data = loader.load()
+            
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+            docs = text_splitter.split_documents(data)
+            
+            # Embedding ve Vectorstore
+            embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+            rag_vectorstore = Chroma.from_documents(
+                documents=docs,
+                embedding=embeddings,
+                persist_directory="./chroma_db"
+            )
+            
+            retriever = rag_vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 10})
+            
+            # LLM tanımı
+            llm = ChatGoogleGenerativeAI(
+                model="gemini-2.5-flash",
+                temperature=0.3,
+                max_tokens=500
+            )
+            
+            # Sistem promptu ve template
+            system_prompt = (
+                "Sen BTK Akademi'nin AI asistanısın. Kullanıcıların sorularını Türkçe olarak yanıtla.\n"
+                "Aşağıdaki bağlam bilgilerini kullanarak soruları yanıtla.\n"
+                "Eğer cevabı bilmiyorsan, bilmediğini söyle.\n"
+                "Yanıtını 3 cümle ile sınırla ve kısa, öz ve doğru tut.\n\n"
+                "{context}"
+            )
+            
+            prompt_template = ChatPromptTemplate.from_messages([
+                ("system", system_prompt),
+                ("human", "{input}")
+            ])
+            
+            question_answer_chain = create_stuff_documents_chain(llm, prompt_template)
+            rag_chain = create_retrieval_chain(retriever, question_answer_chain)
+            
+            print("RAG sistemi başarıyla başlatıldı!")
+            return True
+        else:
+            print(f"PDF dosyası bulunamadı: {pdf_path}")
+            return False
+            
+    except Exception as e:
+        print(f"RAG sistemi başlatma hatası: {e}")
+        return False
+
+# RAG sistemini başlat
+initialize_rag_system()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'btk-auth-secret-key-2024'
@@ -2500,6 +2575,35 @@ def get_weekly_tournament_calendar():
         
     except Exception as e:
         return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
+
+@app.route('/api/chat', methods=['POST'])
+def chat_with_rag():
+    """RAG sistemi ile sohbet"""
+    try:
+        data = request.get_json()
+        
+        if not data.get('message'):
+            return jsonify({'error': 'Mesaj gereklidir'}), 400
+        
+        if not rag_chain:
+            return jsonify({
+                'response': 'Üzgünüm, AI asistan şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.',
+                'timestamp': datetime.datetime.now().isoformat()
+            }), 200
+        
+        # RAG sistemi ile yanıt al
+        response = rag_chain.invoke({"input": data['message']})
+        
+        return jsonify({
+            'response': response["answer"],
+            'timestamp': datetime.datetime.now().isoformat()
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'response': f'Sorry, bir hata oluştu: {str(e)}',
+            'timestamp': datetime.datetime.now().isoformat()
+        }), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000) 
