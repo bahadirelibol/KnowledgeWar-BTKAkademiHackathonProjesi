@@ -143,9 +143,9 @@
             <!-- Page Title -->
             <div class="text-center mb-12">
                 <h1 class="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent mb-4">
-                    🎯 Kişisel Öğrenme Yol Haritası
+                    Kişisel Öğrenme Yol Haritası
                 </h1>
-                <p class="text-gray-400 text-lg">5 soru ile size özel kurs önerisi alın</p>
+                <p class="text-gray-400 text-lg">4 soru ile size özel kurs önerisi alın</p>
             </div>
 
             <!-- Form Container -->
@@ -194,21 +194,6 @@
                         <input type="text" name="time" required 
                                class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400"
                                placeholder="Örnek: Günde 1 saat, haftada 3 gün, 2 ay...">
-                    </div>
-
-                    <!-- Learning Style Question -->
-                    <div class="space-y-4">
-                        <label class="block text-xl font-semibold text-white">
-                            5. Hangi öğrenme tarzını tercih edersin?
-                        </label>
-                        <select name="learning_style" required 
-                                class="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white input-glow focus:outline-none focus:border-cyan-400">
-                            <option value="">Öğrenme tarzı seçin</option>
-                            <option value="Videolu anlatım">Videolu anlatım</option>
-                            <option value="Uygulamalı görevler">Uygulamalı görevler</option>
-                            <option value="Proje odaklı">Proje odaklı</option>
-                            <option value="Metin ve dökümanla öğrenme">Metin ve dökümanla öğrenme</option>
-                        </select>
                     </div>
 
                     <!-- Submit Button -->
@@ -292,8 +277,7 @@
                 skill: formData.get('skill'),
                 goal: formData.get('goal'),
                 level: formData.get('level'),
-                time: formData.get('time'),
-                learning_style: formData.get('learning_style')
+                time: formData.get('time')
             };
             
             console.log('Sending data:', data);

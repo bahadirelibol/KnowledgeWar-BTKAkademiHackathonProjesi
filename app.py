@@ -249,7 +249,7 @@ def analyze_user_profile(responses):
         return {
             "hedef": f"{responses['skill']} öğrenerek {responses['goal']}",
             "seviye": level_mapping.get(responses['level'], "başlangıç"),
-            "yaklasim": style_mapping.get(responses['learning_style'], "genel öğrenme"),
+            "yaklasim": "genel öğrenme",
             "sure": f"{responses['time']} süreyle",
             "ozel_ihtiyaclar": "Yok"
         }
@@ -649,7 +649,7 @@ def analyze_profile():
         print(f"Received data: {data}")
         
         # Veri doğrulama
-        required_fields = ['skill', 'goal', 'level', 'time', 'learning_style']
+        required_fields = ['skill', 'goal', 'level', 'time']
         for field in required_fields:
             if not data.get(field):
                 print(f"ERROR: Missing field: {field}")
@@ -691,7 +691,7 @@ def analyze_profile():
         cursor.execute('''
             INSERT INTO user_profiles (user_id, skill, goal, level, time_commitment, learning_style)
             VALUES (?, ?, ?, ?, ?, ?)
-        ''', (payload['user_id'], data['skill'], data['goal'], data['level'], data['time'], data['learning_style']))
+        ''', (payload['user_id'], data['skill'], data['goal'], data['level'], data['time'], 'Genel öğrenme'))
         
         conn.commit()
         conn.close()
