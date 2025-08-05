@@ -413,7 +413,7 @@ def generate_project_suggestion(skill, level):
                 'status': 'locked'
             }
         
-        model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         
         prompt = f"""
 {skill} programlama dili için {level} seviyesinde bir proje önerisi oluştur.
@@ -1188,7 +1188,7 @@ def generate_questions_with_gemini(topic, question_count=15):
                 "correct_option": "A"
             }]
         
-        model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         
         prompt = f"""
 {topic} konusu için {question_count} adet çoktan seçmeli soru üret. 
