@@ -1,0 +1,115 @@
+<!-- chatbot.html -->
+<div id="chatbot-container">
+  <!-- Düğme -->
+  <button id="chatbot-toggle"
+    class="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 shadow-xl hover:shadow-2xl text-white text-2xl flex items-center justify-center z-50 transition-all duration-300 hover:scale-110 group">
+    <span class="group-hover:animate-pulse">💬</span>
+  </button>
+
+  <!-- Chat Penceresi -->
+  <div id="chatbot-box"
+    class="hidden fixed bottom-24 right-6 w-96 bg-white/95 backdrop-blur-lg text-gray-800 rounded-2xl shadow-2xl border border-gray-200/50 z-50 overflow-hidden transition-all duration-300 animate-fadeInUp">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-4 relative">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+          <h3 class="font-semibold text-lg">AI Asistan</h3>
+        </div>
+        <button class="text-white/80 hover:text-white transition-colors duration-200 text-xl" onclick="closeChat()">×</button>
+      </div>
+      <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400"></div>
+    </div>
+
+    <!-- Chat Alanı -->
+    <div class="p-5 h-80 overflow-y-auto bg-gradient-to-b from-gray-50/50 to-white/50 scroll-smooth">
+      <div class="space-y-4">
+        <!-- Bot Mesajı -->
+        <div class="flex items-start space-x-3">
+          <div
+            class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+            🤖
+          </div>
+          <div
+            class="bg-white/80 backdrop-blur-sm rounded-2xl rounded-tl-sm px-4 py-3 shadow-md border border-gray-100 max-w-xs">
+            <p class="text-sm text-gray-700">Merhaba! Size nasıl yardımcı olabilirim? 😊</p>
+            <span class="text-xs text-gray-400 mt-1 block">Az önce</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Alanı -->
+    <div class="border-t border-gray-200/50 p-4 bg-white/80 backdrop-blur-sm">
+      <div class="flex items-center space-x-3">
+        <div class="flex-1 relative">
+          <input type="text" placeholder="Mesajınızı yazın..."
+            class="w-full pl-4 pr-12 py-3 bg-gray-50/80 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200 text-sm placeholder-gray-400" />
+          <button
+            class="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white hover:shadow-lg transition-all duration-200 hover:scale-105">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Hızlı Yanıtlar -->
+      <div class="flex flex-wrap gap-2 mt-3">
+        <button
+          class="px-3 py-1 bg-blue-100/80 text-blue-600 rounded-full text-xs hover:bg-blue-200/80 transition-colors duration-200 border border-blue-200/50">
+          Yardım
+        </button>
+        <button
+          class="px-3 py-1 bg-purple-100/80 text-purple-600 rounded-full text-xs hover:bg-purple-200/80 transition-colors duration-200 border border-purple-200/50">
+          Bilgi
+        </button>
+        <button
+          class="px-3 py-1 bg-green-100/80 text-green-600 rounded-full text-xs hover:bg-green-200/80 transition-colors duration-200 border border-green-200/50">
+          İletişim
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fadeInUp {
+    animation: fadeInUp 0.3s ease-out;
+  }
+
+  /* Scrollbar Styling */
+  #chatbot-box .overflow-y-auto::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  #chatbot-box .overflow-y-auto::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  #chatbot-box .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.3);
+    border-radius: 2px;
+  }
+
+  #chatbot-box .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.5);
+  }
+</style>
+
+<script>
+
+</script>

@@ -56,3 +56,6 @@ logs/
 # Temporary files
 *.tmp
 *.temp 
+
+# Database
+database.db
