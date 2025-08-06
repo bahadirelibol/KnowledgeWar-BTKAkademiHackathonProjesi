@@ -52,8 +52,14 @@ def initialize_rag_system():
     global rag_vectorstore, rag_chain
     
     try:
+        # Chroma DB klasörünü otomatik oluştur
+        chroma_dir = "./chroma_db"
+        if not os.path.exists(chroma_dir):
+            os.makedirs(chroma_dir)
+            print(f"Chroma DB klasörü oluşturuldu: {chroma_dir}")
+        
         # PDF'den veri yükleme ve parçalama
-        pdf_path = "togu_pdf.pdf"  # PDF dosyanızın adı
+        pdf_path = "mypdf.pdf"  # PDF dosyanızın adı 
         if os.path.exists(pdf_path):
             loader = PyPDFLoader(pdf_path)
             data = loader.load()
@@ -61,21 +67,25 @@ def initialize_rag_system():
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
             docs = text_splitter.split_documents(data)
             
-            # Embedding ve Vectorstore
-            embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+            # Embedding ve Vectorstore - Gemini API anahtarı ile
+            embeddings = GoogleGenerativeAIEmbeddings(
+                model="models/embedding-001",
+                google_api_key=GEMINI_API_KEY
+            )
             rag_vectorstore = Chroma.from_documents(
                 documents=docs,
                 embedding=embeddings,
-                persist_directory="./chroma_db"
+                persist_directory=chroma_dir
             )
             
             retriever = rag_vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 10})
             
-            # LLM tanımı
+            # LLM tanımı - Gemini API anahtarı ile
             llm = ChatGoogleGenerativeAI(
                 model="gemini-2.5-flash",
                 temperature=0.3,
-                max_tokens=500
+                max_tokens=500,
+                google_api_key=GEMINI_API_KEY
             )
             
             # Sistem promptu ve template
@@ -105,11 +115,14 @@ def initialize_rag_system():
         print(f"RAG sistemi başlatma hatası: {e}")
         return False
 
-# RAG sistemini başlat (hata durumunda devam et)
-try:
-    initialize_rag_system()
-except Exception as e:
-    print(f"RAG sistemi başlatılamadı, uygulama devam ediyor: {e}")
+# RAG sistemini başlat (başarısız olursa uygulama çalışmasın)
+rag_success = initialize_rag_system()
+if not rag_success:
+    print("RAG sistemi başlatılamadı! Uygulama çalışmayacak.")
+    print("Lütfen Google Cloud kimlik doğrulama ayarlarını kontrol edin.")
+    exit(1)
+else:
+    print("RAG sistemi başarıyla başlatıldı, uygulama çalışıyor...")
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'btk-auth-secret-key-2024'
