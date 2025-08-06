@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Turnuva Admin Paneli - BTK</title>
+    <title>KNOWLEDGEWAR - Turnuva Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
@@ -321,7 +321,12 @@
 
             <!-- Existing Tournaments -->
             <div class="glass-card p-8 rounded-3xl mt-8">
-                <h3 class="text-2xl font-bold text-white mb-6">📋 Mevcut Turnuvalar</h3>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-white">📋 Mevcut Turnuvalar</h3>
+                    <button onclick="loadExistingTournaments()" class="text-cosmic-blue hover:text-white transition-colors text-sm px-3 py-1 rounded bg-blue-500/20">
+                        🔄 Yenile
+                    </button>
+                </div>
                 <div id="existingTournaments" class="space-y-4">
                     <!-- Existing tournaments will be loaded here -->
                 </div>
@@ -559,14 +564,18 @@
                 
                 if (result.success) {
                     Swal.fire({
-                    icon: 'warning',
-                    title: 'Uyarı',
-                    text: 'Turnuva başarıyla kaydedildi!',
-                    confirmButtonText: 'Tamam'
-                    }).then(() => {});
-                    return;
-                    loadExistingTournaments();
-                    resetForm();
+                        icon: 'success',
+                        title: 'Başarılı!',
+                        text: 'Turnuva başarıyla kaydedildi!',
+                        confirmButtonText: 'Tamam'
+                    }).then(() => {
+                        // Kısa bir gecikme ile turnuva listesini yenile (veritabanı işleminin tamamlanması için)
+                        setTimeout(() => {
+                            loadExistingTournaments();
+                        }, 500);
+                        // Formu sıfırla
+                        resetForm();
+                    });
                 } else {
                     throw new Error(result.error || 'Turnuva kaydedilirken hata oluştu');
                 }
@@ -664,8 +673,22 @@
 
         async function loadExistingTournaments() {
             try {
+                console.log('Loading existing tournaments...');
                 const token = localStorage.getItem('authToken');
-                if (!token) return;
+                if (!token) {
+                    console.log('No auth token found');
+                    return;
+                }
+
+                // Show loading indicator
+                const container = document.getElementById('existingTournaments');
+                container.innerHTML = `
+                    <div class="text-center text-gray-400 py-8">
+                        <div class="text-3xl mb-4">⏳</div>
+                        <div class="text-lg font-bold mb-2">Turnuvalar Yükleniyor...</div>
+                        <div class="text-sm">Lütfen bekleyin</div>
+                    </div>
+                `;
 
                 const response = await fetch('/api/tournaments', {
                     headers: {
@@ -673,12 +696,15 @@
                     }
                 });
 
+                console.log('Tournaments API response status:', response.status);
                 const result = await response.json();
                 console.log('Loaded tournaments:', result);
                 
                 if (result.success) {
                     const container = document.getElementById('existingTournaments');
                     container.innerHTML = '';
+                    
+                    console.log('Tournament count:', result.tournaments.length);
                     
                     if (result.tournaments.length === 0) {
                         container.innerHTML = `
@@ -729,6 +755,11 @@
                         `;
                         container.appendChild(tournamentCard);
                     });
+                    
+                    console.log('Tournaments loaded successfully');
+                } else {
+                    console.error('API returned error:', result.error);
+                    throw new Error(result.error || 'Turnuvalar yüklenirken hata oluştu');
                 }
             } catch (error) {
                 console.error('Error loading tournaments:', error);
@@ -737,7 +768,7 @@
                     <div class="text-center text-red-400 py-8">
                         <div class="text-3xl mb-4">❌</div>
                         <div class="text-lg font-bold mb-2">Hata Oluştu</div>
-                        <div class="text-sm">Turnuvalar yüklenirken bir hata oluştu.</div>
+                        <div class="text-sm">Turnuvalar yüklenirken bir hata oluştu: ${error.message}</div>
                     </div>
                 `;
             }
@@ -823,14 +854,15 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Başarılı',
-                    text: 'Turnuva silindi',
-                    confirmButtonText: 'Tamam'
-                }).then(() => {});
-                return;
-                    loadExistingTournaments();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Başarılı',
+                        text: 'Turnuva başarıyla silindi!',
+                        confirmButtonText: 'Tamam'
+                    }).then(() => {
+                        // Turnuva listesini yenile
+                        loadExistingTournaments();
+                    });
                 } else {
                     throw new Error(result.error || 'Turnuva silinirken hata oluştu');
                 }

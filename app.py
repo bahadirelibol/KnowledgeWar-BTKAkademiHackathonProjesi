@@ -3,8 +3,7 @@ from flask_cors import CORS
 import sqlite3
 import hashlib
 import jwt
-import datetime
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import requests
 import json
@@ -91,7 +90,7 @@ def initialize_rag_system():
             
             # Sistem promptu ve template
             system_prompt = (
-                "Sen BTK Akademi'nin AI asistanısın. Kullanıcıların sorularını Türkçe olarak yanıtla.\n"
+                "Sen KNOWLEDGEWAR sitesinin AI asistanısın. Kullanıcıların sorularını Türkçe olarak yanıtla.\n"
                 "Aşağıdaki bağlam bilgilerini kullanarak soruları yanıtla.\n"
                 "Eğer cevabı bilmiyorsan, bilmediğini söyle.\n"
                 "Yanıtını 3 cümle ile sınırla ve kısa, öz ve doğru tut.\n\n"
@@ -722,7 +721,7 @@ def register():
         token = jwt.encode({
             'user_id': user_id,
             'email': data['email'],
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
+            'exp': datetime.utcnow() + timedelta(days=7)
         }, app.config['SECRET_KEY'], algorithm='HS256')
         
         return jsonify({
@@ -782,7 +781,7 @@ def login():
         token = jwt.encode({
             'user_id': user[0],
             'email': user[3],
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
+            'exp': datetime.utcnow() + timedelta(days=7)
         }, app.config['SECRET_KEY'], algorithm='HS256')
         
         return jsonify({
@@ -1714,9 +1713,9 @@ def join_tournament():
         
         # Zaman kontrolü (daha esnek)
         try:
-            start_time = datetime.datetime.fromisoformat(tournament[0].replace('Z', '+00:00'))
-            end_time = datetime.datetime.fromisoformat(tournament[1].replace('Z', '+00:00'))
-            current_time = datetime.datetime.now()
+            start_time = datetime.fromisoformat(tournament[0].replace('Z', '+00:00'))
+            end_time = datetime.fromisoformat(tournament[1].replace('Z', '+00:00'))
+            current_time = datetime.now()
             
             # Turnuva bitmişse katılıma izin verme
             if current_time > end_time:
@@ -1857,8 +1856,8 @@ def answer_question():
             conn.close()
             return jsonify({'error': 'Turnuva bulunamadı'}), 404
         
-        end_time = datetime.datetime.fromisoformat(tournament[0].replace('Z', '+00:00'))
-        current_time = datetime.datetime.now()
+        end_time = datetime.fromisoformat(tournament[0].replace('Z', '+00:00'))
+        current_time = datetime.now()
         
         # Turnuva bitmişse cevap vermeye izin verme
         if current_time > end_time:
@@ -2023,7 +2022,7 @@ def get_tournament_results(tournament_id):
             completion_time = "N/A"
             if participant[5]:  # completed_at varsa
                 try:
-                    completed_time = datetime.datetime.fromisoformat(participant[5].replace('Z', '+00:00'))
+                    completed_time = datetime.fromisoformat(participant[5].replace('Z', '+00:00'))
                     # Basit süre hesaplama (gerçek uygulamada daha detaylı olabilir)
                     completion_time = "Tamamlandı"
                 except:
@@ -2095,12 +2094,12 @@ def get_user_tournament_status(tournament_id):
         participant = cursor.fetchone()
         conn.close()
         
-        current_time = datetime.datetime.now()
+        current_time = datetime.now()
         
         # Zaman kontrolü (daha esnek)
         try:
-            start_time = datetime.datetime.fromisoformat(tournament[1].replace('Z', '+00:00'))
-            end_time = datetime.datetime.fromisoformat(tournament[2].replace('Z', '+00:00'))
+            start_time = datetime.fromisoformat(tournament[1].replace('Z', '+00:00'))
+            end_time = datetime.fromisoformat(tournament[2].replace('Z', '+00:00'))
             
             status = {
                 'tournament_id': tournament_id,
@@ -2539,8 +2538,8 @@ def get_tournament_stats(tournament_id):
         highest_score = round(max_score, 1) if max_score else 0
         
         # Kalan süre hesapla
-        now = datetime.datetime.now()
-        end_datetime = datetime.datetime.fromisoformat(end_time.replace('Z', '+00:00'))
+        now = datetime.now()
+        end_datetime = datetime.fromisoformat(end_time.replace('Z', '+00:00'))
         
         if end_datetime > now:
             time_left = end_datetime - now
@@ -2579,10 +2578,10 @@ def get_weekly_tournament_calendar():
         cursor = conn.cursor()
         
         # Bu haftanın başlangıç ve bitiş tarihlerini hesapla
-        now = datetime.datetime.now()
-        start_of_week = now - datetime.timedelta(days=now.weekday())
+        now = datetime.now()
+        start_of_week = now - timedelta(days=now.weekday())
         start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
-        end_of_week = start_of_week + datetime.timedelta(days=7)
+        end_of_week = start_of_week + timedelta(days=7)
         
         # Haftalık günler
         days_of_week = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
@@ -2590,7 +2589,7 @@ def get_weekly_tournament_calendar():
         weekly_calendar = []
         
         for i in range(7):
-            current_date = start_of_week + datetime.timedelta(days=i)
+            current_date = start_of_week + timedelta(days=i)
             day_name = days_of_week[i]
             
             # Bu gün için turnuva var mı kontrol et
@@ -2697,7 +2696,7 @@ def chat_with_rag():
         if not rag_chain:
             return jsonify({
                 'response': 'Üzgünüm, AI asistan şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.',
-                'timestamp': datetime.datetime.now().isoformat()
+                'timestamp': datetime.now().isoformat()
             }), 200
         
         # RAG sistemi ile yanıt al
@@ -2705,13 +2704,13 @@ def chat_with_rag():
         
         return jsonify({
             'response': response["answer"],
-            'timestamp': datetime.datetime.now().isoformat()
+            'timestamp': datetime.now().isoformat()
         }), 200
         
     except Exception as e:
         return jsonify({
             'response': f'Sorry, bir hata oluştu: {str(e)}',
-            'timestamp': datetime.datetime.now().isoformat()
+            'timestamp': datetime.now().isoformat()
         }), 500
 
 @app.route('/api/user-tournament-wins', methods=['GET'])
@@ -2776,7 +2775,7 @@ def get_user_tournament_wins():
             print(f"DEBUG: Turnuva {tournament_id} - {tournament_title} - {correct_answers} doğru - {total_participants} katılımcı")
             
             # Tamamlama tarihini formatla
-            completion_date = datetime.datetime.fromisoformat(completed_at.replace('Z', '+00:00'))
+            completion_date = datetime.fromisoformat(completed_at.replace('Z', '+00:00'))
             formatted_date = completion_date.strftime('%d %B %Y')
             
             wins_list.append({

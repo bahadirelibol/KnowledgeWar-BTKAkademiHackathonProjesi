@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - BTK Auth</title>
+    <title>KNOWLEDGEWAR - Profil</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='profile.css') }}">
 </head>
@@ -21,7 +21,7 @@
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <div class="text-2xl font-black neon-text">ROADMAP</div>
+                    <div class="text-2xl font-black neon-text">KNOWLEDGEWAR</div>
                     <div class="hidden md:flex items-center space-x-6 ml-8">
                         <a href="/" class="text-gray-300 hover:text-white transition-colors">Ana sayfa</a>
                         <a href="/roadmap" class="text-gray-300 hover:text-white transition-colors">Yol Haritası</a>
@@ -103,62 +103,12 @@
                     <div class="mb-6">
                         <h3 class="text-2xl font-bold neon-text">Tamamlanmış Kurslar</h3>
                     </div>
-                    <div class="space-y-4">
-                        <div class="activity-item flex items-center space-x-4 p-4 rounded-xl">
-                            <div
-                                class="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-white font-semibold">Completed JavaScript Advanced Course</p>
-                                <p class="text-gray-400 text-sm">2 hours ago</p>
-                            </div>
-                        </div>
-
-                        <div class="activity-item flex items-center space-x-4 p-4 rounded-xl">
-                            <div
-                                class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-white font-semibold">Earned "React Master" Badge</p>
-                                <p class="text-gray-400 text-sm">1 day ago</p>
-                            </div>
-                        </div>
-
-                        <div class="activity-item flex items-center space-x-4 p-4 rounded-xl">
-                            <div
-                                class="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-white font-semibold">Started Node.js Fundamentals</p>
-                                <p class="text-gray-400 text-sm">3 days ago</p>
-                            </div>
-                        </div>
-
-                        <div class="activity-item flex items-center space-x-4 p-4 rounded-xl">
-                            <div
-                                class="w-10 h-10 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-white font-semibold">Joined "Web Development" Community</p>
-                                <p class="text-gray-400 text-sm">1 week ago</p>
-                            </div>
+                    <div id="completedCoursesContainer" class="space-y-4">
+                        <!-- Tamamlanmış kurslar buraya dinamik olarak yüklenecek -->
+                        <div class="text-center text-gray-400 py-8" id="noCompletedCoursesMessage">
+                            <div class="text-4xl mb-4">🎓</div>
+                            <p class="text-lg font-semibold">Henüz tamamlanmış kursunuz yok</p>
+                            <p class="text-sm">Kursları tamamlayarak burada görünecek!</p>
                         </div>
                     </div>
                 </div>
