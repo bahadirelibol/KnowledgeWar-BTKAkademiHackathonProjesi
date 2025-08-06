@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Öğrenme Yol Haritası - BTK</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         /* Custom scrollbar */
@@ -332,7 +333,13 @@
                 
                 // Show error message
                 const errorMessage = error.message || 'Bilinmeyen bir hata oluştu';
-                alert('Hata: ' + errorMessage);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Uyarı',
+                    text: 'Hata',
+                    confirmButtonText: 'Tamam'
+                })
+                return;
             }
         }
 
@@ -393,7 +400,12 @@
 
         async function addCourseToRoadmap() {
             if (!window.currentCourse) {
-                alert('Önce bir kurs analizi yapın');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Uyarı',
+                    text: 'Lütfen kurs analizi yapınız',
+                    confirmButtonText: 'Tamam'
+                })
                 return;
             }
 
@@ -447,7 +459,13 @@
                 addButton.disabled = false;
                 addButton.classList.remove('opacity-50');
                 
-                alert('Hata: ' + error.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Uyarı',
+                    text: 'Hata',
+                    confirmButtonText: 'Tamam'
+                })
+                return;
             }
         }
 
@@ -462,8 +480,15 @@
         document.addEventListener('DOMContentLoaded', () => {
             const token = localStorage.getItem('authToken');
             if (!token) {
-                alert('Bu sayfayı kullanmak için giriş yapmanız gerekiyor');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Uyarı',
+                text: 'Bu sayfayı kullanmak için giriş yapmanız gerekiyor',
+                confirmButtonText: 'Tamam'
+            }).then(() => {
                 window.location.href = '/login';
+            })
+            return;
             }
         });
     </script>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Çöz - NEXUS</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
@@ -289,8 +290,14 @@
             try {
                 const token = localStorage.getItem('authToken');
                 if (!token) {
-                    alert('Giriş yapmanız gerekiyor');
-                    window.location.href = '/login';
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Giriş yapmanız gerekiyor!',
+                        confirmButtonText: 'Tamam'
+                    }).then(() => {
+                        window.location.href = '/login';
+                    });
                     return;
                 }
 
@@ -305,8 +312,15 @@
 
             } catch (error) {
                 console.error('Test initialization error:', error);
-                alert('Test başlatılırken hata oluştu: ' + error.message);
-                window.location.href = '/roadmap';
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Test başlatılırken hata oluştu!',
+                        confirmButtonText: 'Tamam'
+                    }).then(() => {
+                        window.location.href = '/roadmap';
+                    });
+                    return;
             }
         }
 
@@ -320,7 +334,12 @@
                 const topicInput = document.getElementById('topicInput').value.trim();
                 
                 if (!topicInput) {
-                    alert('Lütfen bir konu başlığı girin');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Lütfen bir konu başlığı girin',
+                        confirmButtonText: 'Tamam'
+                    }).then(() => {});
                     return;
                 }
 
@@ -344,7 +363,13 @@
 
             } catch (error) {
                 console.error('Test generation error:', error);
-                alert('Test oluşturulurken hata oluştu: ' + error.message);
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Test oluşturulurken hata oluştu',
+                        confirmButtonText: 'Tamam'
+                    }).then(() => {});
+                    return;
                 returnToTopicSelection();
             }
         }
@@ -506,7 +531,13 @@
 
             } catch (error) {
                 console.error('Finish test error:', error);
-                alert('Test tamamlanırken hata oluştu: ' + error.message);
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Test tamamlanırken hata oluştu',
+                        confirmButtonText: 'Tamam'
+                    }).then(() => {});
+                    return;
             }
         }
 

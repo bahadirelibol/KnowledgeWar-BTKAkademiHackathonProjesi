@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Turnuva Admin Paneli - BTK</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         /* Custom scrollbar */
@@ -405,7 +406,13 @@
                 
                 // Show error message
                 const errorMessage = error.message || 'Bilinmeyen bir hata oluştu';
-                alert('Hata: ' + errorMessage);
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Uyarı',
+                    text: 'Hata',
+                    confirmButtonText: 'Tamam'
+                }).then(() => {});
+                return;
             }
         }
 
@@ -495,7 +502,12 @@
 
         async function saveTournament() {
             if (!window.currentTournament) {
-                alert('Önce sorular üretin');
+                Swal.fire({
+                icon: 'warning',
+                title: 'Uyarı',
+                text: 'Önce sorular üretin',
+                confirmButtonText: 'Tamam'
+                }).then(() => {});
                 return;
             }
 
@@ -546,7 +558,13 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    alert('Turnuva başarıyla kaydedildi!');
+                    Swal.fire({
+                    icon: 'warning',
+                    title: 'Uyarı',
+                    text: 'Turnuva başarıyla kaydedildi!',
+                    confirmButtonText: 'Tamam'
+                    }).then(() => {});
+                    return;
                     loadExistingTournaments();
                     resetForm();
                 } else {
@@ -555,7 +573,13 @@
 
             } catch (error) {
                 console.error('Error:', error);
-                alert('Hata: ' + error.message);
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Uyarı',
+                    text: 'Hata',
+                    confirmButtonText: 'Tamam'
+                }).then(() => {});
+                return;
             }
         }
 
@@ -768,7 +792,13 @@
 
             } catch (error) {
                 console.error('Error:', error);
-                alert('Hata: ' + error.message);
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Uyarı',
+                    text: 'Hata',
+                    confirmButtonText: 'Tamam'
+                }).then(() => {});
+                return;
             }
         }
 
@@ -793,7 +823,13 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    alert('Turnuva silindi!');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı',
+                    text: 'Turnuva silindi',
+                    confirmButtonText: 'Tamam'
+                }).then(() => {});
+                return;
                     loadExistingTournaments();
                 } else {
                     throw new Error(result.error || 'Turnuva silinirken hata oluştu');
@@ -801,7 +837,13 @@
 
             } catch (error) {
                 console.error('Error:', error);
-                alert('Hata: ' + error.message);
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Uyarı',
+                    text: 'Hata',
+                    confirmButtonText: 'Tamam'
+                }).then(() => {});
+                return;
             }
         }
 
@@ -809,8 +851,15 @@
         document.addEventListener('DOMContentLoaded', () => {
             const token = localStorage.getItem('authToken');
             if (!token) {
-                alert('Bu sayfayı kullanmak için giriş yapmanız gerekiyor');
-                window.location.href = '/login';
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Uyarı',
+                    text: 'Bu sayfayı kullanmak için giriş yapmanı gerekiyor',
+                    confirmButtonText: 'Tamam'
+                }).then(() => {
+                    window.location.href = '/login';
+                });
+                return;
             } else {
                 loadExistingTournaments();
             }

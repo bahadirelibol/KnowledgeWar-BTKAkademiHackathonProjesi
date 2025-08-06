@@ -5,6 +5,7 @@ w<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galactic Tournament Arena - Python Combat Zone</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
@@ -530,8 +531,14 @@ w<!DOCTYPE html>
             try {
                 const token = localStorage.getItem('authToken');
                 if (!token) {
-                    alert('Turnuvaya katılmak için giriş yapmanız gerekiyor');
-                    window.location.href = '/login';
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Turnuvaya katılmak için giriş yapmanız gerekiyor',
+                        confirmButtonText: 'Tamam'
+                    }).then(() => {
+                        window.location.href = '/login';
+                    });
                     return;
                 }
 
@@ -545,7 +552,12 @@ w<!DOCTYPE html>
                 const result = await response.json();
                 
                 if (!result.success || result.tournaments.length === 0) {
-                    alert('Şu anda aktif turnuva bulunmuyor. Admin panelinden turnuva oluşturun.');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Şu anda aktif turnuva bulunmuyor. Admin panelinden turnuva oluşturun.',
+                        confirmButtonText: 'Tamam'
+                    }).then(() => {});
                     return;
                 }
 
@@ -567,7 +579,12 @@ w<!DOCTYPE html>
                     const status = statusResult.status;
                     
                     if (status.is_completed) {
-                        alert('Bu turnuvayı zaten tamamladınız!');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Uyarı',
+                            text: 'Bu turnuvayı zaten tamamladınız!',
+                            confirmButtonText: 'Tamam'
+                        }).then(() => {});
                         await loadTournamentResults();
                         return;
                     }
@@ -587,11 +604,27 @@ w<!DOCTYPE html>
                             const timeDiff = startTime - currentTime;
                             const hours = Math.floor(timeDiff / (1000 * 60 * 60));
                             const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-                            alert(`Turnuva henüz başlamadı! Başlamasına ${hours} saat ${minutes} dakika kaldı.`);
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Uyarı',
+                                text: `Turnuva henüz başlamadı! Başlamasına ${hours} saat ${minutes} dakika kaldı.`,
+                                confirmButtonText: 'Tamam'
+                            }).then(() => {});
+                            return;
                         } else if (currentTime > endTime) {
-                            alert('Turnuva süresi dolmuş!');
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Uyarı',
+                                text: 'Turnuva süresi dolmuş',
+                                confirmButtonText: 'Tamam'
+                            }).then(() => {});
                         } else {
-                            alert('Turnuva şu anda aktif değil!');
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Uyarı',
+                                text: 'Turnuva şu anda aktif değil',
+                                confirmButtonText: 'Tamam'
+                            }).then(() => {});
                         }
                         return;
                     }
@@ -616,12 +649,22 @@ w<!DOCTYPE html>
                     // Başarıyla katıldı, savaş sayfasına yönlendir
                     window.location.href = `/battle?tournament_id=${currentTournament.id}`;
                 } else {
-                    alert(joinResult.error || 'Turnuvaya katılırken hata oluştu');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Turnuvaya katılırken hata oluştu',
+                        confirmButtonText: 'Tamam'
+                    }).then(() => {});
                 }
 
             } catch (error) {
                 console.error('Error:', error);
-                alert('Bir hata oluştu: ' + error.message);
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Bir hata oluştu',
+                        confirmButtonText: 'Tamam'
+                }).then(() => {});
             }
         }
 
@@ -653,12 +696,22 @@ w<!DOCTYPE html>
                     startQuizTimer();
                     showQuestion(0);
                 } else {
-                    alert('Sorular yüklenirken hata oluştu: ' + (result.error || 'Bilinmeyen hata'));
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Sorular yüklenirken hata oluştu',
+                        confirmButtonText: 'Tamam'
+                }).then(() => {});
                 }
 
             } catch (error) {
                 console.error('Error:', error);
-                alert('Sorular yüklenirken hata oluştu: ' + error.message);
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Sorular yüklenirken hata oluştu',
+                        confirmButtonText: 'Tamam'
+                }).then(() => {});
             }
         }
 
@@ -852,7 +905,12 @@ w<!DOCTYPE html>
                     // Sonuçları göster
                     showResults(score, completeResult.correct_answers, timeString, totalXP);
                 } else {
-                    alert(completeResult.error || 'Turnuva tamamlanırken hata oluştu');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Turnuva tamamlanırken hata oluştu',
+                        confirmButtonText: 'Tamam'
+                }).then(() => {});
                 }
                 
                 // Timer'ı durdur
@@ -865,7 +923,12 @@ w<!DOCTYPE html>
                 
             } catch (error) {
                 console.error('Error:', error);
-                alert('Sonuçlar kaydedilirken hata oluştu: ' + error.message);
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Sonuç kaydedilirken hata oluştu',
+                        confirmButtonText: 'Tamam'
+                }).then(() => {});
             }
         }
 
@@ -1041,8 +1104,14 @@ w<!DOCTYPE html>
             try {
                 const token = localStorage.getItem('authToken');
                 if (!token) {
-                    alert('Sonuçları görmek için giriş yapmanız gerekiyor');
-                    window.location.href = '/login';
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Sonuçları görmek için giriş yapmanız gerekiyor',
+                        confirmButtonText: 'Tamam'
+                    }).then(() => {
+                        window.location.href = '/login';
+                    });
                     return;
                 }
 
@@ -1056,7 +1125,12 @@ w<!DOCTYPE html>
                 const result = await response.json();
                 
                 if (!result.success || result.tournaments.length === 0) {
-                    alert('Şu anda aktif turnuva bulunmuyor. Admin panelinden turnuva oluşturun.');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Şu anda aktif turnuva bulunmuyor. Admin panelinden turnuva oluşturun.',
+                        confirmButtonText: 'Tamam'
+                }).then(() => {});
                     return;
                 }
 
@@ -1158,7 +1232,12 @@ w<!DOCTYPE html>
                 
             } catch (error) {
                 console.error('Error:', error);
-                alert('Sonuçlar yüklenirken hata oluştu');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Uyarı',
+                        text: 'Sonuçlar yüklenirken hata oluştu',
+                        confirmButtonText: 'Tamam'
+                }).then(() => {});
             }
         }
 
@@ -1586,7 +1665,12 @@ w<!DOCTYPE html>
         }
 
         function showEmailPreview() {
-            alert('Email önizleme özelliği yakında eklenecek!');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Uyarı',
+                    text: 'Email önizleme özelliği yakında eklenecek!',
+                    confirmButtonText: 'Tamam'
+            }).then(() => {});
         }
 
         // Event listeners - Butonlar onclick ile çalışıyor, event listener'a gerek yok
