@@ -175,20 +175,10 @@ body {
     }
 }
 
-.achievement-badge {
-    animation: badgePulse 3s ease-in-out infinite;
-}
-
-@keyframes badgePulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.05);
-    }
+/* Turnuva kazanım kartları için basit stiller */
+.tournament-win-card {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(255, 165, 0, 0.05) 100%);
+    border: 1px solid rgba(255, 215, 0, 0.2);
 }
 
 .slide-in {

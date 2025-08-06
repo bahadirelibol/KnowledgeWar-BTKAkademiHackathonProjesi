@@ -2637,5 +2637,209 @@ def chat_with_rag():
             'timestamp': datetime.datetime.now().isoformat()
         }), 500
 
+@app.route('/api/user-tournament-wins', methods=['GET'])
+def get_user_tournament_wins():
+    """Kullanıcının kazandığı turnuvaları getir"""
+    try:
+        # Token kontrolü
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'error': 'Token gereklidir'}), 401
+        
+        token = auth_header.split(' ')[1]
+        
+        try:
+            payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token süresi dolmuş'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Geçersiz token'}), 401
+        
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        
+        # Kullanıcının 1. olduğu turnuvaları bul - daha basit sorgu
+        cursor.execute('''
+            SELECT 
+                t.id as tournament_id,
+                t.title as tournament_title,
+                tp.total_score,
+                tp.correct_answers,
+                tp.total_questions,
+                tp.completed_at,
+                (
+                    SELECT COUNT(*) 
+                    FROM tournament_participants tp2 
+                    WHERE tp2.tournament_id = t.id 
+                        AND tp2.completed_at IS NOT NULL
+                ) as total_participants
+            FROM tournament_participants tp
+            JOIN tournaments t ON tp.tournament_id = t.id
+            WHERE tp.user_id = ? 
+                AND tp.completed_at IS NOT NULL
+                AND tp.correct_answers = (
+                    SELECT MAX(correct_answers) 
+                    FROM tournament_participants tp2 
+                    WHERE tp2.tournament_id = tp.tournament_id 
+                        AND tp2.completed_at IS NOT NULL
+                )
+            ORDER BY tp.completed_at DESC
+            LIMIT 4
+        ''', (payload['user_id'],))
+        
+        wins = cursor.fetchall()
+        conn.close()
+        
+        print(f"DEBUG: Kullanıcı {payload['user_id']} için {len(wins)} turnuva kazanımı bulundu")
+        
+        wins_list = []
+        for win in wins:
+            tournament_id, tournament_title, total_score, correct_answers, total_questions, completed_at, total_participants = win
+            
+            print(f"DEBUG: Turnuva {tournament_id} - {tournament_title} - {correct_answers} doğru - {total_participants} katılımcı")
+            
+            # Tamamlama tarihini formatla
+            completion_date = datetime.datetime.fromisoformat(completed_at.replace('Z', '+00:00'))
+            formatted_date = completion_date.strftime('%d %B %Y')
+            
+            wins_list.append({
+                'tournament_id': tournament_id,
+                'tournament_title': tournament_title,
+                'total_score': total_score,
+                'correct_answers': correct_answers,
+                'total_questions': total_questions,
+                'completion_date': formatted_date,
+                'total_participants': total_participants
+            })
+        
+        return jsonify({
+            'success': True,
+            'tournament_wins': wins_list,
+            'total_wins': len(wins_list)
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
+
+@app.route('/api/debug-tournament-data', methods=['GET'])
+def debug_tournament_data():
+    """Debug için turnuva verilerini kontrol et"""
+    try:
+        # Token kontrolü
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'error': 'Token gereklidir'}), 401
+        
+        token = auth_header.split(' ')[1]
+        
+        try:
+            payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token süresi dolmuş'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Geçersiz token'}), 401
+        
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        
+        # Kullanıcının tüm turnuva katılımlarını getir
+        cursor.execute('''
+            SELECT 
+                t.id as tournament_id,
+                t.title as tournament_title,
+                tp.total_score,
+                tp.correct_answers,
+                tp.total_questions,
+                tp.completed_at,
+                tp.joined_at
+            FROM tournament_participants tp
+            JOIN tournaments t ON tp.tournament_id = t.id
+            WHERE tp.user_id = ?
+            ORDER BY tp.completed_at DESC
+        ''', (payload['user_id'],))
+        
+        participations = cursor.fetchall()
+        
+        # Turnuva bazında en yüksek skorları getir
+        cursor.execute('''
+            SELECT 
+                t.id as tournament_id,
+                t.title as tournament_title,
+                MAX(tp.correct_answers) as max_correct,
+                COUNT(tp.id) as total_participants
+            FROM tournaments t
+            LEFT JOIN tournament_participants tp ON t.id = tp.tournament_id
+            WHERE tp.completed_at IS NOT NULL
+            GROUP BY t.id, t.title
+            ORDER BY t.id DESC
+        ''')
+        
+        tournament_stats = cursor.fetchall()
+        
+        conn.close()
+        
+        participations_list = []
+        for p in participations:
+            participations_list.append({
+                'tournament_id': p[0],
+                'tournament_title': p[1],
+                'total_score': p[2],
+                'correct_answers': p[3],
+                'total_questions': p[4],
+                'completed_at': p[5],
+                'joined_at': p[6]
+            })
+        
+        stats_list = []
+        for s in tournament_stats:
+            stats_list.append({
+                'tournament_id': s[0],
+                'tournament_title': s[1],
+                'max_correct': s[2],
+                'total_participants': s[3]
+            })
+        
+        return jsonify({
+            'user_participations': participations_list,
+            'tournament_stats': stats_list
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
+
+@app.route('/api/test-db', methods=['GET'])
+def test_db():
+    """Veritabanındaki turnuva verilerini test et"""
+    try:
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        
+        # Tüm turnuvaları listele
+        cursor.execute('SELECT id, title, status FROM tournaments ORDER BY id DESC LIMIT 5')
+        tournaments = cursor.fetchall()
+        
+        # Tüm katılımları listele
+        cursor.execute('''
+            SELECT tp.id, tp.user_id, tp.tournament_id, tp.correct_answers, tp.total_questions, tp.completed_at, t.title
+            FROM tournament_participants tp
+            JOIN tournaments t ON tp.tournament_id = t.id
+            ORDER BY tp.id DESC LIMIT 10
+        ''')
+        participations = cursor.fetchall()
+        
+        conn.close()
+        
+        return jsonify({
+            'tournaments': [{'id': t[0], 'title': t[1], 'status': t[2]} for t in tournaments],
+            'participations': [{
+                'id': p[0], 'user_id': p[1], 'tournament_id': p[2], 
+                'correct_answers': p[3], 'total_questions': p[4], 
+                'completed_at': p[5], 'tournament_title': p[6]
+            } for p in participations]
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'DB hatası: {str(e)}'}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000) 

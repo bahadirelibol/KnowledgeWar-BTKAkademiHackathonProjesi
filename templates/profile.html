@@ -136,29 +136,15 @@
 
             <!-- Right Column - Main Content -->
             <div class="lg:col-span-2 space-y-6">
-                <!-- Achievements -->
+                <!-- Tournament Wins -->
                 <div class="glass-card rounded-3xl p-8 neon-glow hover-lift slide-in">
-                    <h3 class="text-2xl font-bold neon-text mb-6">Recent Achievements</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div
-                            class="achievement-badge text-center p-4 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-2xl border border-yellow-500/30">
-                            <div class="text-3xl mb-2">🏆</div>
-                            <div class="text-sm font-semibold">First Course</div>
-                        </div>
-                        <div
-                            class="achievement-badge text-center p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl border border-blue-500/30">
-                            <div class="text-3xl mb-2">🚀</div>
-                            <div class="text-sm font-semibold">Speed Learner</div>
-                        </div>
-                        <div
-                            class="achievement-badge text-center p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-2xl border border-green-500/30">
-                            <div class="text-3xl mb-2">💎</div>
-                            <div class="text-sm font-semibold">Perfectionist</div>
-                        </div>
-                        <div
-                            class="achievement-badge text-center p-4 bg-gradient-to-r from-pink-500/20 to-rose-500/20 rounded-2xl border border-pink-500/30">
-                            <div class="text-3xl mb-2">🔥</div>
-                            <div class="text-sm font-semibold">Streak Master</div>
+                    <h3 class="text-2xl font-bold neon-text mb-6">Kazandığım Turnuvalar</h3>
+                    <div id="tournamentWinsContainer" class="space-y-4">
+                        <!-- Turnuva kazanımları buraya dinamik olarak yüklenecek -->
+                        <div class="text-center text-gray-400 py-4" id="noWinsMessage">
+                            <div class="text-2xl mb-2">🏆</div>
+                            <p class="text-sm font-medium">Henüz turnuva kazanmadınız</p>
+                            <p class="text-xs">Turnuvalara katılarak birinci olmaya çalışın!</p>
                         </div>
                     </div>
                 </div>
@@ -367,14 +353,21 @@
             });
 
 
-            // Update UI
-            document.getElementById('userName').textContent = `${user.first_name} ${user.last_name}`;
-            document.getElementById('userFullName').textContent = `${user.first_name} ${user.last_name}`;
-            document.getElementById('userEmail').textContent = user.email;
-            document.getElementById('userInitials').textContent = `${user.first_name[0]}${user.last_name[0]}`;
+            // Update UI - güvenli şekilde
+            const userNameEl = document.getElementById('userName');
+            const userFullNameEl = document.getElementById('userFullName');
+            const userEmailEl = document.getElementById('userEmail');
+            const userInitialsEl = document.getElementById('userInitials');
+            
+            if (userNameEl) userNameEl.textContent = `${user.first_name} ${user.last_name}`;
+            if (userFullNameEl) userFullNameEl.textContent = `${user.first_name} ${user.last_name}`;
+            if (userEmailEl) userEmailEl.textContent = user.email;
+            if (userInitialsEl) userInitialsEl.textContent = `${user.first_name[0]}${user.last_name[0]}`;
 
             // Load additional user data from API
             loadUserProfile();
+            loadTournamentWins();
+            debugTournamentData(); // Debug için
         }
 
         async function loadUserProfile() {
