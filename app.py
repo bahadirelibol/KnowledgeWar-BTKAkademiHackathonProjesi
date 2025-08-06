@@ -33,6 +33,10 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 
 # SSL uyarılarını kapat
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+from dotenv import load_dotenv
+
+# .env dosyasını yükle
+load_dotenv()
 
 # Gemini API konfigürasyonu
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "your_gemini_api_key_here")
@@ -101,8 +105,11 @@ def initialize_rag_system():
         print(f"RAG sistemi başlatma hatası: {e}")
         return False
 
-# RAG sistemini başlat
-initialize_rag_system()
+# RAG sistemini başlat (hata durumunda devam et)
+try:
+    initialize_rag_system()
+except Exception as e:
+    print(f"RAG sistemi başlatılamadı, uygulama devam ediyor: {e}")
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'btk-auth-secret-key-2024'
@@ -1142,11 +1149,16 @@ def clean_and_fix_json(json_text):
     except json.JSONDecodeError as e:
         print(f"JSON temizleme gerekli: {e}")
         
+        # Markdown kod bloğu varsa temizle
+        if json_text.startswith('```'):
+            json_text = re.sub(r'^```(?:json)?\s*', '', json_text)
+            json_text = re.sub(r'\s*```$', '', json_text)
+        
         # Eksik kapanan tırnak işaretlerini düzelt
         lines = json_text.split('\n')
         fixed_lines = []
         
-        for line in lines:
+        for i, line in enumerate(lines):
             # Satırda açık tırnak işareti varsa ve kapanmamışsa
             if '"' in line:
                 quote_count = line.count('"')
@@ -1171,11 +1183,17 @@ def clean_and_fix_json(json_text):
             if not fixed_text.strip().endswith('}'):
                 fixed_text = fixed_text.rstrip().rstrip(',') + '}'
         
-        return fixed_text
+        # Son bir deneme daha
+        try:
+            json.loads(fixed_text)
+            return fixed_text
+        except json.JSONDecodeError:
+            # Hala hata varsa, basit bir JSON yapısı oluştur
+            return '{"questions": []}'
         
     except Exception as e:
         print(f"JSON temizleme hatası: {e}")
-        return json_text
+        return '{"questions": []}'
 
 def extract_questions_from_text(text, topic, max_questions=15):
     """AI yanıtından soruları manuel olarak çıkarır"""
@@ -1266,31 +1284,32 @@ def generate_questions_with_gemini(topic, question_count=15):
         model = genai.GenerativeModel('gemini-2.5-flash')
         
         prompt = f"""
-{topic} konusu için {question_count} adet çoktan seçmeli soru üret. 
-Her soru için 4 şık olmalı (A, B, C, D) ve sadece bir doğru cevap olmalı.
+{topic} konusu için {question_count} adet çoktan seçmeli soru üret.
 
-ÖNEMLİ: Yanıtı SADECE JSON formatında ver, başka hiçbir metin ekleme:
+KURALLAR:
+- Sorular Türkçe olmalı ve tamamen "{topic}" konusu ile ilgili olmalı
+- Her soru için 4 şık olmalı (A, B, C, D) ve sadece bir doğru cevap olmalı
+- Soruların zorluk seviyesi orta düzeyde olsun
+- Her soru net, anlaşılır ve tek doğru cevabı olsun
+- correct_option değeri A, B, C veya D olmalı
 
+YANIT FORMATI - SADECE JSON:
 {{
     "questions": [
         {{
-            "question": "Soru metni",
+            "question": "Soru metni buraya",
             "options": ["A şıkkı", "B şıkkı", "C şıkkı", "D şıkkı"],
             "correct_option": "A"
         }}
     ]
 }}
 
-KURALLAR:
-- Sorular Türkçe olmalı ve tamamen "{topic}" konusu ile ilgili olmalı
-- Soruların zorluk seviyesi orta düzeyde olsun
-- Her soru net, anlaşılır ve tek doğru cevabı olsun
-- Yanıt sadece JSON olmalı, markdown kod bloğu kullanma
-- Başka açıklama ekleme, sadece JSON döndür
-- Tüm tırnak işaretlerinin doğru kapatıldığından emin ol
+ÖNEMLİ:
+- Sadece JSON döndür, markdown kod bloğu kullanma
+- Başka açıklama ekleme
+- Tüm tırnak işaretlerini doğru kapat
 - JSON formatının tam ve geçerli olduğundan emin ol
-- Her soru için 4 seçenek olduğundan emin ol
-- correct_option değeri A, B, C veya D olmalı
+- Her soru için tam 4 seçenek olmalı
 """
         
         response = model.generate_content(prompt)

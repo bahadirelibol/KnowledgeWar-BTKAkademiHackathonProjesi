@@ -59,3 +59,6 @@ logs/
 
 # Database
 database.db
+
+#chroma
+chroma_db/*
