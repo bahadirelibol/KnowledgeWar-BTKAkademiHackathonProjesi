@@ -1,0 +1,11 @@
+KNOWLEDGEWAR Nedir?
+KNOWLEDGEWAR, yapay zeka destekli, kişiselleştirilmiş ve eğlenceli bir dijital öğrenme platformudur. Amacı, geleneksel eğitim anlayışını modern teknolojilerle birleştirerek her yaştan kullanıcıya etkili, motive edici ve özgün bir öğrenme deneyimi sunmaktır.
+
+Neden Farklı?
+Geleneksel eğitim herkese aynı içeriği sunar. KNOWLEDGEWAR ise sizi tanır, öğrenme stilinize göre içerikler önerir, adım adım ilerlemenizi takip eder ve sizi motive eder. Üstelik bunu oyunlaştırma (turnuvalar, rozetler, sıralamalar) ve yapay zeka desteğiyle yapar.
+
+Öne Çıkan Özellikler
+Kişiselleştirilmiş Öğrenme: Yapay zeka ile size özel kurs önerileri ve öğrenme planları
+Oyunlaştırma (Gamification): Turnuvalar, liderlik tabloları ve ödüllerle rekabetçi öğrenme
+Akıllı Asistan: Anında sorularınıza cevap veren yapay zeka destekli sohbet sistemi
+Güçlü Altyapı: Her cihazda çalışan modern ve güvenli sistem

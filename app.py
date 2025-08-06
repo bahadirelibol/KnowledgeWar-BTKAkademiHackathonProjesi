@@ -31,11 +31,11 @@ from langchain.chains import create_retrieval_chain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.combine_documents import create_stuff_documents_chain
 
-# SSL uyarılarını kapat
+# SSL uyarılarını kapatma
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from dotenv import load_dotenv
 
-# .env dosyasını yükle
+# .env dosyasını yükleme
 load_dotenv()
 
 # Gemini API konfigürasyonu
@@ -59,7 +59,7 @@ def initialize_rag_system():
             print(f"Chroma DB klasörü oluşturuldu: {chroma_dir}")
         
         # PDF'den veri yükleme ve parçalama
-        pdf_path = "mypdf.pdf"  # PDF dosyanızın adı 
+        pdf_path = "mypdf.pdf"
         if os.path.exists(pdf_path):
             loader = PyPDFLoader(pdf_path)
             data = loader.load()
@@ -115,7 +115,7 @@ def initialize_rag_system():
         print(f"RAG sistemi başlatma hatası: {e}")
         return False
 
-# RAG sistemini başlat (başarısız olursa uygulama çalışmasın)
+# RAG sistemini başlatma
 rag_success = initialize_rag_system()
 if not rag_success:
     print("RAG sistemi başlatılamadı! Uygulama çalışmayacak.")
@@ -192,9 +192,7 @@ def init_db():
             FOREIGN KEY (tournament_id) REFERENCES tournaments(id)
         )
     ''')
-    
 
-    
     # Kullanıcı cevapları tablosu
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS user_answers (
@@ -251,11 +249,10 @@ def update_database_schema():
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
         
-        # Mevcut sütunları kontrol et
+        
         cursor.execute("PRAGMA table_info(tournaments)")
         columns = [column[1] for column in cursor.fetchall()]
         
-        # Eksik sütunları ekle
         if 'question_count' not in columns:
             cursor.execute('ALTER TABLE tournaments ADD COLUMN question_count INTEGER DEFAULT 15')
             print("question_count sütunu eklendi")
@@ -264,7 +261,6 @@ def update_database_schema():
             cursor.execute('ALTER TABLE tournaments ADD COLUMN duration_minutes INTEGER DEFAULT 45')
             print("duration_minutes sütunu eklendi")
         
-        # user_courses tablosu için sütunları kontrol et
         cursor.execute("PRAGMA table_info(user_courses)")
         user_courses_columns = [column[1] for column in cursor.fetchall()]
         
@@ -283,7 +279,7 @@ def update_database_schema():
     except Exception as e:
         print(f"Veritabanı güncelleme hatası: {e}")
 
-# Veritabanını başlat
+# Veritabanını başlatma
 init_db()
 update_database_schema()
 
@@ -322,7 +318,9 @@ def search_btk_courses(query):
     except Exception as e:
         print(f"BTK arama hatası: {str(e)}")
         return get_demo_courses(query)
+    
 
+    #BTK Akademi'den kurs verisi alınamadığında örnek (demo) kurs verileri döndürmek için kullanılır
 def get_demo_courses(query):
     """Demo kurs verileri döndür"""
     demo_courses = [
@@ -353,7 +351,7 @@ def get_demo_courses(query):
         }
     ]
     
-    # Query'ye göre filtrele
+    # Query'ye göre filtreleme
     filtered_courses = []
     query_lower = query.lower()
     
