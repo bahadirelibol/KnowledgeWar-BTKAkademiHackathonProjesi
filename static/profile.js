@@ -144,3 +144,70 @@ async function debugTournamentData() {
         console.error('Debug verisi yüklenirken hata:', error);
     }
 }
+
+// Aktif kursu yükle
+async function loadActiveCourse() {
+    try {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch('/api/active-course', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Aktif Kurs:', data);
+            const container = document.getElementById('activeCourseContainer');
+            const noCourseMessage = document.getElementById('noActiveCourseMessage');
+
+            if (data.active_course) {
+                // Aktif kurs varsa mesajı gizle ve kursu göster
+                noCourseMessage.style.display = 'none';
+                
+                const course = data.active_course;
+                const progressColor = course.progress_percentage >= 70 ? 'from-green-500 to-emerald-600' : 
+                                    course.progress_percentage >= 40 ? 'from-blue-500 to-purple-600' : 
+                                    'from-yellow-500 to-orange-600';
+                
+                const progressBgColor = course.progress_percentage >= 70 ? 'from-green-500/10 to-emerald-500/10' : 
+                                      course.progress_percentage >= 40 ? 'from-blue-500/10 to-purple-500/10' : 
+                                      'from-yellow-500/10 to-orange-500/10';
+                
+                const progressBorderColor = course.progress_percentage >= 70 ? 'border-green-500/20' : 
+                                          course.progress_percentage >= 40 ? 'border-blue-500/20' : 
+                                          'border-yellow-500/20';
+                
+                const progressTextColor = course.progress_percentage >= 70 ? 'text-green-300' : 
+                                        course.progress_percentage >= 40 ? 'text-blue-300' : 
+                                        'text-yellow-300';
+                
+                const progressBgTextColor = course.progress_percentage >= 70 ? 'bg-green-500/20' : 
+                                          course.progress_percentage >= 40 ? 'bg-blue-500/20' : 
+                                          'bg-yellow-500/20';
+                
+                container.innerHTML = `
+                    <div class="bg-gradient-to-r ${progressBgColor} border ${progressBorderColor} rounded-2xl p-6 hover:scale-105 transition-transform duration-300">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-gradient-to-r ${progressColor} rounded-xl flex items-center justify-center">
+                                <span class="text-xl">📚</span>
+                            </div>
+                            <span class="text-xs ${progressBgTextColor} ${progressTextColor} px-2 py-1 rounded-full">${course.progress_percentage}% Complete</span>
+                        </div>
+                        <h4 class="text-lg font-bold mb-2">${course.title}</h4>
+                        <p class="text-gray-400 text-sm mb-4">${course.completed_steps}/${course.total_steps} adım tamamlandı</p>
+                        <div class="w-full bg-gray-700 rounded-full h-2 mb-4">
+                            <div class="bg-gradient-to-r ${progressColor} h-2 rounded-full" style="width: ${course.progress_percentage}%"></div>
+                        </div>
+                                                 <button onclick="window.location.href='/roadmap'" class="text-blue-400 hover:text-blue-300 font-semibold text-sm transition-colors">Continue →</button>
+                    </div>
+                `;
+            } else {
+                // Aktif kurs yoksa mesajı göster
+                noCourseMessage.style.display = 'block';
+            }
+        }
+    } catch (error) {
+        console.error('Aktif kurs yüklenirken hata:', error);
+    }
+}

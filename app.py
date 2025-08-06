@@ -544,17 +544,20 @@ KURALLAR:
             
             # Markdown kod bloğu varsa temizle
             if response_text.startswith('```json'):
+                # ```json ile başlayıp ``` ile bitenleri bul
                 json_match = re.search(r'```json\s*(.*?)\s*```', response_text, re.DOTALL)
                 if json_match:
                     response_text = json_match.group(1).strip()
                 else:
-                    response_text = response_text[7:].strip()
+                    # ```json varsa ama ``` yoksa, ```json'dan sonrasını al
+                    response_text = response_text[7:].strip()  # ```json kısmını çıkar
             elif response_text.startswith('```'):
+                # Sadece ``` ile başlıyorsa
                 json_match = re.search(r'```\s*(.*?)\s*```', response_text, re.DOTALL)
                 if json_match:
                     response_text = json_match.group(1).strip()
                 else:
-                    response_text = response_text[3:].strip()
+                    response_text = response_text[3:].strip()  # ``` kısmını çıkar
             
             # JSON'u temizle ve tamamla
             response_text = clean_and_fix_json(response_text)
@@ -1133,6 +1136,10 @@ def update_user_progress():
         
         # Mevcut roadmap'i güncelle
         updated_roadmap = json.dumps(data['roadmap_steps'])
+        
+        print(f"DEBUG: Updating roadmap for course {course_id}")
+        print(f"DEBUG: New roadmap data: {data['roadmap_steps']}")
+        print(f"DEBUG: Completed step: {data['completed_step']}")
         
         cursor.execute('''
             UPDATE user_courses 
@@ -2840,6 +2847,101 @@ def test_db():
         
     except Exception as e:
         return jsonify({'error': f'DB hatası: {str(e)}'}), 500
+
+@app.route('/api/active-course', methods=['GET'])
+def get_active_course():
+    """Kullanıcının aktif olarak öğrendiği kursu getir"""
+    try:
+        # Token kontrolü
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'error': 'Token gereklidir'}), 401
+        
+        token = auth_header.split(' ')[1]
+        
+        try:
+            payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token süresi dolmuş'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Geçersiz token'}), 401
+        
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        
+        # Kullanıcının en son eklediği kursu bul (aktif kurs)
+        cursor.execute('''
+            SELECT id, course_title, course_link, roadmap_sections, added_at
+            FROM user_courses 
+            WHERE user_id = ? 
+            ORDER BY added_at DESC 
+            LIMIT 1
+        ''', (payload['user_id'],))
+        
+        course = cursor.fetchone()
+        conn.close()
+        
+        if not course:
+            return jsonify({
+                'active_course': None,
+                'message': 'Henüz aktif bir kursunuz yok'
+            }), 200
+        
+        course_id, course_title, course_link, roadmap_sections, added_at = course
+        
+        # Roadmap bölümlerini parse et
+        roadmap_data = []
+        if roadmap_sections:
+            try:
+                roadmap_data = json.loads(roadmap_sections)
+                print(f"DEBUG: Roadmap data parsed: {roadmap_data}")
+                print(f"DEBUG: Roadmap data type: {type(roadmap_data)}")
+                print(f"DEBUG: Roadmap data length: {len(roadmap_data)}")
+            except json.JSONDecodeError as e:
+                print(f"DEBUG: JSON decode error: {e}")
+                print(f"DEBUG: Raw roadmap_sections: {roadmap_sections}")
+                roadmap_data = []
+        
+        # Tamamlanan adım sayısını hesapla
+        completed_steps = 0
+        total_steps = len(roadmap_data)
+        
+        if roadmap_data:
+            print(f"DEBUG: Processing {total_steps} roadmap steps")
+            for i, section in enumerate(roadmap_data):
+                print(f"DEBUG: Step {i}: {section}")
+                # Hem 'completed' hem de 'isCompleted' hem de 'status' kontrol et
+                is_completed = (section.get('completed', False) or 
+                              section.get('isCompleted', False) or 
+                              section.get('status') == 'completed')
+                print(f"DEBUG: Step {i} completed: {is_completed} (status: {section.get('status')})")
+                if is_completed:
+                    completed_steps += 1
+                    print(f"DEBUG: Completed section: {section.get('title', 'Unknown')}")
+        
+        print(f"DEBUG: Total steps: {total_steps}, Completed: {completed_steps}")
+        
+        # İlerleme yüzdesini hesapla
+        progress_percentage = 0
+        if total_steps > 0:
+            progress_percentage = round((completed_steps / total_steps) * 100)
+        
+        print(f"DEBUG: Progress percentage: {progress_percentage}%")
+        
+        return jsonify({
+            'active_course': {
+                'id': course_id,
+                'title': course_title,
+                'link': course_link,
+                'progress_percentage': progress_percentage,
+                'completed_steps': completed_steps,
+                'total_steps': total_steps,
+                'added_at': added_at
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000) 
