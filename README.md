@@ -450,7 +450,7 @@ python  app.py
   ## **🎬️**Proje Videosu
 Proje videosunu izlemek için:
 
-- [[video](http://www.suleymanyilmaz.me/)]
+- [[video](https://github.com/bahadirelibol/BTK/blob/main/tanitim_video.mp4)]
 
   
   
