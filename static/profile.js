@@ -106,9 +106,9 @@ async function loadTournamentWins() {
                             <div class="flex-1 min-w-0">
                                 <h4 class="text-sm font-semibold text-white truncate">${win.tournament_title}</h4>
                                 <div class="flex items-center space-x-3 text-xs text-gray-300 mt-1">
-                                    <span class="text-green-400">${win.correct_answers}/${win.total_questions}</span>
-                                    <span class="text-blue-400">${win.total_score}%</span>
-                                    <span class="text-purple-400">${win.total_participants} kişi</span>
+                                    <span class="text-green-400">Doğru: ${win.correct_answers}/${win.total_questions}</span>
+                                    <span class="text-blue-400">Başarı: ${win.total_score}%</span>
+                                    <span class="text-purple-400">Katılımcı: ${win.total_participants}</span>
                                 </div>
                             </div>
                         </div>
@@ -142,6 +142,102 @@ async function debugTournamentData() {
         }
     } catch (error) {
         console.error('Debug verisi yüklenirken hata:', error);
+    }
+}
+
+// Tamamlanan kursları yükle
+async function loadCompletedCourses() {
+    try {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch('/api/completed-courses', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Tamamlanan Kurslar:', data);
+            
+            // Recent Activity bölümünü bul
+            const recentActivityCards = document.querySelectorAll('.glass-card');
+            let activityContainer = null;
+            
+            // "Tamamlanmış Kurslar" başlığı olan kartı bul
+            for (let card of recentActivityCards) {
+                const title = card.querySelector('h3');
+                if (title && title.textContent.includes('Tamamlanmış Kurslar')) {
+                    activityContainer = card.querySelector('.space-y-4');
+                    break;
+                }
+            }
+            
+            if (!activityContainer) {
+                console.error('Recent Activity bölümü bulunamadı');
+                return;
+            }
+            
+            if (data.completed_courses && data.completed_courses.length > 0) {
+                // Mevcut statik aktiviteleri temizle
+                activityContainer.innerHTML = '';
+                
+                // Tamamlanan kursları ekle
+                data.completed_courses.forEach((course, index) => {
+                    const activityItem = document.createElement('div');
+                    activityItem.className = 'activity-item flex items-center space-x-4 p-4 rounded-xl';
+                    
+                    activityItem.innerHTML = `
+                        <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-white font-semibold">${course.title} tamamlandı</p>
+                            <p class="text-gray-400 text-sm">${course.time_ago} • ${course.duration} sürdü</p>
+                        </div>
+                    `;
+                    
+                    activityContainer.appendChild(activityItem);
+                });
+                
+                // Eğer 4'ten az kurs varsa, diğer aktiviteleri de ekle
+                if (data.completed_courses.length < 4) {
+                    const remainingSlots = 4 - data.completed_courses.length;
+                    
+                    // Turnuva kazanımları varsa ekle
+                    const tournamentWinsResponse = await fetch('/api/user-tournament-wins', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (tournamentWinsResponse.ok) {
+                        const winsData = await tournamentWinsResponse.json();
+                        if (winsData.tournament_wins && winsData.tournament_wins.length > 0) {
+                            winsData.tournament_wins.slice(0, remainingSlots).forEach((win, index) => {
+                                const activityItem = document.createElement('div');
+                                activityItem.className = 'activity-item flex items-center space-x-4 p-4 rounded-xl';
+                                
+                                activityItem.innerHTML = `
+                                    <div class="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
+                                        <span class="text-white text-lg">🏆</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-white font-semibold">${win.tournament_title} turnuvasını kazandı</p>
+                                        <p class="text-gray-400 text-sm">${win.total_score}% başarı ile</p>
+                                    </div>
+                                `;
+                                
+                                activityContainer.appendChild(activityItem);
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Tamamlanan kurslar yüklenirken hata:', error);
     }
 }
 

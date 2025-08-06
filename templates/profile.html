@@ -62,17 +62,7 @@
                         <h2 class="text-3xl font-bold neon-text mb-2" id="userName"></h2>
                     </div>
 
-                    <!-- Stats -->
-                    <div class="grid grid-cols-2 gap-4 pt-6 border-t border-white/10">
-                        <div class="text-center">
-                            <div class="text-2xl font-bold neon-text stat-counter">156</div>
-                            <div class="text-sm text-gray-400">Completed</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold neon-text stat-counter">42</div>
-                            <div class="text-sm text-gray-400">Certificates</div>
-                        </div>
-                    </div>
+
                 </div>
 
 
@@ -96,7 +86,7 @@
                 <!-- Current Courses -->
                 <div class="glass-card rounded-3xl p-8 neon-glow hover-lift slide-in">
                     <div class="mb-6">
-                        <h3 class="text-2xl font-bold neon-text">Continue Learning</h3>
+                        <h3 class="text-2xl font-bold neon-text">Devam Eden Kurslar</h3>
                     </div>
                     <div id="activeCourseContainer">
                         <!-- Aktif kurs buraya dinamik olarak yüklenecek -->
@@ -110,10 +100,8 @@
 
                 <!-- Activity Feed -->
                 <div class="glass-card rounded-3xl p-8 neon-glow hover-lift slide-in">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-2xl font-bold neon-text">Recent Activity</h3>
-                        <button class="text-blue-400 hover:text-blue-300 text-sm font-semibold transition-colors">View
-                            All</button>
+                    <div class="mb-6">
+                        <h3 class="text-2xl font-bold neon-text">Tamamlanmış Kurslar</h3>
                     </div>
                     <div class="space-y-4">
                         <div class="activity-item flex items-center space-x-4 p-4 rounded-xl">
@@ -275,6 +263,7 @@
             loadUserProfile();
             loadTournamentWins();
             loadActiveCourse();
+            loadCompletedCourses(); // Tamamlanan kursları yükle
             debugTournamentData(); // Debug için
         }
 

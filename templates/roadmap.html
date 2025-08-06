@@ -1089,9 +1089,13 @@
                         // Proje kartı için özel butonlar
                         btn.style.display = '';
                         btn.href = '#';
-                        btn.innerHTML = '🎯 Projeyi Başlat';
+                        btn.innerHTML = '🎯 Öğrenmeyi Bitir';
                         btn.style.background = 'linear-gradient(45deg, #ff6b6b, #ee5a24)';
                         btn.style.boxShadow = '0 4px 15px rgba(255, 107, 107, 0.3)';
+                        btn.onclick = function(event) {
+                            event.preventDefault();
+                            completeProject();
+                        };
                         
                         if (step.status === 'locked') {
                             completeBtn.innerHTML = '🔒 Önceki Bölümleri Tamamlayın';
@@ -1156,21 +1160,26 @@
 
                     // Tamamlandı butonuna tıklama olayı ekle
                     completeBtn.addEventListener('click', function(event) {
-                        // Tıklanan butonu hemen güncelle
-                        const clickedButton = event.target;
-                        clickedButton.innerHTML = `
-                            <span class="flex items-center gap-2">
-                                <span class="text-xl animate-pulse">🎉</span>
-                                <span>Tamamlandı!</span>
-                            </span>
-                        `;
-                        clickedButton.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
-                        clickedButton.style.boxShadow = '0 8px 25px rgba(0, 255, 136, 0.5)';
-                        clickedButton.style.transform = 'scale(1.05)';
-                        clickedButton.disabled = true;
-                        clickedButton.classList.add('animate-pulse');
-                        
-                        completeStep(index, course.roadmap_steps);
+                        if (isProject) {
+                            // Proje kartı için özel tamamlama mantığı
+                            completeProject();
+                        } else {
+                            // Normal kartlar için mevcut mantık
+                            const clickedButton = event.target;
+                            clickedButton.innerHTML = `
+                                <span class="flex items-center gap-2">
+                                    <span class="text-xl animate-pulse">🎉</span>
+                                    <span>Tamamlandı!</span>
+                                </span>
+                            `;
+                            clickedButton.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
+                            clickedButton.style.boxShadow = '0 8px 25px rgba(0, 255, 136, 0.5)';
+                            clickedButton.style.transform = 'scale(1.05)';
+                            clickedButton.disabled = true;
+                            clickedButton.classList.add('animate-pulse');
+                            
+                            completeStep(index, course.roadmap_steps);
+                        }
                     });
 
                     stepsContainer.appendChild(card);
@@ -1252,6 +1261,42 @@
                 
             } catch (error) {
                 console.error('Error completing step:', error);
+                showNotification('Bir hata oluştu!', 'error');
+            }
+        }
+
+        // Proje tamamlama fonksiyonu
+        async function completeProject() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    showNotification('Giriş yapmanız gerekiyor!', 'error');
+                    return;
+                }
+
+                // Kursu tamamlandı olarak işaretle
+                const response = await fetch('/api/complete-course', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showNotification('🎉 Tebrikler! Öğrenme süreciniz tamamlandı!', 'success');
+                    
+                    // 2 saniye sonra sayfayı yenile (sıfırla)
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    const error = await response.json();
+                    showNotification(error.error || 'Bir hata oluştu!', 'error');
+                }
+            } catch (error) {
+                console.error('Proje tamamlama hatası:', error);
                 showNotification('Bir hata oluştu!', 'error');
             }
         }

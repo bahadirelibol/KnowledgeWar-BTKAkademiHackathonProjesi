@@ -4,6 +4,7 @@ import sqlite3
 import hashlib
 import jwt
 import datetime
+from datetime import datetime
 import os
 import requests
 import json
@@ -235,6 +236,8 @@ def init_db():
             course_link TEXT NOT NULL,
             course_description TEXT,
             roadmap_sections TEXT,
+            status TEXT DEFAULT 'active',
+            completed_at TIMESTAMP NULL,
             added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
@@ -261,6 +264,18 @@ def update_database_schema():
         if 'duration_minutes' not in columns:
             cursor.execute('ALTER TABLE tournaments ADD COLUMN duration_minutes INTEGER DEFAULT 45')
             print("duration_minutes sütunu eklendi")
+        
+        # user_courses tablosu için sütunları kontrol et
+        cursor.execute("PRAGMA table_info(user_courses)")
+        user_courses_columns = [column[1] for column in cursor.fetchall()]
+        
+        if 'status' not in user_courses_columns:
+            cursor.execute('ALTER TABLE user_courses ADD COLUMN status TEXT DEFAULT "active"')
+            print("user_courses status sütunu eklendi")
+            
+        if 'completed_at' not in user_courses_columns:
+            cursor.execute('ALTER TABLE user_courses ADD COLUMN completed_at TIMESTAMP NULL')
+            print("user_courses completed_at sütunu eklendi")
         
         conn.commit()
         conn.close()
@@ -1045,10 +1060,10 @@ def get_user_roadmap():
         
         profile = cursor.fetchone()
         
-        # Kurslar
+        # Kurslar (sadece aktif olanlar)
         cursor.execute('''
             SELECT course_title, course_link, course_description, roadmap_sections, added_at
-            FROM user_courses WHERE user_id = ? ORDER BY added_at DESC
+            FROM user_courses WHERE user_id = ? AND status = 'active' ORDER BY added_at DESC
         ''', (payload['user_id'],))
         
         courses = cursor.fetchall()
@@ -1155,6 +1170,61 @@ def update_user_progress():
             'message': 'İlerleme başarıyla kaydedildi',
             'completed_step': data['completed_step'],
             'course_title': course_title
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
+
+@app.route('/api/complete-course', methods=['POST'])
+def complete_course():
+    """Kullanıcının kursunu tamamlandı olarak işaretle"""
+    try:
+        # Token kontrolü
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'error': 'Token gereklidir'}), 401
+        
+        token = auth_header.split(' ')[1]
+        
+        try:
+            payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token süresi dolmuş'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Geçersiz token'}), 401
+        
+        # Veritabanına kaydet
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        
+        # Kullanıcının en son kursunu bul
+        cursor.execute('''
+            SELECT id FROM user_courses 
+            WHERE user_id = ? AND status = 'active'
+            ORDER BY added_at DESC 
+            LIMIT 1
+        ''', (payload['user_id'],))
+        
+        course = cursor.fetchone()
+        if not course:
+            conn.close()
+            return jsonify({'error': 'Tamamlanacak aktif kurs bulunamadı'}), 404
+        
+        course_id = course[0]
+        
+        # Kursu tamamlandı olarak işaretle
+        cursor.execute('''
+            UPDATE user_courses 
+            SET status = 'completed', completed_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        ''', (course_id,))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Kurs başarıyla tamamlandı! Tebrikler!'
         }), 200
         
     except Exception as e:
@@ -2848,6 +2918,94 @@ def test_db():
     except Exception as e:
         return jsonify({'error': f'DB hatası: {str(e)}'}), 500
 
+@app.route('/api/completed-courses', methods=['GET'])
+def get_completed_courses():
+    """Kullanıcının tamamladığı kursları getir"""
+    try:
+        # Token kontrolü
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'error': 'Token gereklidir'}), 401
+        
+        token = auth_header.split(' ')[1]
+        
+        try:
+            payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token süresi dolmuş'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Geçersiz token'}), 401
+        
+        # Veritabanından tamamlanan kursları getir
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT course_title, completed_at, added_at
+            FROM user_courses 
+            WHERE user_id = ? AND status = 'completed'
+            ORDER BY completed_at DESC
+            LIMIT 10
+        ''', (payload['user_id'],))
+        
+        completed_courses = []
+        for row in cursor.fetchall():
+            course_title, completed_at, added_at = row
+            
+            # Tarih formatını düzenle
+            completed_date = datetime.fromisoformat(completed_at) if completed_at else None
+            added_date = datetime.fromisoformat(added_at) if added_at else None
+            
+            # Ne kadar sürede tamamlandığını hesapla
+            duration = None
+            if completed_date and added_date:
+                duration = completed_date - added_date
+                duration_days = duration.days
+                duration_hours = duration.seconds // 3600
+                
+                if duration_days > 0:
+                    duration_text = f"{duration_days} gün"
+                elif duration_hours > 0:
+                    duration_text = f"{duration_hours} saat"
+                else:
+                    duration_text = "1 saatten az"
+            else:
+                duration_text = "Bilinmiyor"
+            
+            # Ne kadar zaman önce tamamlandığını hesapla
+            if completed_date:
+                now = datetime.now()
+                time_diff = now - completed_date
+                
+                if time_diff.days > 0:
+                    time_ago = f"{time_diff.days} gün önce"
+                elif time_diff.seconds > 3600:
+                    hours = time_diff.seconds // 3600
+                    time_ago = f"{hours} saat önce"
+                elif time_diff.seconds > 60:
+                    minutes = time_diff.seconds // 60
+                    time_ago = f"{minutes} dakika önce"
+                else:
+                    time_ago = "Az önce"
+            else:
+                time_ago = "Bilinmiyor"
+            
+            completed_courses.append({
+                'title': course_title,
+                'completed_at': completed_at,
+                'time_ago': time_ago,
+                'duration': duration_text
+            })
+        
+        conn.close()
+        
+        return jsonify({
+            'completed_courses': completed_courses
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Sunucu hatası: {str(e)}'}), 500
+
 @app.route('/api/active-course', methods=['GET'])
 def get_active_course():
     """Kullanıcının aktif olarak öğrendiği kursu getir"""
@@ -2869,11 +3027,11 @@ def get_active_course():
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
         
-        # Kullanıcının en son eklediği kursu bul (aktif kurs)
+        # Kullanıcının en son eklediği aktif kursu bul
         cursor.execute('''
             SELECT id, course_title, course_link, roadmap_sections, added_at
             FROM user_courses 
-            WHERE user_id = ? 
+            WHERE user_id = ? AND status = 'active'
             ORDER BY added_at DESC 
             LIMIT 1
         ''', (payload['user_id'],))
